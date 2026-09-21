@@ -87,7 +87,7 @@ class MenuButtonCommands(MenuButton):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=MenuButton.COMMANDS)
+    type: str = tg_field(compare=True, init=False, default=MenuButton.COMMANDS)
 
 
 @tg_dataclass()

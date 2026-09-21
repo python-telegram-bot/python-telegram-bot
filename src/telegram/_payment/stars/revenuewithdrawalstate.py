@@ -83,7 +83,7 @@ class RevenueWithdrawalStatePending(RevenueWithdrawalState):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=RevenueWithdrawalState.PENDING)
+    type: str = tg_field(compare=True, init=False, default=RevenueWithdrawalState.PENDING)
 
 
 @tg_dataclass()
@@ -125,4 +125,4 @@ class RevenueWithdrawalStateFailed(RevenueWithdrawalState):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=RevenueWithdrawalState.FAILED)
+    type: str = tg_field(compare=True, init=False, default=RevenueWithdrawalState.FAILED)

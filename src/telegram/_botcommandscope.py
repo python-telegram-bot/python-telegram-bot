@@ -110,7 +110,7 @@ class BotCommandScopeDefault(BotCommandScope):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=BotCommandScope.DEFAULT)
+    type: str = tg_field(compare=True, init=False, default=BotCommandScope.DEFAULT)
 
 
 @tg_dataclass()
@@ -124,7 +124,7 @@ class BotCommandScopeAllPrivateChats(BotCommandScope):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=BotCommandScope.ALL_PRIVATE_CHATS)
+    type: str = tg_field(compare=True, init=False, default=BotCommandScope.ALL_PRIVATE_CHATS)
 
 
 @tg_dataclass()
@@ -136,7 +136,7 @@ class BotCommandScopeAllGroupChats(BotCommandScope):
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.ALL_GROUP_CHATS`.
     """
 
-    type: str = tg_field(init=False, default=BotCommandScope.ALL_GROUP_CHATS)
+    type: str = tg_field(compare=True, init=False, default=BotCommandScope.ALL_GROUP_CHATS)
 
 
 @tg_dataclass()
@@ -149,7 +149,7 @@ class BotCommandScopeAllChatAdministrators(BotCommandScope):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=BotCommandScope.ALL_CHAT_ADMINISTRATORS)
+    type: str = tg_field(compare=True, init=False, default=BotCommandScope.ALL_CHAT_ADMINISTRATORS)
 
 
 @tg_dataclass()

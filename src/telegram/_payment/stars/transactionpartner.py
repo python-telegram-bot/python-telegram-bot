@@ -191,7 +191,7 @@ class TransactionPartnerFragment(TransactionPartner):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=TransactionPartner.FRAGMENT)
+    type: str = tg_field(compare=True, init=False, default=TransactionPartner.FRAGMENT)
     # Optional
     withdrawal_state: "RevenueWithdrawalState | None" = tg_field(default=None)
 
@@ -343,7 +343,7 @@ class TransactionPartnerOther(TransactionPartner):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=TransactionPartner.OTHER)
+    type: str = tg_field(compare=True, init=False, default=TransactionPartner.OTHER)
 
 
 @tg_dataclass()
@@ -358,7 +358,7 @@ class TransactionPartnerTelegramAds(TransactionPartner):
     """
 
     # Attribute only (init=False)
-    type: str = tg_field(init=False, default=TransactionPartner.TELEGRAM_ADS)
+    type: str = tg_field(compare=True, init=False, default=TransactionPartner.TELEGRAM_ADS)
 
 
 @tg_dataclass()

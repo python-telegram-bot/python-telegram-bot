@@ -97,7 +97,7 @@ class ChatBoostSource(TelegramObject):
     def _source_converter(value: str) -> str:
         return enum.get_member(constants.ChatBoostSources, value, value)
 
-    source: str = tg_field(compare=True, default=None, converter=_source_converter)
+    source: str = tg_field(compare=True, converter=_source_converter)
 
 
 @tg_dataclass()
@@ -118,7 +118,7 @@ class ChatBoostSourcePremium(ChatBoostSource):
     """
 
     # Attribute only (init=False)
-    source: str = tg_field(init=False, default=ChatBoostSource.PREMIUM)
+    source: str = tg_field(compare=True, init=False, default=ChatBoostSource.PREMIUM)
 
     user: User = tg_field()
 
@@ -142,7 +142,7 @@ class ChatBoostSourceGiftCode(ChatBoostSource):
     """
 
     # Attribute only (init=False)
-    source: str = tg_field(init=False, default=ChatBoostSource.GIFT_CODE)
+    source: str = tg_field(compare=True, init=False, default=ChatBoostSource.GIFT_CODE)
 
     user: User = tg_field()
 
@@ -184,7 +184,7 @@ class ChatBoostSourceGiveaway(ChatBoostSource):
     """
 
     # Attribute only (init=False)
-    source: str = tg_field(init=False, default=ChatBoostSource.GIVEAWAY)
+    source: str = tg_field(compare=True, init=False, default=ChatBoostSource.GIVEAWAY)
 
     giveaway_message_id: int = tg_field()
     user: User | None = tg_field(default=None)

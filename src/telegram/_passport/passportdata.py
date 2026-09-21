@@ -63,10 +63,8 @@ class PassportData(TelegramObject):
 
     """
 
-    data: tuple[EncryptedPassportElement, ...] = tg_field(
-        compare=True, converter=parse_sequence_arg
-    )
-    credentials: EncryptedCredentials = tg_field(compare=True)
+    data: tuple[EncryptedPassportElement, ...] = tg_field(converter=parse_sequence_arg)
+    credentials: EncryptedCredentials = tg_field()
 
     # Attribute only (init=False)
     _decrypted_data: tuple[EncryptedPassportElement, ...] | None = tg_field(

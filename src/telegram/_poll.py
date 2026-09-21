@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram Poll."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING, ClassVar, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._chat import Chat
@@ -289,12 +289,12 @@ class PollOption(TelegramObject):
         """
         return parse_message_entities(self.text, self.text_entities, types)
 
-    MIN_LENGTH: Final[int] = constants.PollLimit.MIN_OPTION_LENGTH
+    MIN_LENGTH: ClassVar[int] = constants.PollLimit.MIN_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MIN_OPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_LENGTH: Final[int] = constants.PollLimit.MAX_OPTION_LENGTH
+    MAX_LENGTH: ClassVar[int] = constants.PollLimit.MAX_OPTION_LENGTH
     """:const:`telegram.constants.PollLimit.MAX_OPTION_LENGTH`
 
     .. versionadded:: 20.0

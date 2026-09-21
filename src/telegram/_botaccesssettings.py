@@ -48,4 +48,6 @@ class BotAccessSettings(TelegramObject):
     """
 
     is_access_restricted: bool = tg_field(compare=True)
-    added_users: tuple[User, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    added_users: tuple[User, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
+    )

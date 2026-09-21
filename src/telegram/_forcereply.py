@@ -80,7 +80,7 @@ class ForceReply(TelegramObject):
     # Attribute only (init=False)
     force_reply: bool = tg_field(init=False, default=True)
 
-    selective: bool | None = tg_field(compare=True)
+    selective: bool | None = tg_field(compare=True, default=None)
     input_field_placeholder: str | None = tg_field(default=None)
 
     MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
