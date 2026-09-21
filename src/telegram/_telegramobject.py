@@ -47,7 +47,7 @@ Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
 _DATETIME_FIELD = object()  # Sentinel that marks datetime fields in the de_json plan.
 
 
-@tg_dataclass(eq=False)
+@tg_dataclass()
 class TelegramObject:
     """Base class for most Telegram objects.
 
