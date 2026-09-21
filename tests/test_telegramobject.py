@@ -475,6 +475,58 @@ class TestTelegramObject:
         assert b == a
         assert len(recwarn) == 0
 
+    def test_hash_without_comparison_fields_uses_identity(self, recwarn):
+        @tg_dataclass()
+        class TGO(TelegramObject):
+            arg: str = tg_field(compare=False)
+
+        a = TGO("test")
+        b = TGO("test")
+        assert a == b
+
+        ab_set = {a, b}
+        assert len(ab_set) == 2
+
+        ab_dict = {
+            a: "a",
+            b: "b",
+        }
+        assert ab_dict[a] == "a"
+        assert ab_dict[b] == "b"
+
+    def test_hash_with_comparison_fields_uses_field_values(self, recwarn):
+        @tg_dataclass()
+        class TGO(TelegramObject):
+            arg: str = tg_field(compare=True)
+
+        a = TGO("test")
+        b = TGO("test")
+        assert a == b
+
+        ab_set = {a, b}
+        assert len(ab_set) == 1
+
+        ab_dict = {
+            a: 1,
+            b: 2,
+        }
+        assert ab_dict[a] == 2
+        assert ab_dict[b] == 2
+        assert len(ab_dict) == 1
+
+        c = TGO("not test")
+
+        ac_set = {a, c}
+        assert len(ac_set) == 2
+
+        ac_dict = {
+            a: 1,
+            c: 3,
+        }
+        assert ac_dict[a] == 1
+        assert ac_dict[c] == 3
+        assert len(ac_dict) == 2
+
     def test_bot_instance_none(self):
         tg_object = TelegramObject()
         with pytest.raises(RuntimeError):

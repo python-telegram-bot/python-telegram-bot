@@ -224,8 +224,11 @@ def tg_dataclass(
             )
 
             def __hash__(self: object) -> int:
-                values = tuple(getattr(self, name) for name in compare_fields)
-                return hash((self.__class__, values))
+                if compare_fields:
+                    values = tuple(getattr(self, name) for name in compare_fields)
+                    return hash((self.__class__, values))
+
+                return object.__hash__(self)
 
             transformed_cls.__hash__ = __hash__  # type: ignore[method-assign]
 
