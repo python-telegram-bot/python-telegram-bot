@@ -58,10 +58,6 @@ class InvalidCallbackData(TelegramError):
     Args:
         callback_data (:obj:`int`, optional): The button data of which the callback data could not
             be found.
-
-    Attributes:
-        callback_data (:obj:`int`): Optional. The button data of which the callback data could not
-            be found.
     """
 
     __slots__ = ("callback_data",)
@@ -142,15 +138,10 @@ class CallbackDataCache:
         bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
         maxsize (:obj:`int`, optional): Maximum number of items in each of the internal mappings.
             Defaults to ``1024``.
-
         persistent_data (tuple[list[tuple[:obj:`str`, :obj:`float`, \
         dict[:obj:`str`, :class:`object`]]], dict[:obj:`str`, :obj:`str`]], optional): \
         Data to initialize the cache with, as returned by \
         :meth:`telegram.ext.BasePersistence.get_callback_data`.
-
-    Attributes:
-        bot (:class:`telegram.ext.ExtBot`): The bot this cache is for.
-
     """
 
     __slots__ = ("_callback_queries", "_keyboard_data", "_maxsize", "bot")

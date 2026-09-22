@@ -37,12 +37,6 @@ class Birthdate(TelegramObject):
         day (:obj:`int`): Day of the user's birth; 1-31.
         month (:obj:`int`): Month of the user's birth; 1-12.
         year (:obj:`int`, optional): Year of the user's birth.
-
-    Attributes:
-        day (:obj:`int`): Day of the user's birth; 1-31.
-        month (:obj:`int`): Month of the user's birth; 1-12.
-        year (:obj:`int`): Optional. Year of the user's birth.
-
     """
 
     __slots__ = ("day", "month", "year")

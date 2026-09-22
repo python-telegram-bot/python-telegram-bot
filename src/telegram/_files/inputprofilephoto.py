@@ -42,10 +42,6 @@ class InputProfilePhoto(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the profile photo.
-
-    Attributes:
-        type (:obj:`str`): Type of the profile photo.
-
     """
 
     STATIC = constants.InputProfilePhotoType.STATIC

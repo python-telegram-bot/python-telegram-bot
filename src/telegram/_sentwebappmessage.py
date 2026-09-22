@@ -34,11 +34,6 @@ class SentWebAppMessage(TelegramObject):
         inline_message_id (:obj:`str`, optional): Identifier of the sent inline message. Available
             only if there is an :attr:`inline keyboard <telegram.InlineKeyboardMarkup>` attached to
             the message.
-
-    Attributes:
-        inline_message_id (:obj:`str`): Optional. Identifier of the sent inline message. Available
-            only if there is an :attr:`inline keyboard <telegram.InlineKeyboardMarkup>` attached to
-            the message.
     """
 
     __slots__ = ("inline_message_id",)

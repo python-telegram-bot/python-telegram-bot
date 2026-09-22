@@ -52,22 +52,12 @@ class Location(TelegramObject):
             approaching another chat member, in meters. For sent live locations only.
 
     Attributes:
-        longitude (:obj:`float`): Longitude as defined by the sender.
-        latitude (:obj:`float`): Latitude as defined by the sender.
-        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Time relative to the
             message sending date, during which the location can be updated, in seconds. For active
             live locations only.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        heading (:obj:`int`): Optional. The direction in which user is moving, in degrees;
-            :tg-const:`telegram.Location.MIN_HEADING`-:tg-const:`telegram.Location.MAX_HEADING`.
-            For active live locations only.
-        proximity_alert_radius (:obj:`int`): Optional. Maximum distance for proximity alerts about
-            approaching another chat member, in meters. For sent live locations only.
-
     """
 
     __slots__ = (

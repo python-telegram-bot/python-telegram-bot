@@ -33,10 +33,6 @@ class PaidMessagePriceChanged(TelegramObject):
     Args:
         paid_message_star_count (:obj:`int`): The new number of Telegram Stars that must be paid by
             non-administrator users of the supergroup chat for each sent message
-
-    Attributes:
-        paid_message_star_count (:obj:`int`): The new number of Telegram Stars that must be paid by
-            non-administrator users of the supergroup chat for each sent message
     """
 
     __slots__ = ("paid_message_star_count",)

@@ -737,8 +737,8 @@ class ApplicationBuilder(Generic[BT, CCT, UD, CD, BD, JQ]):
         .. versionadded:: 20.7
 
         Args:
-            proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): The URL to a proxy server,
-                a ``httpx.Proxy`` object or a ``httpx.URL`` object. See
+            get_updates_proxy (:obj:`str` | ``httpx.Proxy`` | ``httpx.URL``): The URL to a
+                proxy server, a ``httpx.Proxy`` object or a ``httpx.URL`` object. See
                 :paramref:`telegram.request.HTTPXRequest.proxy` for more information.
 
         Returns:
