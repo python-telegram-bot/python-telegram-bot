@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``PicklePersistence`` re-reading from disk on every call to ``get_user_data``, ``get_chat_data``, ``get_bot_data``, and ``get_conversations`` when the in-memory data was loaded but empty."
+[[pull_requests]]
+uid = ""
+author_uids = ["leoca"]
+closes_threads = []
