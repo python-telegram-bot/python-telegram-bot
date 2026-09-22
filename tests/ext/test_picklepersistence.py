@@ -1000,6 +1000,23 @@ class TestPicklePersistence:
         assert isinstance(await persistence.get_bot_data(), bd)
         assert await persistence.get_bot_data() == 1
 
+    @pytest.mark.parametrize("single_file", [True, False])
+    async def test_get_methods_use_empty_cache(
+        self, pickle_persistence, good_pickle_files, single_file
+    ):
+        pickle_persistence.single_file = single_file
+        # Simulate already-loaded-but-empty state (e.g. after all entries were dropped).
+        # The getters must use the in-memory {} instead of re-reading stale data from disk.
+        pickle_persistence.user_data = {}
+        pickle_persistence.chat_data = {}
+        pickle_persistence.bot_data = {}
+        pickle_persistence.conversations = {}
+
+        assert await pickle_persistence.get_user_data() == {}
+        assert await pickle_persistence.get_chat_data() == {}
+        assert await pickle_persistence.get_bot_data() == {}
+        assert await pickle_persistence.get_conversations("name1") == {}
+
     async def test_no_write_if_data_did_not_change(
         self, pickle_persistence, bot_data, user_data, chat_data, conversations, callback_data
     ):
