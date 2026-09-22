@@ -28,7 +28,6 @@ from telegram import (
     InputPollOption,
     LivePhoto,
     Location,
-    MaybeInaccessibleMessage,
     MessageEntity,
     PhotoSize,
     Poll,
@@ -42,6 +41,7 @@ from telegram import (
     Venue,
     Video,
 )
+from telegram._message import Message
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from telegram.warnings import PTBDeprecationWarning
@@ -796,7 +796,7 @@ def poll_option_added():
 
 
 class PollOptionAddedTestBase:
-    poll_message = MaybeInaccessibleMessage(
+    poll_message = Message(
         message_id=1,
         date=dtm.datetime.now(dtm.timezone.utc),
         chat=Chat(1, "test_chat"),
@@ -870,9 +870,7 @@ class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
             option_text_entities=self.option_text_entities,
         )
         c = PollOptionAdded(
-            poll_message=MaybeInaccessibleMessage(
-                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
-            ),
+            poll_message=Message(2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")),
             option_persistent_id=self.option_persistent_id,
             option_text=self.option_text,
             option_text_entities=self.option_text_entities,
@@ -908,7 +906,7 @@ def poll_option_deleted():
 
 
 class PollOptionDeletedTestBase:
-    poll_message = MaybeInaccessibleMessage(
+    poll_message = Message(
         message_id=1,
         date=dtm.datetime.now(dtm.timezone.utc),
         chat=Chat(1, "test_chat"),
@@ -986,9 +984,7 @@ class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
             option_text_entities=self.option_text_entities,
         )
         c = PollOptionDeleted(
-            poll_message=MaybeInaccessibleMessage(
-                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
-            ),
+            poll_message=Message(2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")),
             option_persistent_id=self.option_persistent_id,
             option_text=self.option_text,
             option_text_entities=self.option_text_entities,
