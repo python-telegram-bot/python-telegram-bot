@@ -43,7 +43,6 @@ from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
 from telegram._utils.types import ODVInput
 from telegram.ext import PicklePersistence
-from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
 from tests.conftest import unfrozen
 
@@ -449,31 +448,25 @@ class TestTelegramObject:
         assert "default_none" not in to_dict
         assert to_dict["default_false"] is False
 
-    def test_meaningless_comparison(self, recwarn):
-        expected_warning = "Objects of type TGO can not be meaningfully tested for equivalence."
-
-        class TGO(TelegramObject):
+    def test_comparison(self):
+        @tg_dataclass()
+        class EmptyTGO(TelegramObject):
             pass
 
-        a = TGO()
-        b = TGO()
-        assert a == b
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == expected_warning
-        assert recwarn[0].category is PTBUserWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
+        assert EmptyTGO() == EmptyTGO()
 
-    def test_meaningful_comparison(self, recwarn):
-        class TGO(TelegramObject):
-            def __init__(self):
-                self._id_attrs = (1,)
+        @tg_dataclass()
+        class ExcludedFieldTGO(TelegramObject):
+            attribute: str = tg_field(compare=False)
 
-        a = TGO()
-        b = TGO()
-        assert a == b
-        assert len(recwarn) == 0
-        assert b == a
-        assert len(recwarn) == 0
+        assert ExcludedFieldTGO("attr") == ExcludedFieldTGO("not attr")
+
+        @tg_dataclass()
+        class ComparedFieldTGO(TelegramObject):
+            attribute: str = tg_field(compare=True)
+
+        assert ComparedFieldTGO("foo") == ComparedFieldTGO("foo")
+        assert ComparedFieldTGO("foo") != ComparedFieldTGO("not foo")
 
     def test_hash_without_comparison_fields_uses_identity(self, recwarn):
         @tg_dataclass()
