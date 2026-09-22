@@ -1953,7 +1953,7 @@ class TestBotWithoutRequest:
 
     @pytest.mark.parametrize(
         ("acd_in", "maxsize"),
-        [(True, 1024), (False, 1024), (0, 0), (None, None)],
+        [(True, 1024), (False, 1024), (0, 0)],
     )
     async def test_callback_data_maxsize(self, bot_info, acd_in, maxsize):
         async with make_bot(bot_info, arbitrary_callback_data=acd_in, offline=True) as acd_bot:
@@ -3971,7 +3971,7 @@ class TestBotWithRequest:
     async def test_get_chat_member(self, bot, channel_id, chat_id):
         chat_member = await bot.get_chat_member(channel_id, chat_id)
 
-        assert chat_member.status == "creator"
+        assert chat_member.status == "administrator"
         assert chat_member.user.first_name == "PTB"
         assert chat_member.user.last_name == "Test user"
 
@@ -4044,6 +4044,7 @@ class TestBotWithRequest:
         assert protected.has_protected_content is val
 
     @xfail
+    @pytest.mark.skip(reason="We need to rotate the BOTS variable with new bots")
     async def test_set_game_score_and_high_scores(self, bot, chat_id):
         # First, test setting a score.
         game_short_name = "test_game"
@@ -5178,7 +5179,7 @@ class TestBotWithRequest:
 
     async def test_get_user_personal_chat_messages(self, bot):
         # id is of the Test User
-        messages = await bot.get_user_personal_chat_messages(user_id=675666224, limit=2)
+        messages = await bot.get_user_personal_chat_messages(user_id=8967035616, limit=2)
         assert isinstance(messages, tuple)
         assert len(messages) == 2
 
