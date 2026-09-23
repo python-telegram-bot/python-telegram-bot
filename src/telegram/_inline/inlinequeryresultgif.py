@@ -19,22 +19,23 @@
 """This module contains the classes that represent Telegram InlineQueryResultGif."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultGif(InlineQueryResult):
     """
     Represents a link to an animated GIF file. By default, this animated GIF file will be sent by
@@ -130,59 +131,27 @@ class InlineQueryResultGif(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "_gif_duration",
-        "caption",
-        "caption_entities",
-        "gif_height",
-        "gif_url",
-        "gif_width",
-        "input_message_content",
-        "parse_mode",
-        "reply_markup",
-        "show_caption_above_media",
-        "thumbnail_mime_type",
-        "thumbnail_url",
-        "title",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.GIF)
+    # Required
+    gif_url: str = tg_field()
+    thumbnail_url: str = tg_field()
+    # Optional
+    gif_width: int | None = tg_field(default=None)
+    gif_height: int | None = tg_field(default=None)
+    title: str | None = tg_field(default=None)
+    caption: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    _gif_duration: dtm.timedelta | None = tg_field(
+        default=None, alias="gif_duration", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        gif_url: str,
-        thumbnail_url: str,
-        gif_width: int | None = None,
-        gif_height: int | None = None,
-        title: str | None = None,
-        caption: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        gif_duration: TimePeriod | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        thumbnail_mime_type: str | None = None,
-        show_caption_above_media: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.GIF, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.gif_url: str = gif_url
-            self.thumbnail_url: str = thumbnail_url
-
-            # Optionals
-            self.gif_width: int | None = gif_width
-            self.gif_height: int | None = gif_height
-            self._gif_duration: dtm.timedelta | None = to_timedelta(gif_duration)
-            self.title: str | None = title
-            self.caption: str | None = caption
-            self.parse_mode: ODVInput[str] = parse_mode
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
-            self.thumbnail_mime_type: str | None = thumbnail_mime_type
-            self.show_caption_above_media: bool | None = show_caption_above_media
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    thumbnail_mime_type: str | None = tg_field(default=None)
+    show_caption_above_media: bool | None = tg_field(default=None)
 
     @property
     def gif_duration(self) -> int | dtm.timedelta | None:

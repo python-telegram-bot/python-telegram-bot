@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import ShippingAddress
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -44,12 +43,6 @@ class ShippingAddressTestBase:
 
 
 class TestShippingAddressWithoutRequest(ShippingAddressTestBase):
-    def test_slot_behaviour(self, shipping_address):
-        inst = shipping_address
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "country_code": self.country_code,

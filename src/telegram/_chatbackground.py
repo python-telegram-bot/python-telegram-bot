@@ -18,17 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects related to chat backgrounds."""
 
-from collections.abc import Sequence
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._files.document import Document
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class BackgroundFill(TelegramObject):
     """Base class for Telegram BackgroundFill Objects. It can be one of:
 
@@ -52,8 +52,6 @@ class BackgroundFill(TelegramObject):
             or :attr:`~telegram.BackgroundFill.FREEFORM_GRADIENT`.
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -63,29 +61,23 @@ class BackgroundFill(TelegramObject):
         },
     )
 
-    SOLID: Final[constants.BackgroundFillType] = constants.BackgroundFillType.SOLID
+    SOLID: ClassVar[constants.BackgroundFillType] = constants.BackgroundFillType.SOLID
     """:const:`telegram.constants.BackgroundFillType.SOLID`"""
-    GRADIENT: Final[constants.BackgroundFillType] = constants.BackgroundFillType.GRADIENT
+    GRADIENT: ClassVar[constants.BackgroundFillType] = constants.BackgroundFillType.GRADIENT
     """:const:`telegram.constants.BackgroundFillType.GRADIENT`"""
-    FREEFORM_GRADIENT: Final[constants.BackgroundFillType] = (
+    FREEFORM_GRADIENT: ClassVar[constants.BackgroundFillType] = (
         constants.BackgroundFillType.FREEFORM_GRADIENT
     )
     """:const:`telegram.constants.BackgroundFillType.FREEFORM_GRADIENT`"""
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required by all subclasses
-        self.type: str = enum.get_member(constants.BackgroundFillType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.BackgroundFillType, value, value)
 
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class BackgroundFillSolid(BackgroundFill):
     """
     The background is filled using the selected color.
@@ -104,22 +96,13 @@ class BackgroundFillSolid(BackgroundFill):
         color (:obj:`int`): The color of the background fill in the `RGB24` format.
     """
 
-    __slots__ = ("color",)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BackgroundFill.SOLID)
 
-    def __init__(
-        self,
-        color: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.SOLID, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.color: int = color
-
-            self._id_attrs = (self.color,)
+    color: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class BackgroundFillGradient(BackgroundFill):
     """
     The background is a gradient fill.
@@ -148,26 +131,15 @@ class BackgroundFillGradient(BackgroundFill):
             0-:tg-const:`telegram.constants.BackgroundFillLimit.MAX_ROTATION_ANGLE`.
     """
 
-    __slots__ = ("bottom_color", "rotation_angle", "top_color")
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BackgroundFill.GRADIENT)
 
-    def __init__(
-        self,
-        top_color: int,
-        bottom_color: int,
-        rotation_angle: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.GRADIENT, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.top_color: int = top_color
-            self.bottom_color: int = bottom_color
-            self.rotation_angle: int = rotation_angle
-
-            self._id_attrs = (self.top_color, self.bottom_color, self.rotation_angle)
+    top_color: int = tg_field(compare=True)
+    bottom_color: int = tg_field(compare=True)
+    rotation_angle: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class BackgroundFillFreeformGradient(BackgroundFill):
     """
     The background is a freeform gradient that rotates after every message in the chat.
@@ -188,22 +160,13 @@ class BackgroundFillFreeformGradient(BackgroundFill):
             generate the freeform gradient in the `RGB24` format
     """
 
-    __slots__ = ("colors",)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BackgroundFill.FREEFORM_GRADIENT)
 
-    def __init__(
-        self,
-        colors: Sequence[int],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.FREEFORM_GRADIENT, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.colors: tuple[int, ...] = parse_sequence_arg(colors)
-
-            self._id_attrs = (self.colors,)
+    colors: tuple[int, ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class BackgroundType(TelegramObject):
     """Base class for Telegram BackgroundType Objects. It can be one of:
 
@@ -231,8 +194,6 @@ class BackgroundType(TelegramObject):
 
     """
 
-    __slots__ = ("type",)
-
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
         "type",
         {
@@ -243,29 +204,23 @@ class BackgroundType(TelegramObject):
         },
     )
 
-    FILL: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.FILL
+    FILL: ClassVar[constants.BackgroundTypeType] = constants.BackgroundTypeType.FILL
     """:const:`telegram.constants.BackgroundTypeType.FILL`"""
-    WALLPAPER: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.WALLPAPER
+    WALLPAPER: ClassVar[constants.BackgroundTypeType] = constants.BackgroundTypeType.WALLPAPER
     """:const:`telegram.constants.BackgroundTypeType.WALLPAPER`"""
-    PATTERN: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.PATTERN
+    PATTERN: ClassVar[constants.BackgroundTypeType] = constants.BackgroundTypeType.PATTERN
     """:const:`telegram.constants.BackgroundTypeType.PATTERN`"""
-    CHAT_THEME: Final[constants.BackgroundTypeType] = constants.BackgroundTypeType.CHAT_THEME
+    CHAT_THEME: ClassVar[constants.BackgroundTypeType] = constants.BackgroundTypeType.CHAT_THEME
     """:const:`telegram.constants.BackgroundTypeType.CHAT_THEME`"""
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required by all subclasses
-        self.type: str = enum.get_member(constants.BackgroundTypeType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.BackgroundTypeType, value, value)
 
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class BackgroundTypeFill(BackgroundType):
     """
     The background is automatically filled based on the selected colors.
@@ -290,24 +245,14 @@ class BackgroundTypeFill(BackgroundType):
             0-:tg-const:`telegram.constants.BackgroundTypeLimit.MAX_DIMMING`.
     """
 
-    __slots__ = ("dark_theme_dimming", "fill")
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BackgroundType.FILL)
 
-    def __init__(
-        self,
-        fill: BackgroundFill,
-        dark_theme_dimming: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.FILL, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.fill: BackgroundFill = fill
-            self.dark_theme_dimming: int = dark_theme_dimming
-
-            self._id_attrs = (self.fill, self.dark_theme_dimming)
+    fill: BackgroundFill = tg_field(compare=True)
+    dark_theme_dimming: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class BackgroundTypeWallpaper(BackgroundType):
     """
     The background is a wallpaper in the `JPEG` format.
@@ -340,30 +285,18 @@ class BackgroundTypeWallpaper(BackgroundType):
             when the device is tilted
     """
 
-    __slots__ = ("dark_theme_dimming", "document", "is_blurred", "is_moving")
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BackgroundType.WALLPAPER)
 
-    def __init__(
-        self,
-        document: Document,
-        dark_theme_dimming: int,
-        is_blurred: bool | None = None,
-        is_moving: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.WALLPAPER, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            # Required
-            self.document: Document = document
-            self.dark_theme_dimming: int = dark_theme_dimming
-            # Optionals
-            self.is_blurred: bool | None = is_blurred
-            self.is_moving: bool | None = is_moving
-
-            self._id_attrs = (self.document, self.dark_theme_dimming)
+    # Required
+    document: Document = tg_field(compare=True)
+    dark_theme_dimming: int = tg_field(compare=True)
+    # Optionals
+    is_blurred: bool | None = tg_field(default=None)
+    is_moving: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class BackgroundTypePattern(BackgroundType):
     """
     The background is a ``.PNG`` or ``.TGV`` (gzipped subset of ``SVG`` with ``MIME`` type
@@ -404,38 +337,19 @@ class BackgroundTypePattern(BackgroundType):
             when the device is tilted.
     """
 
-    __slots__ = (
-        "document",
-        "fill",
-        "intensity",
-        "is_inverted",
-        "is_moving",
-    )
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BackgroundType.PATTERN)
 
-    def __init__(
-        self,
-        document: Document,
-        fill: BackgroundFill,
-        intensity: int,
-        is_inverted: bool | None = None,
-        is_moving: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.PATTERN, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            # Required
-            self.document: Document = document
-            self.fill: BackgroundFill = fill
-            self.intensity: int = intensity
-            # Optionals
-            self.is_inverted: bool | None = is_inverted
-            self.is_moving: bool | None = is_moving
-
-            self._id_attrs = (self.document, self.fill, self.intensity)
+    # Required
+    document: Document = tg_field(compare=True)
+    fill: BackgroundFill = tg_field(compare=True)
+    intensity: int = tg_field(compare=True)
+    # Optionals
+    is_inverted: bool | None = tg_field(default=None)
+    is_moving: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class BackgroundTypeChatTheme(BackgroundType):
     """
     The background is taken directly from a built-in chat theme.
@@ -454,22 +368,12 @@ class BackgroundTypeChatTheme(BackgroundType):
         theme_name (:obj:`str`): Name of the chat theme, which is usually an emoji.
     """
 
-    __slots__ = ("theme_name",)
-
-    def __init__(
-        self,
-        theme_name: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=self.CHAT_THEME, api_kwargs=api_kwargs)
-
-        with self._unfrozen():
-            self.theme_name: str = theme_name
-
-            self._id_attrs = (self.theme_name,)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BackgroundType.CHAT_THEME)
+    theme_name: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ChatBackground(TelegramObject):
     """
     This object represents a chat background.
@@ -486,16 +390,4 @@ class ChatBackground(TelegramObject):
         type (:class:`telegram.BackgroundType`): Type of the background.
     """
 
-    __slots__ = ("type",)
-
-    def __init__(
-        self,
-        type: BackgroundType,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: BackgroundType = type
-
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: BackgroundType = tg_field(compare=True)

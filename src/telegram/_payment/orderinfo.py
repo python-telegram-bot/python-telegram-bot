@@ -20,9 +20,10 @@
 
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class OrderInfo(TelegramObject):
     """This object represents information about an order.
 
@@ -44,23 +45,7 @@ class OrderInfo(TelegramObject):
 
     """
 
-    __slots__ = ("email", "name", "phone_number", "shipping_address")
-
-    def __init__(
-        self,
-        name: str | None = None,
-        phone_number: str | None = None,
-        email: str | None = None,
-        shipping_address: ShippingAddress | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.name: str | None = name
-        self.phone_number: str | None = phone_number
-        self.email: str | None = email
-        self.shipping_address: ShippingAddress | None = shipping_address
-
-        self._id_attrs = (self.name, self.phone_number, self.email, self.shipping_address)
-
-        self._freeze()
+    name: str | None = tg_field(compare=True, default=None)
+    phone_number: str | None = tg_field(compare=True, default=None)
+    email: str | None = tg_field(compare=True, default=None)
+    shipping_address: ShippingAddress | None = tg_field(compare=True, default=None)

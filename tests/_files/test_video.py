@@ -45,7 +45,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 class VideoTestBase:
@@ -69,13 +68,6 @@ class VideoTestBase:
 
 
 class TestVideoWithoutRequest(VideoTestBase):
-    def test_slot_behaviour(self, offline_video):
-        for attr in offline_video.__slots__:
-            assert getattr(offline_video, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(offline_video)) == len(set(mro_slots(offline_video))), (
-            "duplicate slot"
-        )
-
     def test_creation(self, offline_video):
         # Make sure file has been uploaded.
         assert isinstance(offline_video, Video)

@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram VideoQuality."""
 
 from telegram._files._basemedium import _BaseMedium
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class VideoQuality(_BaseMedium):
     """This object represents a video file of a specific quality.
 
@@ -56,27 +57,9 @@ class VideoQuality(_BaseMedium):
 
     """
 
-    __slots__ = ("codec", "height", "width")
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        width: int,
-        height: int,
-        codec: str,
-        file_size: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Required
-            self.width: int = width
-            self.height: int = height
-            self.codec: str = codec
+    # Required
+    width: int = tg_field()
+    height: int = tg_field()
+    codec: str = tg_field()
+    # Optional
+    file_size: int | None = tg_field(default=None)

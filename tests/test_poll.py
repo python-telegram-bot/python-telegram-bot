@@ -28,7 +28,6 @@ from telegram import (
     InputPollOption,
     LivePhoto,
     Location,
-    MaybeInaccessibleMessage,
     MessageEntity,
     PhotoSize,
     Poll,
@@ -42,10 +41,11 @@ from telegram import (
     Venue,
     Video,
 )
+from telegram._message import Message
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import PollType
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -56,8 +56,8 @@ def input_poll_option():
         text_entities=InputPollOptionTestBase.text_entities,
         media=InputPollOptionTestBase.media,
     )
-    out._unfreeze()
-    return out
+    with unfrozen(out):
+        yield out
 
 
 class InputPollOptionTestBase:
@@ -71,13 +71,6 @@ class InputPollOptionTestBase:
 
 
 class TestInputPollOptionWithoutRequest(InputPollOptionTestBase):
-    def test_slot_behaviour(self, input_poll_option):
-        for attr in input_poll_option.__slots__:
-            assert getattr(input_poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(input_poll_option)) == len(set(mro_slots(input_poll_option))), (
-            "duplicate slot"
-        )
-
     def test_to_dict(self, input_poll_option):
         input_poll_option_dict = input_poll_option.to_dict()
 
@@ -167,11 +160,6 @@ class PollMediaTestBase:
 
 
 class TestPollMediaWithoutRequest(PollMediaTestBase):
-    def test_slot_behaviour(self, poll_media):
-        for attr in poll_media.__slots__:
-            assert getattr(poll_media, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_media)) == len(set(mro_slots(poll_media))), "duplicate slot"
-
     def test_de_json(self):
         json_dict = {
             "animation": self.animation.to_dict(),
@@ -243,8 +231,8 @@ def poll_option():
         persistent_id=PollOptionTestBase.persistent_id,
         media=PollOptionTestBase.media,
     )
-    out._unfreeze()
-    return out
+    with unfrozen(out):
+        yield out
 
 
 class PollOptionTestBase:
@@ -262,11 +250,6 @@ class PollOptionTestBase:
 
 
 class TestPollOptionWithoutRequest(PollOptionTestBase):
-    def test_slot_behaviour(self, poll_option):
-        for attr in poll_option.__slots__:
-            assert getattr(poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_option)) == len(set(mro_slots(poll_option))), "duplicate slot"
-
     def test_de_json(self):
         json_dict = {
             "text": self.text,
@@ -450,8 +433,8 @@ def poll():
         media=PollTestBase.media,
         explanation_media=PollTestBase.explanation_media,
     )
-    poll._unfreeze()
-    return poll
+    with unfrozen(poll):
+        yield poll
 
 
 class PollTestBase:
@@ -808,12 +791,12 @@ def poll_option_added():
         option_text=PollOptionAddedTestBase.option_text,
         option_text_entities=PollOptionAddedTestBase.option_text_entities,
     )
-    p._unfreeze()
-    return p
+    with unfrozen(p):
+        yield p
 
 
 class PollOptionAddedTestBase:
-    poll_message = MaybeInaccessibleMessage(
+    poll_message = Message(
         message_id=1,
         date=dtm.datetime.now(dtm.timezone.utc),
         chat=Chat(1, "test_chat"),
@@ -827,13 +810,6 @@ class PollOptionAddedTestBase:
 
 
 class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
-    def test_slot_behaviour(self, poll_option_added):
-        for attr in poll_option_added.__slots__:
-            assert getattr(poll_option_added, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_option_added)) == len(set(mro_slots(poll_option_added))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "poll_message": self.poll_message.to_dict(),
@@ -894,9 +870,7 @@ class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
             option_text_entities=self.option_text_entities,
         )
         c = PollOptionAdded(
-            poll_message=MaybeInaccessibleMessage(
-                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
-            ),
+            poll_message=Message(2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")),
             option_persistent_id=self.option_persistent_id,
             option_text=self.option_text,
             option_text_entities=self.option_text_entities,
@@ -927,12 +901,12 @@ def poll_option_deleted():
         option_text=PollOptionDeletedTestBase.option_text,
         option_text_entities=PollOptionDeletedTestBase.option_text_entities,
     )
-    p._unfreeze()
-    return p
+    with unfrozen(p):
+        yield p
 
 
 class PollOptionDeletedTestBase:
-    poll_message = MaybeInaccessibleMessage(
+    poll_message = Message(
         message_id=1,
         date=dtm.datetime.now(dtm.timezone.utc),
         chat=Chat(1, "test_chat"),
@@ -946,13 +920,6 @@ class PollOptionDeletedTestBase:
 
 
 class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
-    def test_slot_behaviour(self, poll_option_deleted):
-        for attr in poll_option_deleted.__slots__:
-            assert getattr(poll_option_deleted, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_option_deleted)) == len(set(mro_slots(poll_option_deleted))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "poll_message": self.poll_message.to_dict(),
@@ -1017,9 +984,7 @@ class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
             option_text_entities=self.option_text_entities,
         )
         c = PollOptionDeleted(
-            poll_message=MaybeInaccessibleMessage(
-                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
-            ),
+            poll_message=Message(2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")),
             option_persistent_id=self.option_persistent_id,
             option_text=self.option_text,
             option_text_entities=self.option_text_entities,

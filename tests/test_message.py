@@ -123,7 +123,7 @@ from tests.auxil.bot_method_checks import (
 from tests.auxil.build_messages import make_message
 from tests.auxil.dummy_objects import get_dummy_object_json_dict
 from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture
@@ -137,10 +137,8 @@ def message(bot):
         guest_query_id="706654132",
     )
     message.set_bot(bot)
-    message._unfreeze()
-    message.chat._unfreeze()
-    message.from_user._unfreeze()
-    return message
+    with unfrozen(message), unfrozen(message.chat), unfrozen(message.from_user):
+        yield message
 
 
 @pytest.fixture(
@@ -812,17 +810,6 @@ class TestMessageWithoutRequest(MessageTestBase):
                     ),
                 )
             assert message_thread_id == (message.message_thread_id if is_topic_message else None)
-
-    def test_slot_behaviour(self):
-        message = Message(
-            message_id=MessageTestBase.id_,
-            date=MessageTestBase.date,
-            chat=copy(MessageTestBase.chat),
-            from_user=copy(MessageTestBase.from_user),
-        )
-        for attr in message.__slots__:
-            assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
 
     def test_all_possibilities_de_json_and_to_dict(self, offline_bot, message_params):
         new = Message.de_json(message_params.to_dict(), offline_bot)
@@ -3134,7 +3121,8 @@ class TestMessageWithoutRequest(MessageTestBase):
     @pytest.mark.parametrize("business_connection_id", [None, "123456789"])
     async def test_delete(self, monkeypatch, message, business_connection_id):
         message = deepcopy(message)
-        message.business_connection_id = business_connection_id
+        with unfrozen(message):
+            message.business_connection_id = business_connection_id
 
         async def make_assertion(*_, **kwargs):
             url: str = kwargs.get("url")

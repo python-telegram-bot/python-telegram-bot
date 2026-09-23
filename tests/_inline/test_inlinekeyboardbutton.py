@@ -27,7 +27,6 @@ from telegram import (
     SwitchInlineQueryChosenChat,
     WebAppInfo,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -70,12 +69,6 @@ class InlineKeyboardButtonTestBase:
 
 
 class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
-    def test_slot_behaviour(self, inline_keyboard_button):
-        inst = inline_keyboard_button
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, inline_keyboard_button):
         assert inline_keyboard_button.text == self.text
         assert inline_keyboard_button.url == self.url

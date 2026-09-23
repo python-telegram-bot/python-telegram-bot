@@ -33,7 +33,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -73,13 +72,6 @@ class ChatPhotoTestBase:
 
 
 class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
-    def test_slot_behaviour(self, offline_chat_photo):
-        for attr in offline_chat_photo.__slots__:
-            assert getattr(offline_chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(offline_chat_photo)) == len(set(mro_slots(offline_chat_photo))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "small_file_id": self.chatphoto_small_file_id,

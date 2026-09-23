@@ -19,22 +19,23 @@
 """This module contains the classes that represent Telegram InlineQueryResultVoice."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultVoice(InlineQueryResult):
     """
     Represents a link to a voice recording in an .ogg container encoded with OPUS. By default,
@@ -98,44 +99,22 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "_voice_duration",
-        "caption",
-        "caption_entities",
-        "input_message_content",
-        "parse_mode",
-        "reply_markup",
-        "title",
-        "voice_url",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.VOICE)
+    # Required
+    voice_url: str = tg_field()
+    title: str = tg_field()
+    # Optional
+    _voice_duration: dtm.timedelta | None = tg_field(
+        default=None, alias="voice_duration", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        voice_url: str,
-        title: str,
-        voice_duration: TimePeriod | None = None,
-        caption: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.VOICE, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.voice_url: str = voice_url
-            self.title: str = title
-
-            # Optional
-            self._voice_duration: dtm.timedelta | None = to_timedelta(voice_duration)
-            self.caption: str | None = caption
-            self.parse_mode: ODVInput[str] = parse_mode
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
+    caption: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
 
     @property
     def voice_duration(self) -> int | dtm.timedelta | None:

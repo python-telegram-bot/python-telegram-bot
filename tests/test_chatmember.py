@@ -35,7 +35,6 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatMemberStatus
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -83,12 +82,6 @@ class ChatMemberTestBase:
 
 
 class TestChatMemberWithoutRequest(ChatMemberTestBase):
-    def test_slot_behaviour(self, chat_member):
-        inst = chat_member
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_status_enum_conversion(self, chat_member):
         assert type(ChatMember(ChatMemberTestBase.user, "member").status) is ChatMemberStatus
         assert ChatMember(ChatMemberTestBase.user, "unknown").status == "unknown"
@@ -182,12 +175,6 @@ def chat_member_administrator():
 
 class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
     status = ChatMemberStatus.ADMINISTRATOR
-
-    def test_slot_behaviour(self, chat_member_administrator):
-        inst = chat_member_administrator
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         data = {
@@ -322,12 +309,6 @@ def chat_member_banned():
 class TestChatMemberBannedWithoutRequest(ChatMemberTestBase):
     status = ChatMemberStatus.BANNED
 
-    def test_slot_behaviour(self, chat_member_banned):
-        inst = chat_member_banned
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         data = {
             "user": self.user.to_dict(),
@@ -396,12 +377,6 @@ def chat_member_left():
 class TestChatMemberLeftWithoutRequest(ChatMemberTestBase):
     status = ChatMemberStatus.LEFT
 
-    def test_slot_behaviour(self, chat_member_left):
-        inst = chat_member_left
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         data = {"user": self.user.to_dict()}
         chat_member = ChatMemberLeft.de_json(data, offline_bot)
@@ -440,12 +415,6 @@ def chat_member_member():
 
 class TestChatMemberMemberWithoutRequest(ChatMemberTestBase):
     status = ChatMemberStatus.MEMBER
-
-    def test_slot_behaviour(self, chat_member_member):
-        inst = chat_member_member
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         data = {"user": self.user.to_dict(), "until_date": to_timestamp(self.until_date)}
@@ -510,12 +479,6 @@ def chat_member_owner():
 
 class TestChatMemberOwnerWithoutRequest(ChatMemberTestBase):
     status = ChatMemberStatus.OWNER
-
-    def test_slot_behaviour(self, chat_member_owner):
-        inst = chat_member_owner
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         data = {
@@ -584,12 +547,6 @@ def chat_member_restricted():
 
 class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
     status = ChatMemberStatus.RESTRICTED
-
-    def test_slot_behaviour(self, chat_member_restricted):
-        inst = chat_member_restricted
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         data = {

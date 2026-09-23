@@ -21,9 +21,10 @@
 import datetime as dtm
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class Birthdate(TelegramObject):
     """
     This object describes the birthdate of a user.
@@ -45,30 +46,11 @@ class Birthdate(TelegramObject):
 
     """
 
-    __slots__ = ("day", "month", "year")
-
-    def __init__(
-        self,
-        day: int,
-        month: int,
-        year: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.day: int = day
-        self.month: int = month
-        # Optional
-        self.year: int | None = year
-
-        self._id_attrs = (
-            self.day,
-            self.month,
-        )
-
-        self._freeze()
+    # Required
+    day: int = tg_field(compare=True)
+    month: int = tg_field(compare=True)
+    # Optional
+    year: int | None = tg_field(default=None)
 
     def to_date(self, year: int | None = None) -> dtm.date:
         """Return the birthdate as a date object.

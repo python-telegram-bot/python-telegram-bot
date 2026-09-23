@@ -20,14 +20,15 @@
 
 import datetime as dtm
 
-from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
-class Animation(_BaseThumbedMedium):
+@tg_dataclass()
+class Animation(_BaseMedium):
     """This object represents an animation file (GIF or H.264/MPEG-4 AVC video without sound).
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -80,37 +81,15 @@ class Animation(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("_duration", "file_name", "height", "mime_type", "width")
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        width: int,
-        height: int,
-        duration: TimePeriod,
-        file_name: str | None = None,
-        mime_type: str | None = None,
-        file_size: int | None = None,
-        thumbnail: PhotoSize | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            api_kwargs=api_kwargs,
-            thumbnail=thumbnail,
-        )
-        with self._unfrozen():
-            # Required
-            self.width: int = width
-            self.height: int = height
-            self._duration: dtm.timedelta = to_timedelta(duration)
-            # Optional
-            self.mime_type: str | None = mime_type
-            self.file_name: str | None = file_name
+    # Required
+    width: int = tg_field()
+    height: int = tg_field()
+    _duration: dtm.timedelta = tg_field(alias="duration", converter=to_timedelta)
+    # Optional
+    file_name: str | None = tg_field(default=None)
+    mime_type: str | None = tg_field(default=None)
+    file_size: int | None = tg_field(default=None)
+    thumbnail: PhotoSize | None = tg_field(default=None)
 
     @property
     def duration(self) -> int | dtm.timedelta:

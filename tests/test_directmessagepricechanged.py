@@ -23,7 +23,6 @@ from typing import TYPE_CHECKING
 import pytest
 
 from telegram import DirectMessagePriceChanged, User
-from tests.auxil.slots import mro_slots
 
 if TYPE_CHECKING:
     from telegram._utils.types import JSONDict
@@ -43,12 +42,6 @@ class DirectMessagePriceChangedTestBase:
 
 
 class TestDirectMessagePriceChangedWithoutRequest(DirectMessagePriceChangedTestBase):
-    def test_slot_behaviour(self, direct_message_price_changed):
-        action = direct_message_price_changed
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict: JSONDict = {
             "are_direct_messages_enabled": self.are_direct_messages_enabled,

@@ -64,10 +64,12 @@ async def _mocked_get_me(bot: Bot):
 
 
 class PytestExtBot(ExtBot):
+    # Makes it easier to work with the bot in tests
+    __setattr__ = object.__setattr__
+    __delattr__ = object.__delattr__
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Makes it easier to work with the bot in tests
-        self._unfreeze()
 
     def __repr__(self) -> str:
         return build_repr_with_selected_attrs(self, token=_REDACTED_TOKEN)
@@ -78,10 +80,12 @@ class PytestExtBot(ExtBot):
 
 
 class PytestBot(Bot):
+    # Makes it easier to work with the bot in tests
+    __setattr__ = object.__setattr__
+    __delattr__ = object.__delattr__
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Makes it easier to work with the bot in tests
-        self._unfreeze()
 
     def __repr__(self) -> str:
         return build_repr_with_selected_attrs(self, token=_REDACTED_TOKEN)

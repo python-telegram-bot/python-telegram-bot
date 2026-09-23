@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram CopyTextButton."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class CopyTextButton(TelegramObject):
     """
     This object represents an inline keyboard button that copies specified text to the clipboard.
@@ -43,12 +44,4 @@ class CopyTextButton(TelegramObject):
 
     """
 
-    __slots__ = ("text",)
-
-    def __init__(self, text: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.text: str = text
-
-        self._id_attrs = (self.text,)
-
-        self._freeze()
+    text: str = tg_field(compare=True)

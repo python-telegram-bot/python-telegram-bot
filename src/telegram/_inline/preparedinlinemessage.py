@@ -21,9 +21,10 @@
 import datetime as dtm
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class PreparedInlineMessage(TelegramObject):
     """Describes an inline message to be sent by a user of a Mini App.
 
@@ -45,19 +46,6 @@ class PreparedInlineMessage(TelegramObject):
             |datetime_localization|
     """
 
-    __slots__ = ("expiration_date", "id")
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        expiration_date: dtm.datetime,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self.expiration_date: dtm.datetime = expiration_date
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    # Required
+    id: str = tg_field(compare=True)
+    expiration_date: dtm.datetime = tg_field()

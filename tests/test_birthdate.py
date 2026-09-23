@@ -21,7 +21,6 @@ import datetime as dtm
 import pytest
 
 from telegram import Birthdate
-from tests.auxil.slots import mro_slots
 
 
 class BirthdateTestBase:
@@ -36,11 +35,6 @@ def birthdate():
 
 
 class TestBirthdateWithoutRequest(BirthdateTestBase):
-    def test_slot_behaviour(self, birthdate):
-        for attr in birthdate.__slots__:
-            assert getattr(birthdate, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(birthdate)) == len(set(mro_slots(birthdate))), "duplicate slot"
-
     def test_to_dict(self, birthdate):
         bd_dict = birthdate.to_dict()
         assert isinstance(bd_dict, dict)

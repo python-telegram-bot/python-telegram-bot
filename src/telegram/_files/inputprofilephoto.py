@@ -19,19 +19,21 @@
 """This module contains an objects that represents a InputProfilePhoto and subclasses."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.files import parse_file_input
-from telegram._utils.types import FileInput, JSONDict
+from telegram._utils.types import FileInput
 
 if TYPE_CHECKING:
     from telegram import InputFile
 
 
+@tg_dataclass()
 class InputProfilePhoto(TelegramObject):
     """This object describes a profile photo to set. Currently, it can be one of
 
@@ -48,25 +50,29 @@ class InputProfilePhoto(TelegramObject):
 
     """
 
-    STATIC = constants.InputProfilePhotoType.STATIC
+    STATIC: ClassVar[str] = constants.InputProfilePhotoType.STATIC
     """:obj:`str`: :tg-const:`telegram.constants.InputProfilePhotoType.STATIC`."""
-    ANIMATED = constants.InputProfilePhotoType.ANIMATED
+    ANIMATED: ClassVar[str] = constants.InputProfilePhotoType.ANIMATED
     """:obj:`str`: :tg-const:`telegram.constants.InputProfilePhotoType.ANIMATED`."""
 
-    __slots__ = ("type",)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.InputProfilePhotoType, value, value)
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.InputProfilePhotoType, type, type)
+    @staticmethod
+    def _parse_file_input(value: FileInput) -> "str | InputFile":
+        # We use local_mode=True because we don't have access to the actual setting and want
+        # things to work in local mode.
+        return parse_file_input(
+            value,
+            local_mode=True,
+            attach=True,
+        )
 
-        self._freeze()
+    type: str = tg_field(converter=_type_converter)
 
 
+@tg_dataclass()
 class InputProfilePhotoStatic(InputProfilePhoto):
     """A static profile photo in the .JPG format.
 
@@ -82,21 +88,13 @@ class InputProfilePhotoStatic(InputProfilePhoto):
 
     """
 
-    __slots__ = ("photo",)
-
-    def __init__(
-        self,
-        photo: FileInput,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=constants.InputProfilePhotoType.STATIC, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            # We use local_mode=True because we don't have access to the actual setting and want
-            # things to work in local mode.
-            self.photo: str | InputFile = parse_file_input(photo, attach=True, local_mode=True)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=constants.InputProfilePhotoType.STATIC)
+    # Required
+    photo: "str | InputFile" = tg_field(converter=InputProfilePhoto._parse_file_input)
 
 
+@tg_dataclass()
 class InputProfilePhotoAnimated(InputProfilePhoto):
     """An animated profile photo in the MPEG4 format.
 
@@ -116,21 +114,9 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
             frame that will be used as the static profile photo. Defaults to ``0.0``.
     """
 
-    __slots__ = ("animation", "main_frame_timestamp")
-
-    def __init__(
-        self,
-        animation: FileInput,
-        main_frame_timestamp: float | dtm.timedelta | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(type=constants.InputProfilePhotoType.ANIMATED, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            # We use local_mode=True because we don't have access to the actual setting and want
-            # things to work in local mode.
-            self.animation: str | InputFile = parse_file_input(
-                animation, attach=True, local_mode=True
-            )
-
-            self.main_frame_timestamp: dtm.timedelta | None = to_timedelta(main_frame_timestamp)
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=constants.InputProfilePhotoType.ANIMATED)
+    # Required
+    animation: "str | InputFile" = tg_field(converter=InputProfilePhoto._parse_file_input)
+    # Optional
+    main_frame_timestamp: dtm.timedelta | None = tg_field(default=None, converter=to_timedelta)

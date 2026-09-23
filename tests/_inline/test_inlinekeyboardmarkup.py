@@ -27,7 +27,7 @@ from telegram import (
     ReplyKeyboardRemove,
 )
 from telegram.constants import KeyboardButtonStyle
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -45,12 +45,6 @@ class InlineKeyboardMarkupTestBase:
 
 
 class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
-    def test_slot_behaviour(self, inline_keyboard_markup):
-        inst = inline_keyboard_markup
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, inline_keyboard_markup):
         inline_keyboard_markup_dict = inline_keyboard_markup.to_dict()
 
@@ -220,12 +214,12 @@ class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
             assert bool("'switch_inline_query': ''" in str(data["reply_markup"]))
             assert bool("'switch_inline_query_current_chat': ''" in str(data["reply_markup"]))
 
-        inline_keyboard_markup.inline_keyboard[0][0]._unfreeze()
-        inline_keyboard_markup.inline_keyboard[0][0].callback_data = None
-        inline_keyboard_markup.inline_keyboard[0][0].switch_inline_query = ""
-        inline_keyboard_markup.inline_keyboard[0][1]._unfreeze()
-        inline_keyboard_markup.inline_keyboard[0][1].callback_data = None
-        inline_keyboard_markup.inline_keyboard[0][1].switch_inline_query_current_chat = ""
+        with unfrozen(inline_keyboard_markup.inline_keyboard[0][0]):
+            inline_keyboard_markup.inline_keyboard[0][0].callback_data = None
+            inline_keyboard_markup.inline_keyboard[0][0].switch_inline_query = ""
+        with unfrozen(inline_keyboard_markup.inline_keyboard[0][1]):
+            inline_keyboard_markup.inline_keyboard[0][1].callback_data = None
+            inline_keyboard_markup.inline_keyboard[0][1].switch_inline_query_current_chat = ""
 
         monkeypatch.setattr(offline_bot, "_send_message", make_assertion)
         await offline_bot.send_message(123, "test", reply_markup=inline_keyboard_markup)

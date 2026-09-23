@@ -19,9 +19,11 @@
 """Base classes for Telegram InputMedia, InputPaidMedia, InputPollMedia
 and InputPollOptionMedia Objects."""
 
+import dataclasses
 import datetime as dtm
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final, TypeAlias
+from dataclasses import InitVar
+from typing import ClassVar, TypeAlias, cast
 
 from telegram import constants
 from telegram._files.animation import Animation
@@ -35,18 +37,48 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import parse_file_input
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import FileInput, JSONDict, ODVInput
 from telegram._utils.warnings import warn
 from telegram.constants import BaseInputMediaType
 from telegram.warnings import PTBDeprecationWarning
 
-if TYPE_CHECKING:
-    from telegram._utils.types import FileInput
+
+def _parse_animation_input(value: "FileInput | Animation") -> str | InputFile:
+    return parse_file_input(value, Animation, attach=True, local_mode=True)
 
 
+def _parse_audio_input(value: "FileInput | Audio") -> str | InputFile:
+    return parse_file_input(value, Audio, attach=True, local_mode=True)
+
+
+def _parse_document_input(value: "FileInput | Document") -> str | InputFile:
+    return parse_file_input(value, Document, attach=True, local_mode=True)
+
+
+def _parse_photo_input(value: "FileInput | PhotoSize") -> str | InputFile:
+    return parse_file_input(value, PhotoSize, attach=True, local_mode=True)
+
+
+def _parse_sticker_input(value: "FileInput | Sticker") -> str | InputFile:
+    return parse_file_input(value, Sticker, attach=True, local_mode=True)
+
+
+def _parse_video_input(value: "FileInput | Video") -> str | InputFile:
+    return parse_file_input(value, Video, attach=True, local_mode=True)
+
+
+def _parse_optional_file_input(value: FileInput | None) -> str | InputFile | None:
+    if value is None:
+        return None
+
+    return parse_file_input(value, attach=True, local_mode=True)
+
+
+@tg_dataclass()
 class _BaseInputMedia(TelegramObject):
     """
     Base class for objects representing the various input media types.
@@ -58,18 +90,14 @@ class _BaseInputMedia(TelegramObject):
         type (:obj:`str`): Type of media that the instance represents.
     """
 
-    __slots__ = ("type",)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.BaseInputMediaType, value, value)
 
-    def __init__(
-        self,
-        media_type: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.BaseInputMediaType, media_type, media_type)
+    type: str = tg_field(converter=_type_converter, alias="media_type")
 
 
+@dataclasses.dataclass(frozen=True, slots=False, repr=False, eq=False, match_args=False)
 class InputMedia(_BaseInputMedia):
     """
     This object represents the content of a media message to be sent. It should be one of:
@@ -86,6 +114,11 @@ class InputMedia(_BaseInputMedia):
             :attr:`caption_entities`, :paramref:`parse_mode`.
 
     .. seealso:: :wiki:`Working with Files and Media <Working-with-Files-and-Media>`
+
+    .. deprecated:: NEXT.VERSION
+        The arguments and attributes :attr:`caption`, :attr:`caption_entities`
+        and :attr:`parse_mode` are deprecated for direct instances of :class:`InputMedia` and will
+        be removed. They remain available on the concrete media classes.
 
     Args:
         media_type (:obj:`str`): Type of media that the instance represents.
@@ -117,6 +150,11 @@ class InputMedia(_BaseInputMedia):
 
     """
 
+    # tags: deprecated NEXT.VERSION
+    # Use automatic slots and __init__, and remove optional fields
+    # We currently define explicit slots instead of dataclass fields
+    # to allow subclasses to control parameter ordering
+
     __slots__ = ("caption", "caption_entities", "media", "parse_mode")
 
     def __init__(
@@ -128,25 +166,20 @@ class InputMedia(_BaseInputMedia):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         *,
         api_kwargs: JSONDict | None = None,
-    ):
+    ) -> None:
         super().__init__(media_type=media_type, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.media: str | InputFile = media
-            self.caption: str | None = caption
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.parse_mode: ODVInput[str] = parse_mode
 
-    @staticmethod
-    def _parse_thumbnail_input(thumbnail: "FileInput | None") -> str | InputFile | None:
-        # We use local_mode=True because we don't have access to the actual setting and want
-        # things to work in local mode.
-        return (
-            parse_file_input(thumbnail, attach=True, local_mode=True)
-            if thumbnail is not None
-            else thumbnail
-        )
+        self.media: str | InputFile
+        object.__setattr__(self, "media", media)
+        self.caption: str | None
+        object.__setattr__(self, "caption", caption)
+        self.caption_entities: tuple[MessageEntity, ...]
+        object.__setattr__(self, "caption_entities", parse_sequence_arg(caption_entities))
+        self.parse_mode: ODVInput[str]
+        object.__setattr__(self, "parse_mode", parse_mode)
 
 
+@tg_dataclass()
 class InputPaidMedia(TelegramObject):
     """
     Base class for Telegram InputPaidMedia Objects. Currently, it can be one of:
@@ -169,32 +202,25 @@ class InputPaidMedia(TelegramObject):
         media (:obj:`str` | :class:`telegram.InputFile`): Media to send.
     """
 
-    PHOTO: Final[str] = constants.InputPaidMediaType.PHOTO
+    PHOTO: ClassVar[str] = constants.InputPaidMediaType.PHOTO
     """:const:`telegram.constants.InputPaidMediaType.PHOTO`"""
-    VIDEO: Final[str] = constants.InputPaidMediaType.VIDEO
+    VIDEO: ClassVar[str] = constants.InputPaidMediaType.VIDEO
     """:const:`telegram.constants.InputPaidMediaType.VIDEO`"""
-    LIVE_PHOTO: Final[str] = constants.InputPaidMediaType.LIVE_PHOTO
+    LIVE_PHOTO: ClassVar[str] = constants.InputPaidMediaType.LIVE_PHOTO
     """:const:`telegram.constants.InputPaidMediaType.LIVE_PHOTO`
 
     .. versionadded:: 22.8
     """
 
-    __slots__ = ("media", "type")
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.InputPaidMediaType, value, value)
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        media: str | InputFile,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.InputPaidMediaType, type, type)
-        self.media: str | InputFile = media
-
-        self._freeze()
+    type: str = tg_field(converter=_type_converter)
+    media: str | InputFile = tg_field()
 
 
+@tg_dataclass()
 class InputPaidMediaPhoto(InputPaidMedia):
     """The paid media to send is a photo.
 
@@ -213,19 +239,13 @@ class InputPaidMediaPhoto(InputPaidMedia):
         media (:obj:`str` | :class:`telegram.InputFile`): Photo to send.
     """
 
-    __slots__ = ()
-
-    def __init__(
-        self,
-        media: "FileInput | PhotoSize",
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        media = parse_file_input(media, PhotoSize, attach=True, local_mode=True)
-        super().__init__(type=InputPaidMedia.PHOTO, media=media, api_kwargs=api_kwargs)
-        self._freeze()
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InputPaidMedia.PHOTO)
+    # Required
+    media: str | InputFile = tg_field(converter=_parse_photo_input)
 
 
+@tg_dataclass()
 class InputPaidMediaVideo(InputPaidMedia):
     """
     The paid media to send is a video.
@@ -286,56 +306,44 @@ class InputPaidMediaVideo(InputPaidMedia):
             suitable for streaming.
     """
 
-    __slots__ = (
-        "_duration",
-        "cover",
-        "height",
-        "start_timestamp",
-        "supports_streaming",
-        "thumbnail",
-        "width",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InputPaidMedia.VIDEO)
+    media: str | InputFile = tg_field(converter=_parse_video_input)
+    thumbnail: str | InputFile | None = tg_field(
+        default=None, converter=_parse_optional_file_input
     )
+    width: int | None = tg_field(default=None)
+    height: int | None = tg_field(default=None)
+    _duration: dtm.timedelta | None = tg_field(
+        default=None, alias="duration", converter=to_timedelta
+    )
+    supports_streaming: bool | None = tg_field(default=None)
+    cover: str | InputFile | None = tg_field(default=None, converter=_parse_optional_file_input)
+    start_timestamp: int | None = tg_field(default=None)
 
-    def __init__(
-        self,
-        media: "FileInput | Video",
-        thumbnail: "FileInput | None" = None,
-        width: int | None = None,
-        height: int | None = None,
-        duration: TimePeriod | None = None,
-        supports_streaming: bool | None = None,
-        cover: "FileInput | None" = None,
-        start_timestamp: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
+    def __post_init__(self) -> None:
+        media = cast("FileInput | Video", self.media)
+
         if isinstance(media, Video):
-            width = width if width is not None else media.width
-            height = height if height is not None else media.height
-            duration = duration if duration is not None else media._duration
-            media = media.file_id
-        else:
-            # We use local_mode=True because we don't have access to the actual setting and want
-            # things to work in local mode.
-            media = parse_file_input(media, attach=True, local_mode=True)
+            if self.width is None:
+                object.__setattr__(self, "width", media.width)
+            if self.height is None:
+                object.__setattr__(self, "height", media.height)
+            if self._duration is None:
+                object.__setattr__(
+                    self,
+                    "_duration",
+                    media._duration,  # pylint: disable=protected-access
+                )
 
-        super().__init__(type=InputPaidMedia.VIDEO, media=media, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.thumbnail: str | InputFile | None = InputMedia._parse_thumbnail_input(thumbnail)
-            self.width: int | None = width
-            self.height: int | None = height
-            self._duration: dtm.timedelta | None = to_timedelta(duration)
-            self.supports_streaming: bool | None = supports_streaming
-            self.cover: InputFile | str | None = (
-                parse_file_input(cover, attach=True, local_mode=True) if cover else None
-            )
-            self.start_timestamp: int | None = start_timestamp
+        InputPaidMedia.__post_init__(self)
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
+@tg_dataclass()
 class InputPaidMediaLivePhoto(InputPaidMedia):
     """
     The paid media to send is a live photo.
@@ -365,22 +373,14 @@ class InputPaidMediaLivePhoto(InputPaidMedia):
             |fileinputnopath|
     """
 
-    __slots__ = ("photo",)
-
-    def __init__(
-        self,
-        media: "FileInput | Video",
-        photo: "FileInput | PhotoSize",
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        media = parse_file_input(media, tg_type=Video, attach=True, local_mode=True)
-        photo = parse_file_input(photo, tg_type=PhotoSize, attach=True, local_mode=True)
-        super().__init__(type=InputPaidMedia.LIVE_PHOTO, media=media, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.photo: str | InputFile = photo
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InputPaidMedia.LIVE_PHOTO)
+    # Required
+    media: str | InputFile = tg_field(converter=_parse_video_input)
+    photo: str | InputFile = tg_field(converter=_parse_photo_input)
 
 
+@tg_dataclass()
 class InputMediaAnimation(InputMedia):
     """Represents an animation file (GIF or H.264/MPEG-4 AVC video without sound) to be sent.
 
@@ -476,34 +476,38 @@ class InputMediaAnimation(InputMedia):
             .. versionadded:: 21.3
     """
 
-    __slots__ = (
-        "_duration",
-        "has_spoiler",
-        "height",
-        "show_caption_above_media",
-        "thumbnail",
-        "width",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BaseInputMediaType.ANIMATION)
+    # Required
+    media: str | InputFile = tg_field(converter=_parse_animation_input)
+    # Optional
+    caption: str | None = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    width: int | None = tg_field(default=None)
+    height: int | None = tg_field(default=None)
+    _duration: dtm.timedelta | None = tg_field(
+        default=None, alias="duration", converter=to_timedelta
     )
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    # tag: deprecated 22.8
+    filename_depr: InitVar[str | None] = tg_field(default=None)
+    # -
+    has_spoiler: bool | None = tg_field(default=None)
+    thumbnail: str | InputFile | None = tg_field(
+        default=None, converter=_parse_optional_file_input
+    )
+    show_caption_above_media: bool | None = tg_field(default=None)
+    # Keyword only
+    filename: InitVar[str | None] = tg_field(default=None, kw_only=True)
 
-    def __init__(
+    def __post_init__(
         self,
-        media: "FileInput | Animation",
-        caption: str | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        width: int | None = None,
-        height: int | None = None,
-        duration: TimePeriod | None = None,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated 22.8
-        filename_depr: str | None = None,
-        # -
-        has_spoiler: bool | None = None,
-        thumbnail: "FileInput | None" = None,
-        show_caption_above_media: bool | None = None,
-        *,
-        filename: str | None = None,
-        api_kwargs: JSONDict | None = None,
-    ):
+        filename_depr: str | None,
+        filename: str | None,
+        /,
+    ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
         if filename_depr is not None:
@@ -513,43 +517,43 @@ class InputMediaAnimation(InputMedia):
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
-                stacklevel=2,
+                stacklevel=4,
             )
+
+        media = cast("FileInput | Animation", self.media)
 
         if isinstance(media, Animation):
-            width = media.width if width is None else width
-            height = media.height if height is None else height
-            duration = duration if duration is not None else media._duration
-            media = media.file_id
+            if self.width is None:
+                object.__setattr__(self, "width", media.width)
+            if self.height is None:
+                object.__setattr__(self, "height", media.height)
+            if self._duration is None:
+                object.__setattr__(
+                    self,
+                    "_duration",
+                    media._duration,  # pylint: disable=protected-access
+                )
         else:
-            # We use local_mode=True because we don't have access to the actual setting and want
-            # things to work in local mode.
             effective_filename = filename_depr or filename
-            media = parse_file_input(
-                media, filename=effective_filename, attach=True, local_mode=True
-            )
+            if effective_filename is not None:
+                # We have to convert here because it requires both `media` and `filename`.
+                # It will harmlessly run again in the parent __post_init__
+                object.__setattr__(
+                    self,
+                    "media",
+                    parse_file_input(
+                        media, filename=effective_filename, attach=True, local_mode=True
+                    ),
+                )
 
-        super().__init__(
-            BaseInputMediaType.ANIMATION,
-            media,
-            caption,
-            caption_entities,
-            parse_mode,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
-            self.width: int | None = width
-            self.height: int | None = height
-            self._duration: dtm.timedelta | None = to_timedelta(duration)
-            self.has_spoiler: bool | None = has_spoiler
-            self.show_caption_above_media: bool | None = show_caption_above_media
+        InputMedia.__post_init__(self)
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
+@tg_dataclass()
 class InputMediaPhoto(InputMedia):
     """Represents a photo to be sent.
 
@@ -615,26 +619,30 @@ class InputMediaPhoto(InputMedia):
             .. versionadded:: 21.3
     """
 
-    __slots__ = (
-        "has_spoiler",
-        "show_caption_above_media",
+    # Attribute only
+    type: str = tg_field(init=False, default=BaseInputMediaType.PHOTO)
+    # Required
+    media: str | InputFile = tg_field(converter=_parse_photo_input)
+    # Optional
+    caption: str | None = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
     )
+    # tag: deprecated 22.8
+    filename_depr: InitVar[str | None] = tg_field(default=None)
+    # -
+    has_spoiler: bool | None = tg_field(default=None)
+    show_caption_above_media: bool | None = tg_field(default=None)
+    # Keyword only
+    filename: InitVar[str | None] = tg_field(default=None, kw_only=True)
 
-    def __init__(
+    def __post_init__(
         self,
-        media: "FileInput | PhotoSize",
-        caption: str | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated 22.8
-        filename_depr: str | None = None,
-        # -
-        has_spoiler: bool | None = None,
-        show_caption_above_media: bool | None = None,
-        *,
-        filename: str | None = None,
-        api_kwargs: JSONDict | None = None,
-    ):
+        filename_depr: str | None,
+        filename: str | None,
+        /,
+    ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
         if filename_depr is not None:
@@ -644,29 +652,30 @@ class InputMediaPhoto(InputMedia):
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
-                stacklevel=2,
+                stacklevel=3,
             )
 
-        # We use local_mode=True because we don't have access to the actual setting and want
-        # things to work in local mode.
         effective_filename = filename_depr or filename
-        media = parse_file_input(
-            media, PhotoSize, filename=effective_filename, attach=True, local_mode=True
-        )
-        super().__init__(
-            BaseInputMediaType.PHOTO,
-            media,
-            caption,
-            caption_entities,
-            parse_mode,
-            api_kwargs=api_kwargs,
-        )
+        if effective_filename is not None:
+            # We have to convert here because it requires both `media` and `filename`.
+            # It will harmlessly run again in the parent __post_init__
+            media = cast("FileInput | PhotoSize", self.media)
+            object.__setattr__(
+                self,
+                "media",
+                parse_file_input(
+                    media,
+                    tg_type=PhotoSize,
+                    filename=effective_filename,
+                    attach=True,
+                    local_mode=True,
+                ),
+            )
 
-        with self._unfrozen():
-            self.has_spoiler: bool | None = has_spoiler
-            self.show_caption_above_media: bool | None = show_caption_above_media
+        InputMedia.__post_init__(self)
 
 
+@tg_dataclass()
 class InputMediaVideo(InputMedia):
     """Represents a video to be sent.
 
@@ -781,40 +790,41 @@ class InputMediaVideo(InputMedia):
             .. versionchanged:: 21.11
     """
 
-    __slots__ = (
-        "_duration",
-        "cover",
-        "has_spoiler",
-        "height",
-        "show_caption_above_media",
-        "start_timestamp",
-        "supports_streaming",
-        "thumbnail",
-        "width",
+    # Attribute only
+    type: str = tg_field(init=False, default=BaseInputMediaType.VIDEO)
+    # Required
+    media: "str | InputFile" = tg_field(converter=_parse_video_input)
+    # Optional
+    caption: str | None = tg_field(default=None)
+    width: int | None = tg_field(default=None)
+    height: int | None = tg_field(default=None)
+    _duration: dtm.timedelta | None = tg_field(
+        default=None, alias="duration", converter=to_timedelta
     )
+    supports_streaming: bool | None = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    # tag: deprecated 22.8
+    filename_depr: InitVar[str | None] = tg_field(default=None)
+    # -
+    has_spoiler: bool | None = tg_field(default=None)
+    thumbnail: "str | InputFile | None" = tg_field(
+        default=None, converter=_parse_optional_file_input
+    )
+    show_caption_above_media: bool | None = tg_field(default=None)
+    cover: "str | InputFile | None" = tg_field(default=None, converter=_parse_optional_file_input)
+    start_timestamp: int | None = tg_field(default=None)
+    # Keyword only
+    filename: InitVar[str | None] = tg_field(default=None, kw_only=True)
 
-    def __init__(
+    def __post_init__(
         self,
-        media: "FileInput | Video",
-        caption: str | None = None,
-        width: int | None = None,
-        height: int | None = None,
-        duration: TimePeriod | None = None,
-        supports_streaming: bool | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated 22.8
-        filename_depr: str | None = None,
-        # -
-        has_spoiler: bool | None = None,
-        thumbnail: "FileInput | None" = None,
-        show_caption_above_media: bool | None = None,
-        cover: "FileInput | None" = None,
-        start_timestamp: int | None = None,
-        *,
-        filename: str | None = None,
-        api_kwargs: JSONDict | None = None,
-    ):
+        filename_depr: str | None,
+        filename: str | None,
+        /,
+    ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
         if filename_depr is not None:
@@ -824,48 +834,43 @@ class InputMediaVideo(InputMedia):
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
-                stacklevel=2,
+                stacklevel=4,
             )
+
+        media = cast("FileInput | Video", self.media)
 
         if isinstance(media, Video):
-            width = width if width is not None else media.width
-            height = height if height is not None else media.height
-            duration = duration if duration is not None else media._duration
-            media = media.file_id
+            if self.width is None:
+                object.__setattr__(self, "width", media.width)
+            if self.height is None:
+                object.__setattr__(self, "height", media.height)
+            if self._duration is None:
+                object.__setattr__(
+                    self,
+                    "_duration",
+                    media._duration,  # pylint: disable=protected-access
+                )
         else:
-            # We use local_mode=True because we don't have access to the actual setting and want
-            # things to work in local mode.
             effective_filename = filename_depr or filename
-            media = parse_file_input(
-                media, filename=effective_filename, attach=True, local_mode=True
-            )
+            if effective_filename is not None:
+                # We have to convert here because it requires both `media` and `filename`.
+                # It will harmlessly run again in the parent __post_init__
+                object.__setattr__(
+                    self,
+                    "media",
+                    parse_file_input(
+                        media, filename=effective_filename, attach=True, local_mode=True
+                    ),
+                )
 
-        super().__init__(
-            BaseInputMediaType.VIDEO,
-            media,
-            caption,
-            caption_entities,
-            parse_mode,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            self.width: int | None = width
-            self.height: int | None = height
-            self._duration: dtm.timedelta | None = to_timedelta(duration)
-            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
-            self.supports_streaming: bool | None = supports_streaming
-            self.has_spoiler: bool | None = has_spoiler
-            self.show_caption_above_media: bool | None = show_caption_above_media
-            self.cover: InputFile | str | None = (
-                parse_file_input(cover, attach=True, local_mode=True) if cover else None
-            )
-            self.start_timestamp: int | None = start_timestamp
+        InputMedia.__post_init__(self)
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
+@tg_dataclass()
 class InputMediaLocation(_BaseInputMedia):
     """Represents a location to be sent.
 
@@ -885,23 +890,16 @@ class InputMediaLocation(_BaseInputMedia):
             measured in meters; 0-:tg-const:`telegram.Location.HORIZONTAL_ACCURACY`.
     """
 
-    __slots__ = ("horizontal_accuracy", "latitude", "longitude")
-
-    def __init__(
-        self,
-        latitude: float,
-        longitude: float,
-        horizontal_accuracy: float | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(media_type=BaseInputMediaType.LOCATION, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.latitude: float = latitude
-            self.longitude: float = longitude
-            self.horizontal_accuracy: float | None = horizontal_accuracy
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BaseInputMediaType.LOCATION)
+    # Required
+    latitude: float = tg_field()
+    longitude: float = tg_field()
+    # Optional
+    horizontal_accuracy: float | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class InputMediaVenue(_BaseInputMedia):
     """Represents a venue to be sent.
 
@@ -935,42 +933,21 @@ class InputMediaVenue(_BaseInputMedia):
         `supported types <https://developers.google.com/places/web-service/supported_types>`__)
     """
 
-    __slots__ = (
-        "address",
-        "foursquare_id",
-        "foursquare_type",
-        "google_place_id",
-        "google_place_type",
-        "latitude",
-        "longitude",
-        "title",
-    )
-
-    def __init__(
-        self,
-        latitude: float,
-        longitude: float,
-        title: str,
-        address: str,
-        foursquare_id: str | None = None,
-        foursquare_type: str | None = None,
-        google_place_id: str | None = None,
-        google_place_type: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(media_type=BaseInputMediaType.VENUE, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.latitude: float = latitude
-            self.longitude: float = longitude
-            self.title: str = title
-            self.address: str = address
-            self.foursquare_id: str | None = foursquare_id
-            self.foursquare_type: str | None = foursquare_type
-            self.google_place_id: str | None = google_place_id
-            self.google_place_type: str | None = google_place_type
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BaseInputMediaType.VENUE)
+    # Required
+    latitude: float = tg_field()
+    longitude: float = tg_field()
+    title: str = tg_field()
+    address: str = tg_field()
+    # Optional
+    foursquare_id: str | None = tg_field(default=None)
+    foursquare_type: str | None = tg_field(default=None)
+    google_place_id: str | None = tg_field(default=None)
+    google_place_type: str | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class InputMediaSticker(_BaseInputMedia):
     """Represents a sticker file to be sent.
 
@@ -998,24 +975,39 @@ class InputMediaSticker(_BaseInputMedia):
             stickers.
     """
 
-    __slots__ = ("emoji", "media")
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BaseInputMediaType.STICKER)
+    # Required
+    media: "str | InputFile" = tg_field(converter=_parse_sticker_input)
+    # Optional
+    emoji: str | None = tg_field(default=None)
+    # Keyword only
+    filename: InitVar[str | None] = tg_field(default=None, kw_only=True)
 
-    def __init__(
+    def __post_init__(
         self,
-        media: "FileInput | Sticker",
-        emoji: str | None = None,
-        *,
-        filename: str | None = None,
-        api_kwargs: JSONDict | None = None,
-    ):
-        media = parse_file_input(media, Sticker, filename=filename, attach=True, local_mode=True)
+        filename: str | None,
+        /,
+    ) -> None:
+        if filename is not None:
+            # We have to convert here because it requires both `media` and `filename`.
+            # It will harmlessly run again in the parent __post_init__
+            object.__setattr__(
+                self,
+                "media",
+                parse_file_input(
+                    self.media,
+                    tg_type=Sticker,
+                    filename=filename,
+                    attach=True,
+                    local_mode=True,
+                ),
+            )
 
-        super().__init__(media_type=BaseInputMediaType.STICKER, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.media: str | InputFile = media
-            self.emoji: str | None = emoji
+        _BaseInputMedia.__post_init__(self)
 
 
+@tg_dataclass()
 class InputMediaAudio(InputMedia):
     """Represents an audio file to be treated as music to be sent.
 
@@ -1100,25 +1092,36 @@ class InputMediaAudio(InputMedia):
 
     """
 
-    __slots__ = ("_duration", "performer", "thumbnail", "title")
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BaseInputMediaType.AUDIO)
+    # Required
+    media: "str | InputFile" = tg_field(converter=_parse_audio_input)
+    # Optional
+    caption: str | None = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    _duration: dtm.timedelta | None = tg_field(
+        default=None, alias="duration", converter=to_timedelta
+    )
+    performer: str | None = tg_field(default=None)
+    title: str | None = tg_field(default=None)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    # tag: deprecated 22.8
+    filename_depr: InitVar[str | None] = tg_field(default=None)
+    # -
+    thumbnail: "str | InputFile | None" = tg_field(
+        default=None, converter=_parse_optional_file_input
+    )
+    # Keyword only
+    filename: InitVar[str | None] = tg_field(default=None, kw_only=True)
 
-    def __init__(
+    def __post_init__(
         self,
-        media: "FileInput | Audio",
-        caption: str | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        duration: TimePeriod | None = None,
-        performer: str | None = None,
-        title: str | None = None,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated 22.8
-        filename_depr: str | None = None,
-        # -
-        thumbnail: "FileInput | None" = None,
-        *,
-        filename: str | None = None,
-        api_kwargs: JSONDict | None = None,
-    ):
+        filename_depr: str | None,
+        filename: str | None,
+        /,
+    ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
         if filename_depr is not None:
@@ -1128,41 +1131,43 @@ class InputMediaAudio(InputMedia):
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
-                stacklevel=2,
+                stacklevel=4,
             )
+
+        media = cast("FileInput | Audio", self.media)
 
         if isinstance(media, Audio):
-            duration = duration if duration is not None else media._duration
-            performer = media.performer if performer is None else performer
-            title = media.title if title is None else title
-            media = media.file_id
+            if self._duration is None:
+                object.__setattr__(
+                    self,
+                    "_duration",
+                    media._duration,  # pylint: disable=protected-access
+                )
+            if self.performer is None:
+                object.__setattr__(self, "performer", media.performer)
+            if self.title is None:
+                object.__setattr__(self, "title", media.title)
         else:
-            # We use local_mode=True because we don't have access to the actual setting and want
-            # things to work in local mode.
             effective_filename = filename_depr or filename
-            media = parse_file_input(
-                media, filename=effective_filename, attach=True, local_mode=True
-            )
+            if effective_filename is not None:
+                # We have to convert here because it requires both `media` and `filename`.
+                # It will harmlessly run again in the parent __post_init__
+                object.__setattr__(
+                    self,
+                    "media",
+                    parse_file_input(
+                        media, filename=effective_filename, attach=True, local_mode=True
+                    ),
+                )
 
-        super().__init__(
-            BaseInputMediaType.AUDIO,
-            media,
-            caption,
-            caption_entities,
-            parse_mode,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
-            self._duration: dtm.timedelta | None = to_timedelta(duration)
-            self.title: str | None = title
-            self.performer: str | None = performer
+        InputMedia.__post_init__(self)
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._duration, attribute="duration")
 
 
+@tg_dataclass()
 class InputMediaDocument(InputMedia):
     """Represents a general file to be sent.
 
@@ -1231,23 +1236,32 @@ class InputMediaDocument(InputMedia):
             .. versionadded:: 20.2
     """
 
-    __slots__ = ("disable_content_type_detection", "thumbnail")
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BaseInputMediaType.DOCUMENT)
+    # Required
+    media: "str | InputFile" = tg_field(converter=_parse_document_input)
+    # Optional
+    caption: str | None = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    disable_content_type_detection: bool | None = tg_field(default=None)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    # tag: deprecated 22.8
+    filename_depr: InitVar[str | None] = tg_field(default=None)
+    # -
+    thumbnail: "str | InputFile | None" = tg_field(
+        default=None, converter=_parse_optional_file_input
+    )
+    # Keyword only
+    filename: InitVar[str | None] = tg_field(default=None, kw_only=True)
 
-    def __init__(
+    def __post_init__(
         self,
-        media: "FileInput | Document",
-        caption: str | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        disable_content_type_detection: bool | None = None,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        # tag: deprecated 22.8
-        filename_depr: str | None = None,
-        # -
-        thumbnail: "FileInput | None" = None,
-        *,
-        filename: str | None = None,
-        api_kwargs: JSONDict | None = None,
-    ):
+        filename_depr: str | None,
+        filename: str | None,
+        /,
+    ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
         if filename_depr is not None:
@@ -1257,29 +1271,30 @@ class InputMediaDocument(InputMedia):
                     "Positional passing of `filename` or keyword usage of `filename_depr`"
                     " is deprecated. `filename` will become a keyword-only argument.",
                 ),
-                stacklevel=2,
+                stacklevel=3,
             )
 
-        # We use local_mode=True because we don't have access to the actual setting and want
-        # things to work in local mode.
         effective_filename = filename_depr or filename
-        media = parse_file_input(
-            media, Document, filename=effective_filename, attach=True, local_mode=True
-        )
+        if effective_filename is not None:
+            # We have to convert here because it requires both `media` and `filename`.
+            # It will harmlessly run again in the parent __post_init__
+            media = cast("FileInput | Document", self.media)
+            object.__setattr__(
+                self,
+                "media",
+                parse_file_input(
+                    media,
+                    tg_type=Document,
+                    filename=effective_filename,
+                    attach=True,
+                    local_mode=True,
+                ),
+            )
 
-        super().__init__(
-            BaseInputMediaType.DOCUMENT,
-            media,
-            caption,
-            caption_entities,
-            parse_mode,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            self.thumbnail: str | InputFile | None = self._parse_thumbnail_input(thumbnail)
-            self.disable_content_type_detection: bool | None = disable_content_type_detection
+        InputMedia.__post_init__(self)
 
 
+@tg_dataclass()
 class InputMediaLivePhoto(InputMedia):
     """Represents a live photo to be sent.
 
@@ -1321,35 +1336,19 @@ class InputMediaLivePhoto(InputMedia):
             spoiler animation.
     """
 
-    __slots__ = ("has_spoiler", "photo", "show_caption_above_media")
-
-    def __init__(
-        self,
-        media: "FileInput | Video",
-        photo: "FileInput | PhotoSize",
-        caption: str | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        show_caption_above_media: bool | None = None,
-        has_spoiler: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        media = parse_file_input(media, tg_type=Video, attach=True, local_mode=True)
-        photo = parse_file_input(photo, tg_type=PhotoSize, attach=True, local_mode=True)
-
-        super().__init__(
-            BaseInputMediaType.LIVE_PHOTO,
-            media,
-            caption,
-            caption_entities,
-            parse_mode,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            self.photo: str | InputFile = photo
-            self.show_caption_above_media: bool | None = show_caption_above_media
-            self.has_spoiler: bool | None = has_spoiler
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=BaseInputMediaType.LIVE_PHOTO)
+    # Required
+    media: "str | InputFile" = tg_field(converter=_parse_video_input)
+    photo: "str | InputFile" = tg_field(converter=_parse_photo_input)
+    # Optional
+    caption: str | None = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    show_caption_above_media: bool | None = tg_field(default=None)
+    has_spoiler: bool | None = tg_field(default=None)
 
 
 InputPollMedia: TypeAlias = (

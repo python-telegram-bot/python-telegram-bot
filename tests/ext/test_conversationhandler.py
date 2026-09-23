@@ -564,38 +564,36 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
             assert self.test_flag == (not raise_ahs)
 
             # The user is thirsty and wants to brew coffee.
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.BREWING
             assert self.test_flag == (not raise_ahs)
 
             # Lets see if an invalid command makes sure, no state is changed.
-            message.text = "/nothing"
-            message.entities[0].length = len("/nothing")
+            object.__setattr__(message, "text", "/nothing")
+            object.__setattr__(message.entities[0], "length", len("/nothing"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.BREWING
             assert self.test_flag is True
             self.test_flag = False
 
             # Lets see if the state machine still works by pouring coffee.
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.DRINKING
             assert self.test_flag == (not raise_ahs)
 
             # Let's now verify that for another user, who did not start yet,
             # the state has not been changed.
-            message.from_user = user2
+            object.__setattr__(message, "from_user", user2)
             await app.process_update(Update(update_id=0, message=message))
             with pytest.raises(KeyError):
                 self.current_state[user2.id]
@@ -617,19 +615,17 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/end"
-            message.entities[0].length = len("/end")
+            object.__setattr__(message, "text", "/end")
+            object.__setattr__(message.entities[0], "length", len("/end"))
             caplog.clear()
             with caplog.at_level(logging.ERROR):
                 await app.process_update(Update(update_id=0, message=message))
@@ -638,8 +634,8 @@ class TestConversationHandler:
 
             # make sure that the conversation has ended by checking that the start command is
             # accepted again
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(update_id=0, message=message))
 
     async def test_conversation_handler_fallback(self, app, bot, user1, user2):
@@ -658,8 +654,6 @@ class TestConversationHandler:
             entities=[MessageEntity(type=MessageEntity.BOT_COMMAND, offset=0, length=len("/eat"))],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -667,20 +661,20 @@ class TestConversationHandler:
                 self.current_state[user1.id]
 
             # User starts the state machine.
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
 
             # The user is thirsty and wants to brew coffee.
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.BREWING
 
             # Now a fallback command is issued
-            message.text = "/eat"
-            message.entities[0].length = len("/eat")
+            object.__setattr__(message, "text", "/eat")
+            object.__setattr__(message.entities[0], "length", len("/eat"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
 
@@ -712,8 +706,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             try:
@@ -753,31 +745,29 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
 
             # The user is thirsty and wants to brew coffee.
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
 
             # Let's now verify that for another user, who did not start yet,
             # the state will be changed because they are in the same group.
-            message.from_user = user2
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "from_user", user2)
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             await app.process_update(Update(update_id=0, message=message))
 
             # Check that we're in the DRINKING state by checking that the corresponding command
             # is accepted
-            message.from_user = user1
-            message.text = "/startCoding"
-            message.entities[0].length = len("/startCoding")
+            object.__setattr__(message, "from_user", user1)
+            object.__setattr__(message, "text", "/startCoding")
+            object.__setattr__(message.entities[0], "length", len("/startCoding"))
             assert handler.check_update(Update(update_id=0, message=message))
-            message.from_user = user2
+            object.__setattr__(message, "from_user", user2)
             assert handler.check_update(Update(update_id=0, message=message))
 
     async def test_conversation_handler_per_user(self, app, bot, user1):
@@ -801,36 +791,34 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         # First check that updates without user won't be handled
-        message.from_user = None
+        object.__setattr__(message, "from_user", None)
         assert not handler.check_update(Update(update_id=0, message=message))
 
-        message.from_user = user1
+        object.__setattr__(message, "from_user", user1)
         async with app:
             await app.process_update(Update(update_id=0, message=message))
 
             # The user is thirsty and wants to brew coffee.
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
 
             # Let's now verify that for the same user in a different group, the state will still be
             # updated
-            message.chat = self.second_group
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "chat", self.second_group)
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             await app.process_update(Update(update_id=0, message=message))
 
             # Check that we're in the DRINKING state by checking that the corresponding command
             # is accepted
-            message.chat = self.group
-            message.text = "/startCoding"
-            message.entities[0].length = len("/startCoding")
+            object.__setattr__(message, "chat", self.group)
+            object.__setattr__(message, "text", "/startCoding")
+            object.__setattr__(message.entities[0], "length", len("/startCoding"))
             assert handler.check_update(Update(update_id=0, message=message))
-            message.chat = self.second_group
+            object.__setattr__(message, "chat", self.second_group)
             assert handler.check_update(Update(update_id=0, message=message))
 
     @pytest.mark.parametrize("inline", [True, False])
@@ -865,7 +853,6 @@ class TestConversationHandler:
         )
         if message:
             message.set_bot(bot)
-            message._unfreeze()
         inline_message_id = "42" if inline else None
 
         async with app:
@@ -887,7 +874,6 @@ class TestConversationHandler:
                 inline_message_id=inline_message_id,
             )
             cbq_2.set_bot(bot)
-            cbq_2._unfreeze()
             await app.process_update(Update(update_id=0, callback_query=cbq_1))
 
             # Make sure that we're in the correct state
@@ -902,10 +888,10 @@ class TestConversationHandler:
 
             # Let's now verify that for a different user in the same group, the state will not be
             # updated
-            cbq_2.from_user = user2
+            object.__setattr__(cbq_2, "from_user", user2)
             await app.process_update(Update(update_id=0, callback_query=cbq_2))
 
-            cbq_2.from_user = user1
+            object.__setattr__(cbq_2, "from_user", user1)
             assert not handler.check_update(Update(0, callback_query=cbq_1))
             assert handler.check_update(Update(0, callback_query=cbq_2))
 
@@ -927,8 +913,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert handler.check_update(Update(update_id=0, message=message))
@@ -955,8 +939,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # give the task a chance to finish
@@ -976,7 +958,6 @@ class TestConversationHandler:
         # User starts the state machine and a callback function returns None
         message = Message(0, None, self.group, from_user=user1, text="/start")
         message.set_bot(bot)
-        message._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # Check that the same message is accepted again, i.e. the conversation immediately
@@ -1004,8 +985,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             # Give the task a chance to finish
@@ -1031,7 +1010,6 @@ class TestConversationHandler:
         )
         message = Message(0, date=None, chat=Chat(0, Chat.CHANNEL, "Misses Test"))
         message.set_bot(bot)
-        message._unfreeze()
 
         update = Update(0, channel_post=message)
         assert not handler.check_update(update)
@@ -1045,7 +1023,6 @@ class TestConversationHandler:
         )
         message = Message(0, None, self.group, from_user=user1, text="ignore")
         message.set_bot(bot)
-        message._unfreeze()
         callback_query = CallbackQuery(0, user1, None, message=message, data="data")
         callback_query.set_bot(bot)
         chosen_inline_result = ChosenInlineResult(0, user1, "query")
@@ -1086,8 +1063,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -1137,8 +1112,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
@@ -1188,13 +1161,11 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         # start the conversation
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.1)
-            message.text = "error"
+            object.__setattr__(message, "text", "error")
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.1)
             caplog.clear()
@@ -1239,8 +1210,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         # start the conversation
         async with app:
             await app.process_update(Update(update_id=0, message=message))
@@ -1348,22 +1317,20 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             # start the conversation
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.1)
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=1, message=message))
             await asyncio.sleep(0.1)
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             await app.process_update(Update(update_id=2, message=message))
             await asyncio.sleep(0.1)
-            message.text = "/end"
-            message.entities[0].length = len("/end")
+            object.__setattr__(message, "text", "/end")
+            object.__setattr__(message.entities[0], "length", len("/end"))
             await app.process_update(Update(update_id=3, message=message))
             await asyncio.sleep(1)
             # assert timeout handler didn't get called
@@ -1395,8 +1362,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         brew_message = Message(
             0,
             None,
@@ -1449,8 +1414,6 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         update = Update(update_id=0, message=message)
 
         async def timeout_callback(u, c):
@@ -1509,34 +1472,32 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
 
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             assert handler.check_update(Update(0, message=message))
             await asyncio.sleep(0.35)  # t=.35
             assert handler.check_update(Update(0, message=message))
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             assert handler.check_update(Update(0, message=message))
             await asyncio.sleep(0.25)  # t=.6
             assert handler.check_update(Update(0, message=message))
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/startCoding"
-            message.entities[0].length = len("/startCoding")
+            object.__setattr__(message, "text", "/startCoding")
+            object.__setattr__(message.entities[0], "length", len("/startCoding"))
             assert handler.check_update(Update(0, message=message))
             await asyncio.sleep(0.4)  # t=1.0
             assert handler.check_update(Update(0, message=message))
             await asyncio.sleep(0.3)  # t=1.3
             assert not handler.check_update(Update(0, message=message))
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
 
             await app.stop()
@@ -1562,34 +1523,32 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
 
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             assert handler.check_update(Update(0, message=message))
-            message.from_user = user2
+            object.__setattr__(message, "from_user", user2)
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             # Make sure that user2s conversation has not yet started
             assert handler.check_update(Update(0, message=message))
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             assert handler.check_update(Update(0, message=message))
             await asyncio.sleep(0.7)
             # check that both conversations have ended by checking that the start message is
             # accepted again
-            message.text = "/start"
-            message.entities[0].length = len("/start")
-            message.from_user = user1
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
+            object.__setattr__(message, "from_user", user1)
             assert handler.check_update(Update(0, message=message))
-            message.from_user = user2
+            object.__setattr__(message, "from_user", user2)
             assert handler.check_update(Update(0, message=message))
 
             await app.stop()
@@ -1624,27 +1583,25 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
 
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.7)
             # check that conversation has ended by checking that start cmd is accepted again
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
             assert self.is_timeout
 
             # MessageHandler timeout
             self.is_timeout = False
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             await app.process_update(Update(update_id=1, message=message))
             await asyncio.sleep(0.7)
             # check that conversation has ended by checking that start cmd is accepted again
@@ -1654,16 +1611,16 @@ class TestConversationHandler:
             # Timeout but no valid handler
             self.is_timeout = False
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/startCoding"
-            message.entities[0].length = len("/startCoding")
+            object.__setattr__(message, "text", "/startCoding")
+            object.__setattr__(message.entities[0], "length", len("/startCoding"))
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.7)
             # check that conversation has ended by checking that start cmd is accepted again
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
             assert not self.is_timeout
 
@@ -1699,26 +1656,24 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.start()
 
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.7)
             # check that conversation has ended by checking that start cmd is accepted again
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
             assert self.is_timeout
 
             # MessageHandler timeout
             self.is_timeout = False
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             await app.process_update(Update(update_id=1, message=message))
             await asyncio.sleep(0.7)
             # check that conversation has ended by checking that start cmd is accepted again
@@ -1728,16 +1683,16 @@ class TestConversationHandler:
             # Timeout but no valid handler
             self.is_timeout = False
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
-            message.text = "/startCoding"
-            message.entities[0].length = len("/startCoding")
+            object.__setattr__(message, "text", "/startCoding")
+            object.__setattr__(message.entities[0], "length", len("/startCoding"))
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.7)
             # check that conversation has ended by checking that start cmd is accepted again
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
             assert not self.is_timeout
 
@@ -1783,26 +1738,24 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
 
         async with app:
             await app.start()
             await app.process_update(Update(update_id=0, message=message))
             await asyncio.sleep(0.25)
-            message.text = "/slowbrew"
-            message.entities[0].length = len("/slowbrew")
+            object.__setattr__(message, "text", "/slowbrew")
+            object.__setattr__(message.entities[0], "length", len("/slowbrew"))
             await app.process_update(Update(update_id=0, message=message))
             # Check that conversation has not ended by checking that start cmd is not accepted
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert not handler.check_update(Update(0, message=message))
             assert not self.is_timeout
 
             await asyncio.sleep(0.7)
             # Check that conversation has ended by checking that start cmd is accepted again
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
             assert self.is_timeout
 
@@ -1834,56 +1787,54 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
 
             # The user is thirsty and wants to brew coffee.
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.BREWING
 
             # Lets pour some coffee.
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.DRINKING
 
             # The user is holding the cup
-            message.text = "/hold"
-            message.entities[0].length = len("/hold")
+            object.__setattr__(message, "text", "/hold")
+            object.__setattr__(message.entities[0], "length", len("/hold"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.HOLDING
 
             # The user is sipping coffee
-            message.text = "/sip"
-            message.entities[0].length = len("/sip")
+            object.__setattr__(message, "text", "/sip")
+            object.__setattr__(message.entities[0], "length", len("/sip"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.SIPPING
 
             # The user is swallowing
-            message.text = "/swallow"
-            message.entities[0].length = len("/swallow")
+            object.__setattr__(message, "text", "/swallow")
+            object.__setattr__(message.entities[0], "length", len("/swallow"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.SWALLOWING
 
             # The user is holding the cup again
-            message.text = "/hold"
-            message.entities[0].length = len("/hold")
+            object.__setattr__(message, "text", "/hold")
+            object.__setattr__(message.entities[0], "length", len("/hold"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.HOLDING
 
             # The user wants to replenish the coffee supply
-            message.text = "/replenish"
-            message.entities[0].length = len("/replenish")
+            object.__setattr__(message, "text", "/replenish")
+            object.__setattr__(message.entities[0], "length", len("/replenish"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.REPLENISHING
             # check that we're in the right state now by checking that the update is accepted
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             assert handler.check_update(Update(0, message=message))
 
             # The user wants to drink their coffee again)
@@ -1891,31 +1842,31 @@ class TestConversationHandler:
             assert self.current_state[user1.id] == self.DRINKING
 
             # The user is now ready to start coding
-            message.text = "/startCoding"
-            message.entities[0].length = len("/startCoding")
+            object.__setattr__(message, "text", "/startCoding")
+            object.__setattr__(message.entities[0], "length", len("/startCoding"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.CODING
 
             # The user decides it's time to drink again
-            message.text = "/drinkMore"
-            message.entities[0].length = len("/drinkMore")
+            object.__setattr__(message, "text", "/drinkMore")
+            object.__setattr__(message.entities[0], "length", len("/drinkMore"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.DRINKING
 
             # The user is holding their cup
-            message.text = "/hold"
-            message.entities[0].length = len("/hold")
+            object.__setattr__(message, "text", "/hold")
+            object.__setattr__(message.entities[0], "length", len("/hold"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.HOLDING
 
             # The user wants to end with the drinking and go back to coding
-            message.text = "/end"
-            message.entities[0].length = len("/end")
+            object.__setattr__(message, "text", "/end")
+            object.__setattr__(message.entities[0], "length", len("/end"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.END
             # check that we're in the right state now by checking that the update is accepted
-            message.text = "/drinkMore"
-            message.entities[0].length = len("/drinkMore")
+            object.__setattr__(message, "text", "/drinkMore")
+            object.__setattr__(message.entities[0], "length", len("/drinkMore"))
             assert handler.check_update(Update(0, message=message))
 
             # The user wants to drink once more
@@ -1923,13 +1874,13 @@ class TestConversationHandler:
             assert self.current_state[user1.id] == self.DRINKING
 
             # The user wants to stop altogether
-            message.text = "/stop"
-            message.entities[0].length = len("/stop")
+            object.__setattr__(message, "text", "/stop")
+            object.__setattr__(message.entities[0], "length", len("/stop"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.STOPPING
             # check that the conversation has ended by checking that the start cmd is accepted
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
 
     async def test_nested_conversation_application_handler_stop(self, app, bot, user1, user2):
@@ -1964,63 +1915,61 @@ class TestConversationHandler:
             ],
         )
         message.set_bot(bot)
-        message._unfreeze()
-        message.entities[0]._unfreeze()
         async with app:
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.THIRSTY
             assert not self.test_flag
 
             # The user is thirsty and wants to brew coffee.
-            message.text = "/brew"
-            message.entities[0].length = len("/brew")
+            object.__setattr__(message, "text", "/brew")
+            object.__setattr__(message.entities[0], "length", len("/brew"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.BREWING
             assert not self.test_flag
 
             # Lets pour some coffee.
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.DRINKING
             assert not self.test_flag
 
             # The user is holding the cup
-            message.text = "/hold"
-            message.entities[0].length = len("/hold")
+            object.__setattr__(message, "text", "/hold")
+            object.__setattr__(message.entities[0], "length", len("/hold"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.HOLDING
             assert not self.test_flag
 
             # The user is sipping coffee
-            message.text = "/sip"
-            message.entities[0].length = len("/sip")
+            object.__setattr__(message, "text", "/sip")
+            object.__setattr__(message.entities[0], "length", len("/sip"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.SIPPING
             assert not self.test_flag
 
             # The user is swallowing
-            message.text = "/swallow"
-            message.entities[0].length = len("/swallow")
+            object.__setattr__(message, "text", "/swallow")
+            object.__setattr__(message.entities[0], "length", len("/swallow"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.SWALLOWING
             assert not self.test_flag
 
             # The user is holding the cup again
-            message.text = "/hold"
-            message.entities[0].length = len("/hold")
+            object.__setattr__(message, "text", "/hold")
+            object.__setattr__(message.entities[0], "length", len("/hold"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.HOLDING
             assert not self.test_flag
 
             # The user wants to replenish the coffee supply
-            message.text = "/replenish"
-            message.entities[0].length = len("/replenish")
+            object.__setattr__(message, "text", "/replenish")
+            object.__setattr__(message.entities[0], "length", len("/replenish"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.REPLENISHING
             # check that we're in the right state now by checking that the update is accepted
-            message.text = "/pourCoffee"
-            message.entities[0].length = len("/pourCoffee")
+            object.__setattr__(message, "text", "/pourCoffee")
+            object.__setattr__(message.entities[0], "length", len("/pourCoffee"))
             assert handler.check_update(Update(0, message=message))
             assert not self.test_flag
 
@@ -2030,52 +1979,52 @@ class TestConversationHandler:
             assert not self.test_flag
 
             # The user is now ready to start coding
-            message.text = "/startCoding"
-            message.entities[0].length = len("/startCoding")
+            object.__setattr__(message, "text", "/startCoding")
+            object.__setattr__(message.entities[0], "length", len("/startCoding"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.CODING
             assert not self.test_flag
 
             # The user decides it's time to drink again
-            message.text = "/drinkMore"
-            message.entities[0].length = len("/drinkMore")
+            object.__setattr__(message, "text", "/drinkMore")
+            object.__setattr__(message.entities[0], "length", len("/drinkMore"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.DRINKING
             assert not self.test_flag
 
             # The user is holding their cup
-            message.text = "/hold"
-            message.entities[0].length = len("/hold")
+            object.__setattr__(message, "text", "/hold")
+            object.__setattr__(message.entities[0], "length", len("/hold"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.HOLDING
             assert not self.test_flag
 
             # The user wants to end with the drinking and go back to coding
-            message.text = "/end"
-            message.entities[0].length = len("/end")
+            object.__setattr__(message, "text", "/end")
+            object.__setattr__(message.entities[0], "length", len("/end"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.END
             # check that we're in the right state now by checking that the update is accepted
-            message.text = "/drinkMore"
-            message.entities[0].length = len("/drinkMore")
+            object.__setattr__(message, "text", "/drinkMore")
+            object.__setattr__(message.entities[0], "length", len("/drinkMore"))
             assert handler.check_update(Update(0, message=message))
             assert not self.test_flag
 
             # The user wants to drink once more
-            message.text = "/drinkMore"
-            message.entities[0].length = len("/drinkMore")
+            object.__setattr__(message, "text", "/drinkMore")
+            object.__setattr__(message.entities[0], "length", len("/drinkMore"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.DRINKING
             assert not self.test_flag
 
             # The user wants to stop altogether
-            message.text = "/stop"
-            message.entities[0].length = len("/stop")
+            object.__setattr__(message, "text", "/stop")
+            object.__setattr__(message.entities[0], "length", len("/stop"))
             await app.process_update(Update(update_id=0, message=message))
             assert self.current_state[user1.id] == self.STOPPING
             # check that the conv has ended by checking that the start cmd is accepted
-            message.text = "/start"
-            message.entities[0].length = len("/start")
+            object.__setattr__(message, "text", "/start")
+            object.__setattr__(message.entities[0], "length", len("/start"))
             assert handler.check_update(Update(0, message=message))
             assert not self.test_flag
 
@@ -2297,15 +2246,14 @@ class TestConversationHandler:
             text="/start",
             from_user=user1,
         )
-        message._unfreeze()
 
         async with app:
             await app.process_update(Update(0, message=message))
             assert not self.test_flag
-            message.text = "1"
+            object.__setattr__(message, "text", "1")
             await app.process_update(Update(0, message=message))
             assert self.test_flag == 1
-            message.text = "2"
+            object.__setattr__(message, "text", "2")
             await app.process_update(Update(0, message=message))
             assert self.test_flag == 2
             event.set()

@@ -35,7 +35,6 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import UniqueGiftInfoOrigin, UniqueGiftModelRarity
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -60,13 +59,6 @@ class UniqueGiftColorsTestBase:
 
 
 class TestUniqueGiftColorsWithoutRequest(UniqueGiftColorsTestBase):
-    def test_slot_behaviour(self, unique_gift_colors):
-        for attr in unique_gift_colors.__slots__:
-            assert getattr(unique_gift_colors, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_colors)) == len(set(mro_slots(unique_gift_colors))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "model_custom_emoji_id": self.model_custom_emoji_id,
@@ -177,11 +169,6 @@ class UniqueGiftTestBase:
 
 
 class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
-    def test_slot_behaviour(self, unique_gift):
-        for attr in unique_gift.__slots__:
-            assert getattr(unique_gift, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift)) == len(set(mro_slots(unique_gift))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "gift_id": self.gift_id,
@@ -282,13 +269,6 @@ class UniqueGiftModelTestBase:
 
 
 class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase):
-    def test_slot_behaviour(self, unique_gift_model):
-        for attr in unique_gift_model.__slots__:
-            assert getattr(unique_gift_model, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_model)) == len(set(mro_slots(unique_gift_model))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "name": self.name,
@@ -346,13 +326,6 @@ class UniqueGiftSymbolTestBase:
 
 
 class TestUniqueGiftSymbolWithoutRequest(UniqueGiftSymbolTestBase):
-    def test_slot_behaviour(self, unique_gift_symbol):
-        for attr in unique_gift_symbol.__slots__:
-            assert getattr(unique_gift_symbol, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_symbol)) == len(set(mro_slots(unique_gift_symbol))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "name": self.name,
@@ -403,13 +376,6 @@ class UniqueGiftBackdropTestBase:
 
 
 class TestUniqueGiftBackdropWithoutRequest(UniqueGiftBackdropTestBase):
-    def test_slot_behaviour(self, unique_gift_backdrop):
-        for attr in unique_gift_backdrop.__slots__:
-            assert getattr(unique_gift_backdrop, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_backdrop)) == len(set(mro_slots(unique_gift_backdrop))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "name": self.name,
@@ -462,15 +428,6 @@ class UniqueGiftBackdropColorsTestBase:
 
 
 class TestUniqueGiftBackdropColorsWithoutRequest(UniqueGiftBackdropColorsTestBase):
-    def test_slot_behaviour(self, unique_gift_backdrop_colors):
-        for attr in unique_gift_backdrop_colors.__slots__:
-            assert getattr(unique_gift_backdrop_colors, attr, "err") != "err", (
-                f"got extra slot '{attr}'"
-            )
-        assert len(mro_slots(unique_gift_backdrop_colors)) == len(
-            set(mro_slots(unique_gift_backdrop_colors))
-        ), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "center_color": self.center_color,
@@ -562,13 +519,6 @@ class UniqueGiftInfoTestBase:
 
 
 class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
-    def test_slot_behaviour(self, unique_gift_info):
-        for attr in unique_gift_info.__slots__:
-            assert getattr(unique_gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_info)) == len(set(mro_slots(unique_gift_info))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "gift": self.gift.to_dict(),

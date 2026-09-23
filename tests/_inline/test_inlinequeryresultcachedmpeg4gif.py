@@ -26,7 +26,6 @@ from telegram import (
     InputTextMessageContent,
     MessageEntity,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -58,12 +57,6 @@ class InlineQueryResultCachedMpeg4GifTestBase:
 
 
 class TestInlineQueryResultCachedMpeg4GifWithoutRequest(InlineQueryResultCachedMpeg4GifTestBase):
-    def test_slot_behaviour(self, inline_query_result_cached_mpeg4_gif):
-        inst = inline_query_result_cached_mpeg4_gif
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, inline_query_result_cached_mpeg4_gif):
         assert inline_query_result_cached_mpeg4_gif.type == self.type_
         assert inline_query_result_cached_mpeg4_gif.id == self.id_

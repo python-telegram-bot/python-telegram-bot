@@ -36,7 +36,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 class AnimationTestBase:
@@ -55,13 +54,6 @@ class AnimationTestBase:
 
 
 class TestAnimationWithoutRequest(AnimationTestBase):
-    def test_slot_behaviour(self, offline_animation):
-        for attr in offline_animation.__slots__:
-            assert getattr(offline_animation, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(offline_animation)) == len(set(mro_slots(offline_animation))), (
-            "duplicate slot"
-        )
-
     def test_creation(self, offline_animation):
         assert isinstance(offline_animation, Animation)
         assert isinstance(offline_animation.file_id, str)

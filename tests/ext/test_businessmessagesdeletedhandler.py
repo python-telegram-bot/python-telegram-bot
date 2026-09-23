@@ -36,6 +36,7 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.ext import BusinessMessagesDeletedHandler, CallbackContext, JobQueue
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -152,9 +153,9 @@ class TestBusinessMessagesDeletedHandler:
         handler = BusinessMessagesDeletedHandler(self.callback, username=["@user_b"])
         assert not handler.check_update(business_messages_deleted_update)
 
-        business_messages_deleted_update.deleted_business_messages.chat._unfreeze()
-        business_messages_deleted_update.deleted_business_messages.chat.username = None
-        assert not handler.check_update(business_messages_deleted_update)
+        with unfrozen(business_messages_deleted_update.deleted_business_messages.chat):
+            business_messages_deleted_update.deleted_business_messages.chat.username = None
+            assert not handler.check_update(business_messages_deleted_update)
 
     def test_other_update_types(self, false_update):
         handler = BusinessMessagesDeletedHandler(self.callback)

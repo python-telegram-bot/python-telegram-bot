@@ -24,7 +24,6 @@ from telegram import BotCommand, Chat, Gift, GiftInfo, Gifts, MessageEntity, Sti
 from telegram._gifts import AcceptedGiftTypes, GiftBackground
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.request import RequestData
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -43,13 +42,6 @@ class GiftBackgroundTestBase:
 
 
 class TestGiftBackgroundWithoutRequest(GiftBackgroundTestBase):
-    def test_slot_behaviour(self, gift_background):
-        for attr in gift_background.__slots__:
-            assert getattr(gift_background, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(gift_background)) == len(set(mro_slots(gift_background))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "center_color": self.center_color,
@@ -136,11 +128,6 @@ class GiftTestBase:
 
 
 class TestGiftWithoutRequest(GiftTestBase):
-    def test_slot_behaviour(self, gift):
-        for attr in gift.__slots__:
-            assert getattr(gift, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(gift)) == len(set(mro_slots(gift))), "duplicate slot"
-
     def test_de_json(self, offline_bot, gift):
         json_dict = {
             "id": self.id,
@@ -352,11 +339,6 @@ class GiftsTestBase:
 
 
 class TestGiftsWithoutRequest(GiftsTestBase):
-    def test_slot_behaviour(self, gifts):
-        for attr in gifts.__slots__:
-            assert getattr(gifts, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(gifts)) == len(set(mro_slots(gifts))), "duplicate slot"
-
     def test_de_json(self, offline_bot, gifts):
         json_dict = {"gifts": [gift.to_dict() for gift in self.gifts]}
         gifts = Gifts.de_json(json_dict, offline_bot)
@@ -440,11 +422,6 @@ class GiftInfoTestBase:
 
 
 class TestGiftInfoWithoutRequest(GiftInfoTestBase):
-    def test_slot_behaviour(self, gift_info):
-        for attr in gift_info.__slots__:
-            assert getattr(gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(gift_info)) == len(set(mro_slots(gift_info))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "gift": self.gift.to_dict(),
@@ -548,13 +525,6 @@ class AcceptedGiftTypesTestBase:
 
 
 class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
-    def test_slot_behaviour(self, accepted_gift_types):
-        for attr in accepted_gift_types.__slots__:
-            assert getattr(accepted_gift_types, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(accepted_gift_types)) == len(set(mro_slots(accepted_gift_types))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "unlimited_gifts": self.unlimited_gifts,

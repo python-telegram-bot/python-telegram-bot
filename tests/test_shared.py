@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import ChatShared, PhotoSize, SharedUser, UsersShared
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -35,11 +34,6 @@ class UsersSharedTestBase:
 
 
 class TestUsersSharedWithoutRequest(UsersSharedTestBase):
-    def test_slot_behaviour(self, users_shared):
-        for attr in users_shared.__slots__:
-            assert getattr(users_shared, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(users_shared)) == len(set(mro_slots(users_shared))), "duplicate slot"
-
     def test_to_dict(self, users_shared):
         users_shared_dict = users_shared.to_dict()
 
@@ -94,11 +88,6 @@ class ChatSharedTestBase:
 
 
 class TestChatSharedWithoutRequest(ChatSharedTestBase):
-    def test_slot_behaviour(self, chat_shared):
-        for attr in chat_shared.__slots__:
-            assert getattr(chat_shared, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(chat_shared)) == len(set(mro_slots(chat_shared))), "duplicate slot"
-
     def test_to_dict(self, chat_shared):
         chat_shared_dict = chat_shared.to_dict()
 
@@ -167,11 +156,6 @@ class SharedUserTestBase:
 
 
 class TestSharedUserWithoutRequest(SharedUserTestBase):
-    def test_slot_behaviour(self, shared_user):
-        for attr in shared_user.__slots__:
-            assert getattr(shared_user, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(shared_user)) == len(set(mro_slots(shared_user))), "duplicate slot"
-
     def test_to_dict(self, shared_user):
         shared_user_dict = shared_user.to_dict()
 

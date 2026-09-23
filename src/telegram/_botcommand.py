@@ -18,13 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Bot Command."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class BotCommand(TelegramObject):
     """
     This object represents a bot command.
@@ -50,33 +51,26 @@ class BotCommand(TelegramObject):
 
     """
 
-    __slots__ = ("command", "description")
+    command: str = tg_field(compare=True)
+    description: str = tg_field(compare=True)
 
-    def __init__(self, command: str, description: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.command: str = command
-        self.description: str = description
-
-        self._id_attrs = (self.command, self.description)
-
-        self._freeze()
-
-    MIN_COMMAND: Final[int] = constants.BotCommandLimit.MIN_COMMAND
+    # TODO: https://docs.python.org/3.13/library/typing.html#typing.ClassVar
+    MIN_COMMAND: ClassVar[int] = constants.BotCommandLimit.MIN_COMMAND
     """:const:`telegram.constants.BotCommandLimit.MIN_COMMAND`
 
     .. versionadded:: 20.0
     """
-    MAX_COMMAND: Final[int] = constants.BotCommandLimit.MAX_COMMAND
+    MAX_COMMAND: ClassVar[int] = constants.BotCommandLimit.MAX_COMMAND
     """:const:`telegram.constants.BotCommandLimit.MAX_COMMAND`
 
     .. versionadded:: 20.0
     """
-    MIN_DESCRIPTION: Final[int] = constants.BotCommandLimit.MIN_DESCRIPTION
+    MIN_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MIN_DESCRIPTION
     """:const:`telegram.constants.BotCommandLimit.MIN_DESCRIPTION`
 
     .. versionadded:: 20.0
     """
-    MAX_DESCRIPTION: Final[int] = constants.BotCommandLimit.MAX_DESCRIPTION
+    MAX_DESCRIPTION: ClassVar[int] = constants.BotCommandLimit.MAX_DESCRIPTION
     """:const:`telegram.constants.BotCommandLimit.MAX_DESCRIPTION`
 
     .. versionadded:: 20.0

@@ -19,17 +19,17 @@
 """This module contains an object that represents a Telegram Video."""
 
 import datetime as dtm
-from collections.abc import Sequence
 
-from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._files.videoquality import VideoQuality
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
-class Video(_BaseThumbedMedium):
+@tg_dataclass()
+class Video(_BaseMedium):
     """This object represents a video file.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -107,52 +107,20 @@ class Video(_BaseThumbedMedium):
             .. versionadded:: 22.7
     """
 
-    __slots__ = (
-        "_duration",
-        "_start_timestamp",
-        "cover",
-        "file_name",
-        "height",
-        "mime_type",
-        "qualities",
-        "width",
+    # Required
+    width: int = tg_field()
+    height: int = tg_field()
+    _duration: dtm.timedelta = tg_field(alias="duration", converter=to_timedelta)
+    # Optional
+    mime_type: str | None = tg_field(default=None)
+    file_size: int | None = tg_field(default=None)
+    file_name: str | None = tg_field(default=None)
+    thumbnail: PhotoSize | None = tg_field(default=None)
+    cover: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    _start_timestamp: dtm.timedelta | None = tg_field(
+        default=None, alias="start_timestamp", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        width: int,
-        height: int,
-        duration: TimePeriod,
-        mime_type: str | None = None,
-        file_size: int | None = None,
-        file_name: str | None = None,
-        thumbnail: PhotoSize | None = None,
-        cover: Sequence[PhotoSize] | None = None,
-        start_timestamp: TimePeriod | None = None,
-        qualities: Sequence[VideoQuality] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            thumbnail=thumbnail,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Required
-            self.width: int = width
-            self.height: int = height
-            self._duration: dtm.timedelta = to_timedelta(duration)
-            # Optional
-            self.mime_type: str | None = mime_type
-            self.file_name: str | None = file_name
-            self.cover: Sequence[PhotoSize] | None = parse_sequence_arg(cover)
-            self._start_timestamp: dtm.timedelta | None = to_timedelta(start_timestamp)
-            self.qualities: Sequence[VideoQuality] | None = parse_sequence_arg(qualities)
+    qualities: tuple[VideoQuality, ...] = tg_field(default=None, converter=parse_sequence_arg)
 
     @property
     def duration(self) -> int | dtm.timedelta:
