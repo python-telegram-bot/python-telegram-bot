@@ -111,6 +111,9 @@ class Defaults:
         do_quote(:obj:`bool`, optional): |reply_quote|
 
             .. versionadded:: 20.8
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
+
+            .. versionadded:: 22.9
     """
 
     __slots__ = (
@@ -122,6 +125,7 @@ class Defaults:
         "_link_preview_options",
         "_parse_mode",
         "_protect_content",
+        "_show_caption_above_media",
         "_tzinfo",
     )
 
@@ -135,6 +139,7 @@ class Defaults:
         protect_content: bool | None = None,
         link_preview_options: "LinkPreviewOptions | None" = None,
         do_quote: bool | None = None,
+        show_caption_above_media: bool | None = None,
     ):
         self._parse_mode: str | None = parse_mode
         self._disable_notification: bool | None = disable_notification
@@ -158,6 +163,7 @@ class Defaults:
 
         self._link_preview_options = link_preview_options
         self._do_quote = do_quote
+        self._show_caption_above_media = show_caption_above_media
 
         # Gather all defaults that actually have a default value
         self._api_defaults = {}
@@ -171,6 +177,7 @@ class Defaults:
             "text_parse_mode",
             "protect_content",
             "question_parse_mode",
+            "show_caption_above_media",
         ):
             value = getattr(self, kwarg)
             if value is not None:
@@ -193,6 +200,7 @@ class Defaults:
                 self._tzinfo,
                 self._block,
                 self._protect_content,
+                self._show_caption_above_media,
             )
         )
 
@@ -342,6 +350,20 @@ class Defaults:
     def protect_content(self, _: object) -> NoReturn:
         raise AttributeError(
             "You can't assign a new value to protect_content after initialization."
+        )
+
+    @property
+    def show_caption_above_media(self) -> bool | None:
+        """:obj:`bool`: Optional. |show_cap_above_med|
+
+        .. versionadded:: 22.9
+        """
+        return self._show_caption_above_media
+
+    @show_caption_above_media.setter
+    def show_caption_above_media(self, _: object) -> NoReturn:
+        raise AttributeError(
+            "You can't assign a new value to show_caption_above_media after initialization."
         )
 
     @property
