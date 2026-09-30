@@ -43,7 +43,10 @@ jobs:
           # 2. it ensures that the push will also re-trigger workflows
           github-token: ${{ secrets.CHANGO_PAT }}
           query-issue-types: true
-          commit-and-push: ${{ steps.check_title.outputs.COMMIT_AND_PUSH }}
+          # Don't try to commit & push for PRs from forks - the action can't push to a fork's
+          # branch (no write access), which would fail the job. For fork PRs, contributors must
+          # add the chango fragment manually.
+          commit-and-push: ${{ steps.check_title.outputs.COMMIT_AND_PUSH == 'true' && github.event.pull_request.head.repo.full_name == github.repository }}
 
       # Run `chango release` if applicable - needs some additional setup.
       - name: Set up Python
