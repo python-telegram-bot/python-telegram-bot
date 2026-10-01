@@ -60,6 +60,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_BOT",
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
     "LIVE_PHOTO",
@@ -1590,6 +1591,24 @@ IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 """Messages that contain :attr:`telegram.Message.is_automatic_forward`.
 
     .. versionadded:: 13.9
+"""
+
+
+class _IsBot(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.from_user and message.from_user.is_bot)
+
+
+IS_BOT = _IsBot(name="filters.IS_BOT")
+"""Messages whose sender is a bot (:attr:`telegram.User.is_bot`).
+
+    .. versionadded:: 23.0
+
+    Note:
+        Channel posts and anonymous-admin messages have no :attr:`telegram.Message.from_user`
+        and therefore do **not** match; see :attr:`telegram.ext.filters.SenderChat` for those.
 """
 
 
