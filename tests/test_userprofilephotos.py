@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from telegram import PhotoSize, UserProfilePhotos
-from tests.auxil.slots import mro_slots
 
 
 class UserProfilePhotosTestBase:
@@ -35,12 +34,6 @@ class UserProfilePhotosTestBase:
 
 
 class TestUserProfilePhotosWithoutRequest(UserProfilePhotosTestBase):
-    def test_slot_behaviour(self):
-        inst = UserProfilePhotos(self.total_count, self.photos)
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {"total_count": 2, "photos": [[y.to_dict() for y in x] for x in self.photos]}
         user_profile_photos = UserProfilePhotos.de_json(json_dict, offline_bot)

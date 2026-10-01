@@ -56,7 +56,6 @@ from telegram import (
 )
 from telegram._utils.datetime import from_timestamp
 from telegram.warnings import PTBUserWarning
-from tests.auxil.slots import mro_slots
 
 message = Message(
     1,
@@ -265,12 +264,6 @@ class UpdateTestBase:
 
 
 class TestUpdateWithoutRequest(UpdateTestBase):
-    def test_slot_behaviour(self):
-        update = Update(self.update_id)
-        for attr in update.__slots__:
-            assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
-
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
     def test_de_json(self, offline_bot, paramdict):
         json_dict = {"update_id": self.update_id}
@@ -357,14 +350,11 @@ class TestUpdateWithoutRequest(UpdateTestBase):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned off
         if message := (update.message or update.edited_message or update.guest_message):
-            message._unfreeze()
-            message.sender_chat = None
+            object.__setattr__(message, "sender_chat", None)
         elif reaction := (update.message_reaction):
-            reaction._unfreeze()
-            reaction.actor_chat = None
+            object.__setattr__(reaction, "actor_chat", None)
         elif answer := (update.poll_answer):
-            answer._unfreeze()
-            answer.voter_chat = None
+            object.__setattr__(answer, "voter_chat", None)
 
         # Test that it's sometimes None per docstring
         sender = update.effective_sender
@@ -390,14 +380,11 @@ class TestUpdateWithoutRequest(UpdateTestBase):
         update = deepcopy(update)
         # Simulate 'Remain anonymous' being turned on
         if message := (update.message or update.edited_message or update.guest_message):
-            message._unfreeze()
-            message.from_user = None
+            object.__setattr__(message, "from_user", None)
         elif reaction := (update.message_reaction):
-            reaction._unfreeze()
-            reaction.user = None
+            object.__setattr__(reaction, "user", None)
         elif answer := (update.poll_answer):
-            answer._unfreeze()
-            answer.user = None
+            object.__setattr__(answer, "user", None)
 
         # Test that it's sometimes None per docstring
         sender = update.effective_sender

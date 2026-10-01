@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, JobQueue, PreCheckoutQueryHandler
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -76,9 +77,8 @@ def pre_checkout_query():
             "id", User(1, "test user", False), "EUR", 223, "invoice_payload"
         ),
     )
-    update._unfreeze()
-    update.pre_checkout_query._unfreeze()
-    return update
+    with unfrozen(update), unfrozen(update.pre_checkout_query):
+        yield update
 
 
 class TestPreCheckoutQueryHandler:

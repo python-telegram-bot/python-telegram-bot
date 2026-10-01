@@ -19,8 +19,7 @@
 """This module contains objects that represent owned gifts."""
 
 import datetime as dtm
-from collections.abc import Sequence
-from typing import ClassVar, Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._gifts import Gift
@@ -30,10 +29,11 @@ from telegram._uniquegift import UniqueGift
 from telegram._user import User
 from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.entities import parse_message_entities, parse_message_entity
-from telegram._utils.types import JSONDict
 
 
+@tg_dataclass()
 class OwnedGift(TelegramObject):
     """This object describes a gift received and owned by a user or a chat. Currently, it
     can be one of:
@@ -53,11 +53,9 @@ class OwnedGift(TelegramObject):
         type (:obj:`str`): Type of the owned gift.
     """
 
-    __slots__ = ("type",)
-
-    REGULAR: Final[str] = constants.OwnedGiftType.REGULAR
+    REGULAR: ClassVar[str] = constants.OwnedGiftType.REGULAR
     """:const:`telegram.constants.OwnedGiftType.REGULAR`"""
-    UNIQUE: Final[str] = constants.OwnedGiftType.UNIQUE
+    UNIQUE: ClassVar[str] = constants.OwnedGiftType.UNIQUE
     """:const:`telegram.constants.OwnedGiftType.UNIQUE`"""
 
     __DE_JSON_DISPATCH__: ClassVar[tuple[str, dict[str, str]] | None] = (
@@ -68,19 +66,14 @@ class OwnedGift(TelegramObject):
         },
     )
 
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.type: str = enum.get_member(constants.OwnedGiftType, type, type)
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.OwnedGiftType, value, value)
 
-        self._id_attrs = (self.type,)
-        self._freeze()
+    type: str = tg_field(compare=True, converter=_type_converter)
 
 
+@tg_dataclass()
 class OwnedGifts(TelegramObject):
     """Contains the list of gifts received and owned by a user or a chat.
 
@@ -102,30 +95,12 @@ class OwnedGifts(TelegramObject):
             then there are no more results.
     """
 
-    __slots__ = (
-        "gifts",
-        "next_offset",
-        "total_count",
-    )
-
-    def __init__(
-        self,
-        total_count: int,
-        gifts: Sequence[OwnedGift],
-        next_offset: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.total_count: int = total_count
-        self.gifts: tuple[OwnedGift, ...] = parse_sequence_arg(gifts)
-        self.next_offset: str | None = next_offset
-
-        self._id_attrs = (self.total_count, self.gifts)
-
-        self._freeze()
+    total_count: int = tg_field(compare=True)
+    gifts: tuple[OwnedGift, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    next_offset: str | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class OwnedGiftRegular(OwnedGift):
     """Describes a regular gift owned by a user or a chat.
 
@@ -201,61 +176,26 @@ class OwnedGiftRegular(OwnedGift):
 
     """
 
-    __slots__ = (
-        "can_be_upgraded",
-        "convert_star_count",
-        "entities",
-        "gift",
-        "is_private",
-        "is_saved",
-        "is_upgrade_separate",
-        "owned_gift_id",
-        "prepaid_upgrade_star_count",
-        "send_date",
-        "sender_user",
-        "text",
-        "unique_gift_number",
-        "was_refunded",
-    )
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=OwnedGift.REGULAR)
 
-    def __init__(
-        self,
-        gift: Gift,
-        send_date: dtm.datetime,
-        owned_gift_id: str | None = None,
-        sender_user: User | None = None,
-        text: str | None = None,
-        entities: Sequence[MessageEntity] | None = None,
-        is_private: bool | None = None,
-        is_saved: bool | None = None,
-        can_be_upgraded: bool | None = None,
-        was_refunded: bool | None = None,
-        convert_star_count: int | None = None,
-        prepaid_upgrade_star_count: int | None = None,
-        is_upgrade_separate: bool | None = None,
-        unique_gift_number: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=OwnedGift.REGULAR, api_kwargs=api_kwargs)
+    # Required
+    gift: Gift = tg_field(compare=True)
+    send_date: dtm.datetime = tg_field(compare=True)
 
-        with self._unfrozen():
-            self.gift: Gift = gift
-            self.send_date: dtm.datetime = send_date
-            self.owned_gift_id: str | None = owned_gift_id
-            self.sender_user: User | None = sender_user
-            self.text: str | None = text
-            self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-            self.is_private: bool | None = is_private
-            self.is_saved: bool | None = is_saved
-            self.can_be_upgraded: bool | None = can_be_upgraded
-            self.was_refunded: bool | None = was_refunded
-            self.convert_star_count: int | None = convert_star_count
-            self.prepaid_upgrade_star_count: int | None = prepaid_upgrade_star_count
-            self.is_upgrade_separate: bool | None = is_upgrade_separate
-            self.unique_gift_number: int | None = unique_gift_number
-
-            self._id_attrs = (self.type, self.gift, self.send_date)
+    # Optional
+    owned_gift_id: str | None = tg_field(default=None)
+    sender_user: User | None = tg_field(default=None)
+    text: str | None = tg_field(default=None)
+    entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    is_private: bool | None = tg_field(default=None)
+    is_saved: bool | None = tg_field(default=None)
+    can_be_upgraded: bool | None = tg_field(default=None)
+    was_refunded: bool | None = tg_field(default=None)
+    convert_star_count: int | None = tg_field(default=None)
+    prepaid_upgrade_star_count: int | None = tg_field(default=None)
+    is_upgrade_separate: bool | None = tg_field(default=None)
+    unique_gift_number: int | None = tg_field(default=None)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`
@@ -312,6 +252,7 @@ class OwnedGiftRegular(OwnedGift):
         return parse_message_entities(self.text, self.entities, types)
 
 
+@tg_dataclass()
 class OwnedGiftUnique(OwnedGift):
     """
     Describes a unique gift received and owned by a user or a chat.
@@ -359,40 +300,17 @@ class OwnedGiftUnique(OwnedGift):
             .. versionadded:: 22.3
     """
 
-    __slots__ = (
-        "can_be_transferred",
-        "gift",
-        "is_saved",
-        "next_transfer_date",
-        "owned_gift_id",
-        "send_date",
-        "sender_user",
-        "transfer_star_count",
-    )
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=OwnedGift.UNIQUE)
 
-    def __init__(
-        self,
-        gift: UniqueGift,
-        send_date: dtm.datetime,
-        owned_gift_id: str | None = None,
-        sender_user: User | None = None,
-        is_saved: bool | None = None,
-        can_be_transferred: bool | None = None,
-        transfer_star_count: int | None = None,
-        next_transfer_date: dtm.datetime | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(type=OwnedGift.UNIQUE, api_kwargs=api_kwargs)
+    # Required
+    gift: UniqueGift = tg_field(compare=True)
+    send_date: dtm.datetime = tg_field(compare=True)
 
-        with self._unfrozen():
-            self.gift: UniqueGift = gift
-            self.send_date: dtm.datetime = send_date
-            self.owned_gift_id: str | None = owned_gift_id
-            self.sender_user: User | None = sender_user
-            self.is_saved: bool | None = is_saved
-            self.can_be_transferred: bool | None = can_be_transferred
-            self.transfer_star_count: int | None = transfer_star_count
-            self.next_transfer_date: dtm.datetime | None = next_transfer_date
-
-            self._id_attrs = (self.type, self.gift, self.send_date)
+    # Optional
+    owned_gift_id: str | None = tg_field(default=None)
+    sender_user: User | None = tg_field(default=None)
+    is_saved: bool | None = tg_field(default=None)
+    can_be_transferred: bool | None = tg_field(default=None)
+    transfer_star_count: int | None = tg_field(default=None)
+    next_transfer_date: dtm.datetime | None = tg_field(default=None)

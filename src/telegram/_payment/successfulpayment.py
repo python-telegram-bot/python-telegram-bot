@@ -22,9 +22,10 @@ import datetime as dtm
 
 from telegram._payment.orderinfo import OrderInfo
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class SuccessfulPayment(TelegramObject):
     """This object contains basic information about a successful payment.
     Note that if the buyer initiates a chargeback with the relevant payment provider following
@@ -91,46 +92,15 @@ class SuccessfulPayment(TelegramObject):
 
     """
 
-    __slots__ = (
-        "currency",
-        "invoice_payload",
-        "is_first_recurring",
-        "is_recurring",
-        "order_info",
-        "provider_payment_charge_id",
-        "shipping_option_id",
-        "subscription_expiration_date",
-        "telegram_payment_charge_id",
-        "total_amount",
-    )
-
-    def __init__(
-        self,
-        currency: str,
-        total_amount: int,
-        invoice_payload: str,
-        telegram_payment_charge_id: str,
-        provider_payment_charge_id: str,
-        shipping_option_id: str | None = None,
-        order_info: OrderInfo | None = None,
-        subscription_expiration_date: dtm.datetime | None = None,
-        is_recurring: bool | None = None,
-        is_first_recurring: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.currency: str = currency
-        self.total_amount: int = total_amount
-        self.invoice_payload: str = invoice_payload
-        self.shipping_option_id: str | None = shipping_option_id
-        self.order_info: OrderInfo | None = order_info
-        self.telegram_payment_charge_id: str = telegram_payment_charge_id
-        self.provider_payment_charge_id: str = provider_payment_charge_id
-        self.subscription_expiration_date: dtm.datetime | None = subscription_expiration_date
-        self.is_recurring: bool | None = is_recurring
-        self.is_first_recurring: bool | None = is_first_recurring
-
-        self._id_attrs = (self.telegram_payment_charge_id, self.provider_payment_charge_id)
-
-        self._freeze()
+    # Required
+    currency: str = tg_field()
+    total_amount: int = tg_field()
+    invoice_payload: str = tg_field()
+    telegram_payment_charge_id: str = tg_field(compare=True)
+    provider_payment_charge_id: str = tg_field(compare=True)
+    # Optional
+    shipping_option_id: str | None = tg_field(default=None)
+    order_info: OrderInfo | None = tg_field(default=None)
+    subscription_expiration_date: dtm.datetime | None = tg_field(default=None)
+    is_recurring: bool | None = tg_field(default=None)
+    is_first_recurring: bool | None = tg_field(default=None)

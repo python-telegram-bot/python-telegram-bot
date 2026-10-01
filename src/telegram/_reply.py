@@ -18,7 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This modules contains objects that represents Telegram Replies"""
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
@@ -45,14 +44,16 @@ from telegram._poll import Poll
 from telegram._story import Story
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import ODVInput
 
 if TYPE_CHECKING:
     from telegram._files.contact import Contact
     from telegram._files.location import Location
 
 
+@tg_dataclass()
 class ExternalReplyInfo(TelegramObject):
     """
     This object contains information about a message that is being replied to, which may
@@ -177,100 +178,37 @@ class ExternalReplyInfo(TelegramObject):
 
     """
 
-    __slots__ = (
-        "animation",
-        "audio",
-        "chat",
-        "checklist",
-        "contact",
-        "dice",
-        "document",
-        "game",
-        "giveaway",
-        "giveaway_winners",
-        "has_media_spoiler",
-        "invoice",
-        "link_preview_options",
-        "live_photo",
-        "location",
-        "message_id",
-        "origin",
-        "paid_media",
-        "photo",
-        "poll",
-        "sticker",
-        "story",
-        "venue",
-        "video",
-        "video_note",
-        "voice",
-    )
-
-    def __init__(
-        self,
-        origin: MessageOrigin,
-        chat: Chat | None = None,
-        message_id: int | None = None,
-        link_preview_options: LinkPreviewOptions | None = None,
-        animation: Animation | None = None,
-        audio: Audio | None = None,
-        document: Document | None = None,
-        photo: Sequence[PhotoSize] | None = None,
-        sticker: Sticker | None = None,
-        story: Story | None = None,
-        video: Video | None = None,
-        video_note: VideoNote | None = None,
-        voice: Voice | None = None,
-        has_media_spoiler: bool | None = None,
-        contact: "Contact | None" = None,
-        dice: Dice | None = None,
-        game: Game | None = None,
-        giveaway: Giveaway | None = None,
-        giveaway_winners: GiveawayWinners | None = None,
-        invoice: Invoice | None = None,
-        location: "Location | None" = None,
-        poll: Poll | None = None,
-        venue: Venue | None = None,
-        paid_media: PaidMediaInfo | None = None,
-        checklist: Checklist | None = None,
-        live_photo: LivePhoto | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.origin: MessageOrigin = origin
-        self.chat: Chat | None = chat
-        self.message_id: int | None = message_id
-        self.link_preview_options: LinkPreviewOptions | None = link_preview_options
-        self.animation: Animation | None = animation
-        self.audio: Audio | None = audio
-        self.document: Document | None = document
-        self.photo: tuple[PhotoSize, ...] | None = parse_sequence_arg(photo)
-        self.sticker: Sticker | None = sticker
-        self.story: Story | None = story
-        self.video: Video | None = video
-        self.video_note: VideoNote | None = video_note
-        self.voice: Voice | None = voice
-        self.has_media_spoiler: bool | None = has_media_spoiler
-        self.checklist: Checklist | None = checklist
-        self.contact: Contact | None = contact
-        self.dice: Dice | None = dice
-        self.game: Game | None = game
-        self.giveaway: Giveaway | None = giveaway
-        self.giveaway_winners: GiveawayWinners | None = giveaway_winners
-        self.invoice: Invoice | None = invoice
-        self.location: Location | None = location
-        self.poll: Poll | None = poll
-        self.venue: Venue | None = venue
-        self.paid_media: PaidMediaInfo | None = paid_media
-        self.live_photo: LivePhoto | None = live_photo
-
-        self._id_attrs = (self.origin,)
-
-        self._freeze()
+    # Required
+    origin: MessageOrigin = tg_field(compare=True)
+    # Optionals
+    chat: Chat | None = tg_field(default=None)
+    message_id: int | None = tg_field(default=None)
+    link_preview_options: LinkPreviewOptions | None = tg_field(default=None)
+    animation: Animation | None = tg_field(default=None)
+    audio: Audio | None = tg_field(default=None)
+    document: Document | None = tg_field(default=None)
+    photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    sticker: Sticker | None = tg_field(default=None)
+    story: Story | None = tg_field(default=None)
+    video: Video | None = tg_field(default=None)
+    video_note: VideoNote | None = tg_field(default=None)
+    voice: Voice | None = tg_field(default=None)
+    has_media_spoiler: bool | None = tg_field(default=None)
+    contact: "Contact | None" = tg_field(default=None)
+    dice: Dice | None = tg_field(default=None)
+    game: Game | None = tg_field(default=None)
+    giveaway: Giveaway | None = tg_field(default=None)
+    giveaway_winners: GiveawayWinners | None = tg_field(default=None)
+    invoice: Invoice | None = tg_field(default=None)
+    location: "Location | None" = tg_field(default=None)
+    poll: Poll | None = tg_field(default=None)
+    venue: Venue | None = tg_field(default=None)
+    paid_media: PaidMediaInfo | None = tg_field(default=None)
+    checklist: Checklist | None = tg_field(default=None)
+    live_photo: LivePhoto | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class TextQuote(TelegramObject):
     """
     This object contains information about the quoted part of a message that is replied to
@@ -305,37 +243,15 @@ class TextQuote(TelegramObject):
             message sender. Otherwise, the quote was added automatically by the server.
     """
 
-    __slots__ = (
-        "entities",
-        "is_manual",
-        "position",
-        "text",
-    )
-
-    def __init__(
-        self,
-        text: str,
-        position: int,
-        entities: Sequence[MessageEntity] | None = None,
-        is_manual: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.text: str = text
-        self.position: int = position
-        self.entities: tuple[MessageEntity, ...] | None = parse_sequence_arg(entities)
-        self.is_manual: bool | None = is_manual
-
-        self._id_attrs = (
-            self.text,
-            self.position,
-        )
-
-        self._freeze()
+    # Required
+    text: str = tg_field(compare=True)
+    position: int = tg_field(compare=True)
+    # Optional
+    entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    is_manual: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ReplyParameters(TelegramObject):
     """
     Describes reply parameters for the message that is being sent.
@@ -415,44 +331,16 @@ class ReplyParameters(TelegramObject):
             .. versionadded:: 22.8
     """
 
-    __slots__ = (
-        "allow_sending_without_reply",
-        "chat_id",
-        "checklist_task_id",
-        "message_id",
-        "poll_option_id",
-        "quote",
-        "quote_entities",
-        "quote_parse_mode",
-        "quote_position",
+    # Required
+    message_id: int = tg_field(compare=True)
+    # Optional
+    chat_id: int | str | None = tg_field(default=None)
+    allow_sending_without_reply: ODVInput[bool] = tg_field(default=DEFAULT_NONE)
+    quote: str | None = tg_field(default=None)
+    quote_parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    quote_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        message_id: int,
-        chat_id: int | str | None = None,
-        allow_sending_without_reply: ODVInput[bool] = DEFAULT_NONE,
-        quote: str | None = None,
-        quote_parse_mode: ODVInput[str] = DEFAULT_NONE,
-        quote_entities: Sequence[MessageEntity] | None = None,
-        quote_position: int | None = None,
-        checklist_task_id: int | None = None,
-        poll_option_id: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.message_id: int = message_id
-        self.chat_id: int | str | None = chat_id
-        self.allow_sending_without_reply: ODVInput[bool] = allow_sending_without_reply
-        self.quote: str | None = quote
-        self.quote_parse_mode: ODVInput[str] = quote_parse_mode
-        self.quote_entities: tuple[MessageEntity, ...] | None = parse_sequence_arg(quote_entities)
-        self.quote_position: int | None = quote_position
-        self.checklist_task_id: int | None = checklist_task_id
-        self.poll_option_id: str | None = poll_option_id
-
-        self._id_attrs = (self.message_id,)
-
-        self._freeze()
+    quote_position: int | None = tg_field(default=None)
+    checklist_task_id: int | None = tg_field(default=None)
+    poll_option_id: str | None = tg_field(default=None)

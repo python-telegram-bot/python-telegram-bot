@@ -20,14 +20,15 @@
 
 import datetime as dtm
 
-from telegram._files._basethumbedmedium import _BaseThumbedMedium
+from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
-class Audio(_BaseThumbedMedium):
+@tg_dataclass()
+class Audio(_BaseMedium):
     """This object represents an audio file to be treated as music by the Telegram clients.
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -82,37 +83,15 @@ class Audio(_BaseThumbedMedium):
 
     """
 
-    __slots__ = ("_duration", "file_name", "mime_type", "performer", "title")
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        duration: TimePeriod,
-        performer: str | None = None,
-        title: str | None = None,
-        mime_type: str | None = None,
-        file_size: int | None = None,
-        file_name: str | None = None,
-        thumbnail: PhotoSize | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            thumbnail=thumbnail,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Required
-            self._duration: dtm.timedelta = to_timedelta(duration)
-            # Optional
-            self.performer: str | None = performer
-            self.title: str | None = title
-            self.mime_type: str | None = mime_type
-            self.file_name: str | None = file_name
+    # Required
+    _duration: dtm.timedelta = tg_field(alias="duration", converter=to_timedelta)
+    # Optional
+    performer: str | None = tg_field(default=None)
+    title: str | None = tg_field(default=None)
+    mime_type: str | None = tg_field(default=None)
+    file_size: int | None = tg_field(default=None)
+    file_name: str | None = tg_field(default=None)
+    thumbnail: PhotoSize | None = tg_field(default=None)
 
     @property
     def duration(self) -> int | dtm.timedelta:

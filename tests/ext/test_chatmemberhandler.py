@@ -37,6 +37,7 @@ from telegram import (
 from telegram._utils.datetime import from_timestamp
 from telegram.ext import CallbackContext, ChatMemberHandler, JobQueue
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -84,8 +85,8 @@ def chat_member_updated():
 @pytest.fixture
 def chat_member(bot, chat_member_updated):
     update = Update(0, my_chat_member=chat_member_updated)
-    update._unfreeze()
-    return update
+    with unfrozen(update):
+        yield update
 
 
 class TestChatMemberHandler:

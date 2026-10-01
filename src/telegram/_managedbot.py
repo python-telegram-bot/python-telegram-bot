@@ -20,11 +20,10 @@
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.types import (
-    JSONDict,
-)
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ManagedBotCreated(TelegramObject):
     """
     This object contains information about the bot that was created to be managed by the current
@@ -43,20 +42,10 @@ class ManagedBotCreated(TelegramObject):
             using the method :meth:`~telegram.Bot.get_managed_bot_token`.
     """
 
-    __slots__ = ("bot",)
-
-    def __init__(
-        self,
-        bot: User,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.bot: User = bot
-        self._id_attrs = (self.bot,)
-        self._freeze()
+    bot: User = tg_field(compare=True)
 
 
+@tg_dataclass()
 class ManagedBotUpdated(TelegramObject):
     """
     This object contains information about the creation, token update, or owner update of a bot
@@ -78,22 +67,6 @@ class ManagedBotUpdated(TelegramObject):
             using the method :meth:`~telegram.Bot.get_managed_bot_token`.
     """
 
-    __slots__ = ("bot", "user")
-
-    def __init__(
-        self,
-        user: User,
-        bot: User,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.user: User = user
-        self.bot: User = bot
-
-        self._id_attrs = (
-            self.user,
-            self.bot,
-        )
-        self._freeze()
+    # Required
+    user: User = tg_field(compare=True)
+    bot: User = tg_field(compare=True)

@@ -30,7 +30,6 @@ from telegram import (
     constants,
 )
 from telegram.constants import ReactionEmoji
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -45,12 +44,6 @@ class ReactionTypeTestBase:
 
 
 class TestReactionTypeWithoutRequest(ReactionTypeTestBase):
-    def test_slot_behaviour(self, reaction_type):
-        inst = reaction_type
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self):
         assert type(ReactionType("emoji").type) is constants.ReactionType
         assert ReactionType("unknown").type == "unknown"
@@ -97,12 +90,6 @@ def reaction_type_emoji():
 class TestReactionTypeEmojiWithoutRequest(ReactionTypeTestBase):
     type = constants.ReactionType.EMOJI
 
-    def test_slot_behaviour(self, reaction_type_emoji):
-        inst = reaction_type_emoji
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {"emoji": self.emoji}
         reaction_type_emoji = ReactionTypeEmoji.de_json(json_dict, offline_bot)
@@ -141,12 +128,6 @@ def reaction_type_custom_emoji():
 
 class TestReactionTypeCustomEmojiWithoutRequest(ReactionTypeTestBase):
     type = constants.ReactionType.CUSTOM_EMOJI
-
-    def test_slot_behaviour(self, reaction_type_custom_emoji):
-        inst = reaction_type_custom_emoji
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {"custom_emoji_id": self.custom_emoji_id}
@@ -188,12 +169,6 @@ def reaction_type_paid():
 class TestReactionTypePaidWithoutRequest(ReactionTypeTestBase):
     type = constants.ReactionType.PAID
 
-    def test_slot_behaviour(self, reaction_type_paid):
-        inst = reaction_type_paid
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {}
         reaction_type_paid = ReactionTypePaid.de_json(json_dict, offline_bot)
@@ -217,13 +192,6 @@ def reaction_count():
 class TestReactionCountWithoutRequest:
     type = ReactionTypeEmoji(ReactionEmoji.THUMBS_UP)
     total_count = 42
-
-    def test_slot_behaviour(self, reaction_count):
-        for attr in reaction_count.__slots__:
-            assert getattr(reaction_count, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(reaction_count)) == len(set(mro_slots(reaction_count))), (
-            "duplicate slot"
-        )
 
     def test_de_json(self, offline_bot):
         json_dict = {

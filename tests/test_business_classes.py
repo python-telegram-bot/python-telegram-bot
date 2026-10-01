@@ -35,7 +35,6 @@ from telegram import (
 )
 from telegram._business import BusinessBotRights
 from telegram._utils.datetime import UTC, to_timestamp
-from tests.auxil.slots import mro_slots
 
 
 class BusinessTestBase:
@@ -149,12 +148,6 @@ def business_opening_hours():
 
 
 class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
-    def test_slot_behaviour(self, business_bot_rights):
-        inst = business_bot_rights
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, business_bot_rights):
         rights_dict = business_bot_rights.to_dict()
 
@@ -233,12 +226,6 @@ class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
 
 
 class TestBusinessConnectionWithoutRequest(BusinessTestBase):
-    def test_slots(self, business_connection):
-        bc = business_connection
-        for attr in bc.__slots__:
-            assert getattr(bc, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(bc)) == len(set(mro_slots(bc))), "duplicate slot"
-
     def test_de_json(self, business_bot_rights):
         json_dict = {
             "id": self.id_,
@@ -334,12 +321,6 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
 
 
 class TestBusinessMessagesDeleted(BusinessTestBase):
-    def test_slots(self, business_messages_deleted):
-        bmd = business_messages_deleted
-        for attr in bmd.__slots__:
-            assert getattr(bmd, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(bmd)) == len(set(mro_slots(bmd))), "duplicate slot"
-
     def test_to_dict(self, business_messages_deleted):
         bmd_dict = business_messages_deleted.to_dict()
         assert isinstance(bmd_dict, dict)
@@ -373,12 +354,6 @@ class TestBusinessMessagesDeleted(BusinessTestBase):
 
 
 class TestBusinessIntroWithoutRequest(BusinessTestBase):
-    def test_slot_behaviour(self, business_intro):
-        intro = business_intro
-        for attr in intro.__slots__:
-            assert getattr(intro, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(intro)) == len(set(mro_slots(intro))), "duplicate slot"
-
     def test_to_dict(self, business_intro):
         intro_dict = business_intro.to_dict()
         assert isinstance(intro_dict, dict)
@@ -413,12 +388,6 @@ class TestBusinessIntroWithoutRequest(BusinessTestBase):
 
 
 class TestBusinessLocationWithoutRequest(BusinessTestBase):
-    def test_slot_behaviour(self, business_location):
-        inst = business_location
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, business_location):
         blc_dict = business_location.to_dict()
         assert isinstance(blc_dict, dict)
@@ -450,12 +419,6 @@ class TestBusinessLocationWithoutRequest(BusinessTestBase):
 
 
 class TestBusinessOpeningHoursIntervalWithoutRequest(BusinessTestBase):
-    def test_slot_behaviour(self, business_opening_hours_interval):
-        inst = business_opening_hours_interval
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, business_opening_hours_interval):
         bohi_dict = business_opening_hours_interval.to_dict()
         assert isinstance(bohi_dict, dict)
@@ -521,12 +484,6 @@ class TestBusinessOpeningHoursIntervalWithoutRequest(BusinessTestBase):
 
 
 class TestBusinessOpeningHoursWithoutRequest(BusinessTestBase):
-    def test_slot_behaviour(self, business_opening_hours):
-        inst = business_opening_hours
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, business_opening_hours):
         boh_dict = business_opening_hours.to_dict()
         assert isinstance(boh_dict, dict)

@@ -41,6 +41,7 @@ class PassportElementErrorTranslationFilesTestBase:
 class TestPassportElementErrorTranslationFilesWithoutRequest(
     PassportElementErrorTranslationFilesTestBase
 ):
+    # tags: deprecated NEXT.VERSION
     def test_slot_behaviour(self, passport_element_error_translation_files):
         inst = passport_element_error_translation_files
         for attr in inst.__slots__:

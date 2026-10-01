@@ -24,7 +24,6 @@ import pytest
 from telegram import MessageEntity, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import MessageEntityType
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module", params=MessageEntity.ALL_TYPES)
@@ -68,12 +67,6 @@ class MessageEntityTestBase:
 
 
 class TestMessageEntityWithoutRequest(MessageEntityTestBase):
-    def test_slot_behaviour(self, message_entity):
-        inst = message_entity
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
         entity = MessageEntity.de_json(json_dict, offline_bot)

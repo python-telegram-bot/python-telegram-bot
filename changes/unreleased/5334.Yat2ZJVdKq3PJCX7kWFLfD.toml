@@ -1,0 +1,33 @@
+breaking = """Implement Telegram types as dataclasses
+
+PTB has long  `stability policy <https://docs.python-telegram-bot.org/en/stable/stability_policy.html>`__. With this release we migrated Telegram types to dataclasses. That, however, had to come with the following breaking changes:
+
+- User defined classes that subclass from :class:`~telegram.TelegramObject` will no longer work unchanged.
+- Direct instances of :class:`~telegram.TelegramObject` are frozen by default.
+- Loading a pickled :class:`~telegram.TelegramObject` will return a frozen instance by default.
+- Comparing a parent :class:`telegram.TelegramObject` with a child whose comparison attributes equal the parent's, or where both have no comparison attributes, will now evaluate to :obj:`False`.
+  For example:
+
+  .. code:: python
+
+     parent = BotCommandScope(type=BotCommandScope.DEFAULT)
+     child = BotCommandScopeDefault()
+
+     parent == child  # False in NEXT.VERSION and later
+     parent == child  # True in v22.8
+
+  This affects the following parent classes and some or all of their subclasses:
+  * :class:`~telegram.BackgroundFill`, :class:`~telegram.BackgroundType`, :class:`~telegram.BotCommandScope`, :class:`~telegram.ChatBoostSource`, :class:`~telegram.ChatMember`, :class:`~telegram.InlineQueryResult`, :class:`~telegram.InputMedia`, :class:`~telegram.InputPaidMedia`, :class:`~telegram.InputProfilePhoto`, :class:`~telegram.InputStoryContent`, :class:`~telegram.MaybeInaccessibleMessage`, :class:`~telegram.MenuButton`, :class:`~telegram.MessageOrigin`, :class:`~telegram.ReactionType`, :class:`~telegram.RevenueWithdrawalState`, and :class:`~telegram.TransactionPartner`.
+
+"""
+other = """Implement Telegram types as dataclasses
+
+- Comparisons between Telegram objects that have an empty set of attributes that define equality, will no longer emit :class:`telegram.warnings.PTBUserWarning`.
+- Removed redundant coercion to :obj:`int` for :attr:`telegram.ChatInviteLink.pending_join_request_count`, :attr:`telegram.Location.proximity_alert_radius`, :attr:`telegram.InlineQueryResultLocation.proximity_alert_radius`, and :attr:`telegram.InputLocationMessageContent.proximity_alert_radius`. Values are now stored as passed.
+- Removed redundant coercion to :obj:`str` for ``file_id``, ``file_unique_id`` attributes of Telegram media types, :attr:`telegram.Contact.phone_number`, :attr:`telegram.InlineQueryResult.id`, :attr:`telegram.PassportElementError.source` , and :attr:`telegram.PassportElementError.type`. Values are now stored as passed.
+
+"""
+[[pull_requests]]
+uid = "5334"
+author_uids = ["aelkheir"]
+closes_threads = ["5279"]

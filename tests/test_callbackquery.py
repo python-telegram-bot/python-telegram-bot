@@ -37,7 +37,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(params=["message", "inline", "inaccessible_message"])
@@ -50,18 +50,18 @@ def callback_query(bot, request):
         game_short_name=CallbackQueryTestBase.game_short_name,
     )
     cbq.set_bot(bot)
-    cbq._unfreeze()
-    if request.param == "message":
-        cbq.message = CallbackQueryTestBase.message
-        cbq.message.set_bot(bot)
-    elif request.param == "inline":
-        cbq.inline_message_id = CallbackQueryTestBase.inline_message_id
-    elif request.param == "inaccessible_message":
-        cbq.message = InaccessibleMessage(
-            chat=CallbackQueryTestBase.message.chat,
-            message_id=CallbackQueryTestBase.message.message_id,
-        )
-    return cbq
+    with unfrozen(cbq):
+        if request.param == "message":
+            cbq.message = CallbackQueryTestBase.message
+            cbq.message.set_bot(bot)
+        elif request.param == "inline":
+            cbq.inline_message_id = CallbackQueryTestBase.inline_message_id
+        elif request.param == "inaccessible_message":
+            cbq.message = InaccessibleMessage(
+                chat=CallbackQueryTestBase.message.chat,
+                message_id=CallbackQueryTestBase.message.message_id,
+            )
+        yield cbq
 
 
 class CallbackQueryTestBase:
@@ -100,11 +100,6 @@ class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
             chat_id = kwargs["chat_id"] == callback_query.message.chat_id
             message_id = kwargs["message_id"] == callback_query.message.message_id
         return id_ and chat_id and message_id
-
-    def test_slot_behaviour(self, callback_query):
-        for attr in callback_query.__slots__:
-            assert getattr(callback_query, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {

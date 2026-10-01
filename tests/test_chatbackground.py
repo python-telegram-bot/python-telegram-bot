@@ -34,7 +34,6 @@ from telegram import (
     Document,
 )
 from telegram.constants import BackgroundFillType, BackgroundTypeType
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -52,12 +51,6 @@ class BackgroundFillTestBase:
 
 
 class TestBackgroundFillWithoutRequest(BackgroundFillTestBase):
-    def test_slots(self, background_fill):
-        inst = background_fill
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self, background_fill):
         assert type(BackgroundFill("solid").type) is BackgroundFillType
         assert BackgroundFill("unknown").type == "unknown"
@@ -124,12 +117,6 @@ def background_fill_gradient():
 class TestBackgroundFillGradientWithoutRequest(BackgroundFillTestBase):
     type = BackgroundFill.GRADIENT
 
-    def test_slots(self, background_fill_gradient):
-        inst = background_fill_gradient
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         data = {
             "top_color": self.top_color,
@@ -182,12 +169,6 @@ def background_fill_freeform_gradient():
 class TestBackgroundFillFreeformGradientWithoutRequest(BackgroundFillTestBase):
     type = BackgroundFill.FREEFORM_GRADIENT
 
-    def test_slots(self, background_fill_freeform_gradient):
-        inst = background_fill_freeform_gradient
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         data = {"colors": self.colors}
         transaction_partner = BackgroundFillFreeformGradient.de_json(data, offline_bot)
@@ -223,12 +204,6 @@ def background_fill_solid():
 
 class TestBackgroundFillSolidWithoutRequest(BackgroundFillTestBase):
     type = BackgroundFill.SOLID
-
-    def test_slots(self, background_fill_solid):
-        inst = background_fill_solid
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         data = {"color": self.color}
@@ -276,12 +251,6 @@ class BackgroundTypeTestBase:
 
 
 class TestBackgroundTypeWithoutRequest(BackgroundTypeTestBase):
-    def test_slots(self, background_type):
-        inst = background_type
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self, background_type):
         assert type(BackgroundType("wallpaper").type) is BackgroundTypeType
         assert BackgroundType("unknown").type == "unknown"
@@ -351,12 +320,6 @@ def background_type_fill():
 class TestBackgroundTypeFillWithoutRequest(BackgroundTypeTestBase):
     type = BackgroundType.FILL
 
-    def test_slots(self, background_type_fill):
-        inst = background_type_fill
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         data = {"fill": self.fill.to_dict(), "dark_theme_dimming": self.dark_theme_dimming}
         transaction_partner = BackgroundTypeFill.de_json(data, offline_bot)
@@ -399,12 +362,6 @@ def background_type_pattern():
 
 class TestBackgroundTypePatternWithoutRequest(BackgroundTypeTestBase):
     type = BackgroundType.PATTERN
-
-    def test_slots(self, background_type_pattern):
-        inst = background_type_pattern
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         data = {
@@ -463,12 +420,6 @@ def background_type_chat_theme():
 class TestBackgroundTypeChatThemeWithoutRequest(BackgroundTypeTestBase):
     type = BackgroundType.CHAT_THEME
 
-    def test_slots(self, background_type_chat_theme):
-        inst = background_type_chat_theme
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         data = {"theme_name": self.theme_name}
         transaction_partner = BackgroundTypeChatTheme.de_json(data, offline_bot)
@@ -509,12 +460,6 @@ def background_type_wallpaper():
 
 class TestBackgroundTypeWallpaperWithoutRequest(BackgroundTypeTestBase):
     type = BackgroundType.WALLPAPER
-
-    def test_slots(self, background_type_wallpaper):
-        inst = background_type_wallpaper
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         data = {
@@ -572,12 +517,6 @@ class ChatBackgroundTestBase:
 
 
 class TestChatBackgroundWithoutRequest(ChatBackgroundTestBase):
-    def test_slots(self, chat_background):
-        inst = chat_background
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         data = {"type": self.type.to_dict()}
         transaction_partner = ChatBackground.de_json(data, offline_bot)

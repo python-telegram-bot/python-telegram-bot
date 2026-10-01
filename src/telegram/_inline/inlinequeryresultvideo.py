@@ -19,22 +19,23 @@
 """This module contains the classes that represent Telegram InlineQueryResultVideo."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultVideo(InlineQueryResult):
     """
     Represents a link to a page containing an embedded video player or a video file. By default,
@@ -135,62 +136,28 @@ class InlineQueryResultVideo(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "_video_duration",
-        "caption",
-        "caption_entities",
-        "description",
-        "input_message_content",
-        "mime_type",
-        "parse_mode",
-        "reply_markup",
-        "show_caption_above_media",
-        "thumbnail_url",
-        "title",
-        "video_height",
-        "video_url",
-        "video_width",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.VIDEO)
+    # Required
+    video_url: str = tg_field()
+    mime_type: str = tg_field()
+    thumbnail_url: str = tg_field()
+    title: str = tg_field()
+    # Optional
+    caption: str | None = tg_field(default=None)
+    video_width: int | None = tg_field(default=None)
+    video_height: int | None = tg_field(default=None)
+    _video_duration: dtm.timedelta | None = tg_field(
+        default=None, alias="video_duration", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        video_url: str,
-        mime_type: str,
-        thumbnail_url: str,
-        title: str,
-        caption: str | None = None,
-        video_width: int | None = None,
-        video_height: int | None = None,
-        video_duration: TimePeriod | None = None,
-        description: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        show_caption_above_media: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.VIDEO, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.video_url: str = video_url
-            self.mime_type: str = mime_type
-            self.thumbnail_url: str = thumbnail_url
-            self.title: str = title
-
-            # Optional
-            self.caption: str | None = caption
-            self.parse_mode: ODVInput[str] = parse_mode
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.video_width: int | None = video_width
-            self.video_height: int | None = video_height
-            self._video_duration: dtm.timedelta | None = to_timedelta(video_duration)
-            self.description: str | None = description
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
-            self.show_caption_above_media: bool | None = show_caption_above_media
+    description: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    show_caption_above_media: bool | None = tg_field(default=None)
 
     @property
     def video_duration(self) -> int | dtm.timedelta | None:

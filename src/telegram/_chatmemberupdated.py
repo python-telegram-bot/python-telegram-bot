@@ -25,9 +25,10 @@ from telegram._chatinvitelink import ChatInviteLink
 from telegram._chatmember import ChatMember
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ChatMemberUpdated(TelegramObject):
     """This object represents changes in the status of a chat member.
 
@@ -89,52 +90,17 @@ class ChatMemberUpdated(TelegramObject):
 
     """
 
-    __slots__ = (
-        "chat",
-        "date",
-        "from_user",
-        "invite_link",
-        "new_chat_member",
-        "old_chat_member",
-        "via_chat_folder_invite_link",
-        "via_join_request",
-    )
+    # Required
+    chat: Chat = tg_field(compare=True)
+    from_user: User = tg_field(compare=True)
+    date: dtm.datetime = tg_field(compare=True)
+    old_chat_member: ChatMember = tg_field(compare=True)
+    new_chat_member: ChatMember = tg_field(compare=True)
 
-    def __init__(
-        self,
-        chat: Chat,
-        from_user: User,
-        date: dtm.datetime,
-        old_chat_member: ChatMember,
-        new_chat_member: ChatMember,
-        invite_link: ChatInviteLink | None = None,
-        via_chat_folder_invite_link: bool | None = None,
-        via_join_request: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.chat: Chat = chat
-        self.from_user: User = from_user
-        self.date: dtm.datetime = date
-        self.old_chat_member: ChatMember = old_chat_member
-        self.new_chat_member: ChatMember = new_chat_member
-        self.via_chat_folder_invite_link: bool | None = via_chat_folder_invite_link
-
-        # Optionals
-        self.invite_link: ChatInviteLink | None = invite_link
-        self.via_join_request: bool | None = via_join_request
-
-        self._id_attrs = (
-            self.chat,
-            self.from_user,
-            self.date,
-            self.old_chat_member,
-            self.new_chat_member,
-        )
-
-        self._freeze()
+    # Optionals
+    invite_link: ChatInviteLink | None = tg_field(default=None)
+    via_chat_folder_invite_link: bool | None = tg_field(default=None)
+    via_join_request: bool | None = tg_field(default=None)
 
     def _get_attribute_difference(self, attribute: str) -> tuple[object, object]:
         try:

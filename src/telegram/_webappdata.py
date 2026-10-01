@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram WebAppData."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class WebAppData(TelegramObject):
     """Contains data sent from a `Web App <https://core.telegram.org/bots/webapps>`_ to the bot.
 
@@ -49,14 +50,5 @@ class WebAppData(TelegramObject):
                 Be aware that a bad client can send arbitrary data in this field.
     """
 
-    __slots__ = ("button_text", "data")
-
-    def __init__(self, data: str, button_text: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.data: str = data
-        self.button_text: str = button_text
-
-        self._id_attrs = (self.data, self.button_text)
-
-        self._freeze()
+    data: str = tg_field(compare=True)
+    button_text: str = tg_field(compare=True)

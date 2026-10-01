@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# pylint: disable=redefined-builtin
 #
 # A library that provides a Python interface to the Telegram Bot API
 # Copyright (C) 2015-2026
@@ -19,17 +18,16 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/]
 """This module contains classes related to gifs sent by bots."""
 
-from collections.abc import Sequence
-
 from telegram._chat import Chat
 from telegram._files.sticker import Sticker
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.entities import parse_message_entities, parse_message_entity
-from telegram._utils.types import JSONDict
 
 
+@tg_dataclass()
 class GiftBackground(TelegramObject):
     """This object describes the background of a gift.
 
@@ -51,34 +49,12 @@ class GiftBackground(TelegramObject):
 
     """
 
-    __slots__ = (
-        "center_color",
-        "edge_color",
-        "text_color",
-    )
-
-    def __init__(
-        self,
-        center_color: int,
-        edge_color: int,
-        text_color: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.center_color: int = center_color
-        self.edge_color: int = edge_color
-        self.text_color: int = text_color
-
-        self._id_attrs = (
-            self.center_color,
-            self.edge_color,
-            self.text_color,
-        )
-
-        self._freeze()
+    center_color: int = tg_field(compare=True)
+    edge_color: int = tg_field(compare=True)
+    text_color: int = tg_field(compare=True)
 
 
+@tg_dataclass()
 class Gift(TelegramObject):
     """This object represents a gift that can be sent by the bot.
 
@@ -171,60 +147,22 @@ class Gift(TelegramObject):
 
     """
 
-    __slots__ = (
-        "background",
-        "has_colors",
-        "id",
-        "is_premium",
-        "personal_remaining_count",
-        "personal_total_count",
-        "publisher_chat",
-        "remaining_count",
-        "star_count",
-        "sticker",
-        "total_count",
-        "unique_gift_variant_count",
-        "upgrade_star_count",
-    )
-
-    def __init__(
-        self,
-        id: str,
-        sticker: Sticker,
-        star_count: int,
-        total_count: int | None = None,
-        remaining_count: int | None = None,
-        upgrade_star_count: int | None = None,
-        publisher_chat: Chat | None = None,
-        personal_total_count: int | None = None,
-        personal_remaining_count: int | None = None,
-        background: GiftBackground | None = None,
-        is_premium: bool | None = None,
-        has_colors: bool | None = None,
-        unique_gift_variant_count: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self.sticker: Sticker = sticker
-        self.star_count: int = star_count
-        self.total_count: int | None = total_count
-        self.remaining_count: int | None = remaining_count
-        self.upgrade_star_count: int | None = upgrade_star_count
-        self.publisher_chat: Chat | None = publisher_chat
-        self.personal_total_count: int | None = personal_total_count
-        self.personal_remaining_count: int | None = personal_remaining_count
-        self.background: GiftBackground | None = background
-        self.is_premium: bool | None = is_premium
-        self.has_colors: bool | None = has_colors
-        self.unique_gift_variant_count: int | None = unique_gift_variant_count
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    id: str = tg_field(compare=True)
+    sticker: Sticker = tg_field()
+    star_count: int = tg_field()
+    total_count: int | None = tg_field(default=None)
+    remaining_count: int | None = tg_field(default=None)
+    upgrade_star_count: int | None = tg_field(default=None)
+    publisher_chat: Chat | None = tg_field(default=None)
+    personal_total_count: int | None = tg_field(default=None)
+    personal_remaining_count: int | None = tg_field(default=None)
+    background: GiftBackground | None = tg_field(default=None)
+    is_premium: bool | None = tg_field(default=None)
+    has_colors: bool | None = tg_field(default=None)
+    unique_gift_variant_count: int | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class Gifts(TelegramObject):
     """This object represent a list of gifts.
 
@@ -241,22 +179,10 @@ class Gifts(TelegramObject):
 
     """
 
-    __slots__ = ("gifts",)
-
-    def __init__(
-        self,
-        gifts: Sequence[Gift],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.gifts: tuple[Gift, ...] = parse_sequence_arg(gifts)
-
-        self._id_attrs = (self.gifts,)
-
-        self._freeze()
+    gifts: tuple[Gift, ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class GiftInfo(TelegramObject):
     """Describes a service message about a regular gift that was sent or received.
 
@@ -317,51 +243,16 @@ class GiftInfo(TelegramObject):
 
     """
 
-    __slots__ = (
-        "can_be_upgraded",
-        "convert_star_count",
-        "entities",
-        "gift",
-        "is_private",
-        "is_upgrade_separate",
-        "owned_gift_id",
-        "prepaid_upgrade_star_count",
-        "text",
-        "unique_gift_number",
-    )
-
-    def __init__(
-        self,
-        gift: Gift,
-        owned_gift_id: str | None = None,
-        convert_star_count: int | None = None,
-        prepaid_upgrade_star_count: int | None = None,
-        can_be_upgraded: bool | None = None,
-        text: str | None = None,
-        entities: Sequence[MessageEntity] | None = None,
-        is_private: bool | None = None,
-        unique_gift_number: int | None = None,
-        is_upgrade_separate: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.gift: Gift = gift
-        # Optional
-        self.owned_gift_id: str | None = owned_gift_id
-        self.convert_star_count: int | None = convert_star_count
-        self.prepaid_upgrade_star_count: int | None = prepaid_upgrade_star_count
-        self.can_be_upgraded: bool | None = can_be_upgraded
-        self.text: str | None = text
-        self.entities: tuple[MessageEntity, ...] = parse_sequence_arg(entities)
-        self.is_private: bool | None = is_private
-        self.unique_gift_number: int | None = unique_gift_number
-        self.is_upgrade_separate: bool | None = is_upgrade_separate
-
-        self._id_attrs = (self.gift,)
-
-        self._freeze()
+    gift: Gift = tg_field(compare=True)
+    owned_gift_id: str | None = tg_field(default=None)
+    convert_star_count: int | None = tg_field(default=None)
+    prepaid_upgrade_star_count: int | None = tg_field(default=None)
+    can_be_upgraded: bool | None = tg_field(default=None)
+    text: str | None = tg_field(default=None)
+    entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    is_private: bool | None = tg_field(default=None)
+    unique_gift_number: int | None = tg_field(default=None)
+    is_upgrade_separate: bool | None = tg_field(default=None)
 
     def parse_entity(self, entity: MessageEntity) -> str:
         """Returns the text in :attr:`text`
@@ -418,6 +309,7 @@ class GiftInfo(TelegramObject):
         return parse_message_entities(self.text, self.entities, types)
 
 
+@tg_dataclass()
 class AcceptedGiftTypes(TelegramObject):
     """This object describes the types of gifts that can be gifted to a user or a chat.
 
@@ -455,37 +347,8 @@ class AcceptedGiftTypes(TelegramObject):
 
     """
 
-    __slots__ = (
-        "gifts_from_channels",
-        "limited_gifts",
-        "premium_subscription",
-        "unique_gifts",
-        "unlimited_gifts",
-    )
-
-    def __init__(
-        self,
-        unlimited_gifts: bool,
-        limited_gifts: bool,
-        unique_gifts: bool,
-        premium_subscription: bool,
-        gifts_from_channels: bool,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.unlimited_gifts: bool = unlimited_gifts
-        self.limited_gifts: bool = limited_gifts
-        self.unique_gifts: bool = unique_gifts
-        self.premium_subscription: bool = premium_subscription
-        self.gifts_from_channels: bool = gifts_from_channels
-
-        self._id_attrs = (
-            self.unlimited_gifts,
-            self.limited_gifts,
-            self.unique_gifts,
-            self.premium_subscription,
-            self.gifts_from_channels,
-        )
-
-        self._freeze()
+    unlimited_gifts: bool = tg_field(compare=True)
+    limited_gifts: bool = tg_field(compare=True)
+    unique_gifts: bool = tg_field(compare=True)
+    premium_subscription: bool = tg_field(compare=True)
+    gifts_from_channels: bool = tg_field(compare=True)

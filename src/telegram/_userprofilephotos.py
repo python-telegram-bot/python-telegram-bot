@@ -22,9 +22,10 @@ from collections.abc import Sequence
 
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class UserProfilePhotos(TelegramObject):
     """This object represents a user's profile pictures.
 
@@ -49,20 +50,12 @@ class UserProfilePhotos(TelegramObject):
 
     """
 
-    __slots__ = ("photos", "total_count")
+    @staticmethod
+    def _photos_converter(
+        value: Sequence[Sequence[PhotoSize]],
+    ) -> tuple[tuple[PhotoSize, ...], ...]:
+        return tuple(tuple(sizes) for sizes in value)
 
-    def __init__(
-        self,
-        total_count: int,
-        photos: Sequence[Sequence[PhotoSize]],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.total_count: int = total_count
-        self.photos: tuple[tuple[PhotoSize, ...], ...] = tuple(tuple(sizes) for sizes in photos)
-
-        self._id_attrs = (self.total_count, self.photos)
-
-        self._freeze()
+    # Required
+    total_count: int = tg_field(compare=True)
+    photos: tuple[tuple[PhotoSize, ...], ...] = tg_field(compare=True, converter=_photos_converter)

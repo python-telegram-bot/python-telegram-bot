@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, InlineQueryHandler, JobQueue
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -80,9 +81,8 @@ def inline_query(bot):
             location=Location(latitude=-23.691288, longitude=-46.788279),
         ),
     )
-    update._unfreeze()
-    update.inline_query._unfreeze()
-    return update
+    with unfrozen(update), unfrozen(update.inline_query):
+        yield update
 
 
 class TestInlineQueryHandler:
@@ -147,10 +147,10 @@ class TestInlineQueryHandler:
             update = Update(
                 update_id=0, inline_query=InlineQuery(id="id", from_user=None, query="", offset="")
             )
-            update.inline_query._unfreeze()
-            assert not handler.check_update(update)
-            update.inline_query.query = "not_a_match"
-            assert not handler.check_update(update)
+            with unfrozen(update.inline_query):
+                assert not handler.check_update(update)
+                update.inline_query.query = "not_a_match"
+                assert not handler.check_update(update)
 
     @pytest.mark.parametrize(
         ("query", "expected_result"),

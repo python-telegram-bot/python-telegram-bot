@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import SentWebAppMessage
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -33,12 +32,6 @@ class SentWebAppMessageTestBase:
 
 
 class TestSentWebAppMessageWithoutRequest(SentWebAppMessageTestBase):
-    def test_slot_behaviour(self, sent_web_app_message):
-        inst = sent_web_app_message
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, sent_web_app_message):
         sent_web_app_message_dict = sent_web_app_message.to_dict()
 

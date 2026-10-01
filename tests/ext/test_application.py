@@ -1542,7 +1542,6 @@ class TestApplication:
             .post_init(post_init)
             .build()
         )
-        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(
             app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
@@ -1587,7 +1586,6 @@ class TestApplication:
             .post_shutdown(post_shutdown)
             .build()
         )
-        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(
             app, "shutdown", call_after(app.shutdown, lambda _: events.append("shutdown"))
@@ -1636,7 +1634,6 @@ class TestApplication:
             .post_stop(post_stop)
             .build()
         )
-        app.bot._unfreeze()
         monkeypatch.setattr(app.bot, "get_updates", empty_get_updates)
         monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
         monkeypatch.setattr(
@@ -1817,7 +1814,6 @@ class TestApplication:
             .updater(PytestUpdater(one_time_bot, asyncio.Queue()))
             .build()
         )
-        app.bot._unfreeze()
 
         monkeypatch.setattr(
             app, "initialize", call_after(app.initialize, lambda _: events.append("init"))
@@ -1873,7 +1869,6 @@ class TestApplication:
             .post_shutdown(post_shutdown)
             .build()
         )
-        app.bot._unfreeze()
 
         monkeypatch.setattr(
             app, "shutdown", call_after(app.shutdown, lambda _: events.append("shutdown"))
@@ -1933,7 +1928,6 @@ class TestApplication:
             .post_stop(post_stop)
             .build()
         )
-        app.bot._unfreeze()
 
         monkeypatch.setattr(app, "stop", call_after(app.stop, lambda _: events.append("stop")))
         monkeypatch.setattr(

@@ -18,18 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram LivePhoto."""
 
-from collections.abc import Sequence
-from typing import TYPE_CHECKING
+import datetime as dtm
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
-from telegram._utils.types import JSONDict, TimePeriod
-
-if TYPE_CHECKING:
-    import datetime as dtm
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class LivePhoto(_BaseMedium):
     """
     This object represents a live photo.
@@ -40,7 +37,7 @@ class LivePhoto(_BaseMedium):
     .. versionadded:: 22.8
 
     Args:
-        file_id	(:obj:`str`): Identifier for the video file which can be used to download or reuse
+        file_id (:obj:`str`): Identifier for the video file which can be used to download or reuse
             the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
@@ -55,7 +52,7 @@ class LivePhoto(_BaseMedium):
         file_size (:obj:`int`, optional): File size in bytes.
 
     Attributes:
-        file_id	(:obj:`str`): Identifier for the video file which can be used to download or reuse
+        file_id (:obj:`str`): Identifier for the video file which can be used to download or reuse
             the file.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
@@ -71,38 +68,11 @@ class LivePhoto(_BaseMedium):
 
     """
 
-    __slots__ = (
-        "duration",
-        "height",
-        "mime_type",
-        "photo",
-        "width",
-    )
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        width: int,
-        height: int,
-        duration: TimePeriod,
-        photo: Sequence[PhotoSize] | None = None,
-        mime_type: str | None = None,
-        file_size: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Required
-            self.width: int = width
-            self.height: int = height
-            self.duration: dtm.timedelta = to_timedelta(duration)
-            # Optional
-            self.photo: Sequence[PhotoSize] | None = parse_sequence_arg(photo)
-            self.mime_type: str | None = mime_type
+    # Required
+    width: int = tg_field()
+    height: int = tg_field()
+    duration: dtm.timedelta = tg_field(converter=to_timedelta)
+    # Optional
+    photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    mime_type: str | None = tg_field(default=None)
+    file_size: int | None = tg_field(default=None)

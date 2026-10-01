@@ -36,6 +36,7 @@ from telegram import (
 from telegram.ext import CallbackContext, JobQueue, MessageHandler, filters
 from telegram.ext.filters import MessageFilter
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -66,10 +67,9 @@ def false_update(request):
 @pytest.fixture(scope="class")
 def message(bot):
     message = Message(1, None, Chat(1, ""), from_user=User(1, "", False))
-    message._unfreeze()
-    message.chat._unfreeze()
     message.set_bot(bot)
-    return message
+    with unfrozen(message), unfrozen(message.chat):
+        yield message
 
 
 class TestMessageHandler:

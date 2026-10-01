@@ -19,9 +19,10 @@
 """This module contains objects related to Telegram forum topics."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ForumTopic(TelegramObject):
     """
     This object represents a forum topic.
@@ -55,36 +56,14 @@ class ForumTopic(TelegramObject):
             .. versionadded:: 22.6
     """
 
-    __slots__ = (
-        "icon_color",
-        "icon_custom_emoji_id",
-        "is_name_implicit",
-        "message_thread_id",
-        "name",
-    )
-
-    def __init__(
-        self,
-        message_thread_id: int,
-        name: str,
-        icon_color: int,
-        icon_custom_emoji_id: str | None = None,
-        is_name_implicit: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.message_thread_id: int = message_thread_id
-        self.name: str = name
-        self.icon_color: int = icon_color
-        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
-        self.is_name_implicit: bool | None = is_name_implicit
-
-        self._id_attrs = (self.message_thread_id, self.name, self.icon_color)
-
-        self._freeze()
+    message_thread_id: int = tg_field(compare=True)
+    name: str = tg_field(compare=True)
+    icon_color: int = tg_field(compare=True)
+    icon_custom_emoji_id: str | None = tg_field(default=None)
+    is_name_implicit: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ForumTopicCreated(TelegramObject):
     """
     This object represents the content of a service message about a new forum topic created in
@@ -116,28 +95,13 @@ class ForumTopicCreated(TelegramObject):
             .. versionadded:: 22.6
     """
 
-    __slots__ = ("icon_color", "icon_custom_emoji_id", "is_name_implicit", "name")
-
-    def __init__(
-        self,
-        name: str,
-        icon_color: int,
-        icon_custom_emoji_id: str | None = None,
-        is_name_implicit: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.name: str = name
-        self.icon_color: int = icon_color
-        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
-        self.is_name_implicit: bool | None = is_name_implicit
-
-        self._id_attrs = (self.name, self.icon_color)
-
-        self._freeze()
+    name: str = tg_field(compare=True)
+    icon_color: int = tg_field(compare=True)
+    icon_custom_emoji_id: str | None = tg_field(default=None)
+    is_name_implicit: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ForumTopicClosed(TelegramObject):
     """
     This object represents a service message about a forum topic closed in the chat.
@@ -146,14 +110,8 @@ class ForumTopicClosed(TelegramObject):
     .. versionadded:: 20.0
     """
 
-    __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-
-        self._freeze()
-
-
+@tg_dataclass()
 class ForumTopicReopened(TelegramObject):
     """
     This object represents a service message about a forum topic reopened in the chat.
@@ -162,14 +120,8 @@ class ForumTopicReopened(TelegramObject):
     .. versionadded:: 20.0
     """
 
-    __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-
-        self._freeze()
-
-
+@tg_dataclass()
 class ForumTopicEdited(TelegramObject):
     """
     This object represents a service message about an edited forum topic.
@@ -190,24 +142,11 @@ class ForumTopicEdited(TelegramObject):
             the topic icon, if it was edited; an empty string if the icon was removed.
     """
 
-    __slots__ = ("icon_custom_emoji_id", "name")
-
-    def __init__(
-        self,
-        name: str | None = None,
-        icon_custom_emoji_id: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.name: str | None = name
-        self.icon_custom_emoji_id: str | None = icon_custom_emoji_id
-
-        self._id_attrs = (self.name, self.icon_custom_emoji_id)
-
-        self._freeze()
+    name: str | None = tg_field(compare=True, default=None)
+    icon_custom_emoji_id: str | None = tg_field(compare=True, default=None)
 
 
+@tg_dataclass()
 class GeneralForumTopicHidden(TelegramObject):
     """
     This object represents a service message about General forum topic hidden in the chat.
@@ -216,14 +155,8 @@ class GeneralForumTopicHidden(TelegramObject):
     .. versionadded:: 20.0
     """
 
-    __slots__ = ()
 
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self._freeze()
-
-
+@tg_dataclass()
 class GeneralForumTopicUnhidden(TelegramObject):
     """
     This object represents a service message about General forum topic unhidden in the chat.
@@ -231,10 +164,3 @@ class GeneralForumTopicUnhidden(TelegramObject):
 
     .. versionadded:: 20.0
     """
-
-    __slots__ = ()
-
-    def __init__(self, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self._freeze()

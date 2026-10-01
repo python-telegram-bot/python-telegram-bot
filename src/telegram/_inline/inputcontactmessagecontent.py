@@ -19,9 +19,10 @@
 """This module contains the classes that represent Telegram InputContactMessageContent."""
 
 from telegram._inline.inputmessagecontent import InputMessageContent
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class InputContactMessageContent(InputMessageContent):
     """Represents the content of a contact message to be sent as the result of an inline query.
 
@@ -44,24 +45,9 @@ class InputContactMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = ("first_name", "last_name", "phone_number", "vcard")
-
-    def __init__(
-        self,
-        phone_number: str,
-        first_name: str,
-        last_name: str | None = None,
-        vcard: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        with self._unfrozen():
-            # Required
-            self.phone_number: str = phone_number
-            self.first_name: str = first_name
-            # Optionals
-            self.last_name: str | None = last_name
-            self.vcard: str | None = vcard
-
-            self._id_attrs = (self.phone_number,)
+    # Required
+    phone_number: str = tg_field(compare=True)
+    first_name: str = tg_field()
+    # Optional
+    last_name: str | None = tg_field(default=None)
+    vcard: str | None = tg_field(default=None)

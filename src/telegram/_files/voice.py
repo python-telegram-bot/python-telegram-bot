@@ -22,10 +22,11 @@ import datetime as dtm
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
+@tg_dataclass()
 class Voice(_BaseMedium):
     """This object represents a voice note.
 
@@ -62,29 +63,11 @@ class Voice(_BaseMedium):
 
     """
 
-    __slots__ = ("_duration", "mime_type")
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        duration: TimePeriod,
-        mime_type: str | None = None,
-        file_size: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(
-            file_id=file_id,
-            file_unique_id=file_unique_id,
-            file_size=file_size,
-            api_kwargs=api_kwargs,
-        )
-        with self._unfrozen():
-            # Required
-            self._duration: dtm.timedelta = to_timedelta(duration)
-            # Optional
-            self.mime_type: str | None = mime_type
+    # Required
+    _duration: dtm.timedelta = tg_field(alias="duration", converter=to_timedelta)
+    # Optional
+    mime_type: str | None = tg_field(default=None)
+    file_size: int | None = tg_field(default=None)
 
     @property
     def duration(self) -> int | dtm.timedelta:

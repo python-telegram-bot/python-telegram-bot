@@ -32,6 +32,7 @@ from telegram import (
 from telegram._utils.datetime import from_timestamp
 from telegram.ext import CallbackContext, ChatBoostHandler
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 from tests.test_update import all_types as really_all_types
 from tests.test_update import params as all_params
 
@@ -212,6 +213,6 @@ class TestChatBoostHandler:
         handler = ChatBoostHandler(cb, chat_boost_types=0, chat_username=["@chat_b"])
         assert not handler.check_update(update)
 
-        update.removed_chat_boost.chat._unfreeze()
-        update.removed_chat_boost.chat.username = None
-        assert not handler.check_update(update)
+        with unfrozen(update.removed_chat_boost.chat):
+            update.removed_chat_boost.chat.username = None
+            assert not handler.check_update(update)

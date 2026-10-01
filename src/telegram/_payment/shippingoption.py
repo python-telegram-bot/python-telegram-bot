@@ -18,17 +18,17 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ShippingOption."""
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 if TYPE_CHECKING:
     from telegram import LabeledPrice
 
 
+@tg_dataclass()
 class ShippingOption(TelegramObject):
     """This object represents one shipping option.
 
@@ -56,22 +56,6 @@ class ShippingOption(TelegramObject):
 
     """
 
-    __slots__ = ("id", "prices", "title")
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        title: str,
-        prices: Sequence["LabeledPrice"],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.id: str = id
-        self.title: str = title
-        self.prices: tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    id: str = tg_field(compare=True)
+    title: str = tg_field()
+    prices: tuple["LabeledPrice", ...] = tg_field(converter=parse_sequence_arg)

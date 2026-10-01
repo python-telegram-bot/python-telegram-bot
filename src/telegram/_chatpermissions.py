@@ -18,10 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPermission."""
 
+import dataclasses
+
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ChatPermissions(TelegramObject):
     """Describes actions that a non-administrator user is allowed to take in a chat.
 
@@ -154,91 +157,29 @@ class ChatPermissions(TelegramObject):
 
     """
 
-    __slots__ = (
-        "can_add_web_page_previews",
-        "can_change_info",
-        "can_edit_tag",
-        "can_invite_users",
-        "can_manage_topics",
-        "can_pin_messages",
-        "can_react_to_messages",
-        "can_send_audios",
-        "can_send_documents",
-        "can_send_messages",
-        "can_send_other_messages",
-        "can_send_photos",
-        "can_send_polls",
-        "can_send_video_notes",
-        "can_send_videos",
-        "can_send_voice_notes",
-    )
-
     __REMOVED_API_FIELDS__ = frozenset(
         {
             "can_send_media_messages",
         }
     )
 
-    def __init__(
-        self,
-        can_send_messages: bool | None = None,
-        can_send_polls: bool | None = None,
-        can_send_other_messages: bool | None = None,
-        can_add_web_page_previews: bool | None = None,
-        can_change_info: bool | None = None,
-        can_invite_users: bool | None = None,
-        can_pin_messages: bool | None = None,
-        can_manage_topics: bool | None = None,
-        can_send_audios: bool | None = None,
-        can_send_documents: bool | None = None,
-        can_send_photos: bool | None = None,
-        can_send_videos: bool | None = None,
-        can_send_video_notes: bool | None = None,
-        can_send_voice_notes: bool | None = None,
-        can_edit_tag: bool | None = None,
-        can_react_to_messages: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.can_send_messages: bool | None = can_send_messages
-        self.can_send_polls: bool | None = can_send_polls
-        self.can_send_other_messages: bool | None = can_send_other_messages
-        self.can_add_web_page_previews: bool | None = can_add_web_page_previews
-        self.can_change_info: bool | None = can_change_info
-        self.can_invite_users: bool | None = can_invite_users
-        self.can_pin_messages: bool | None = can_pin_messages
-        self.can_manage_topics: bool | None = can_manage_topics
-        self.can_send_audios: bool | None = can_send_audios
-        self.can_send_documents: bool | None = can_send_documents
-        self.can_send_photos: bool | None = can_send_photos
-        self.can_send_videos: bool | None = can_send_videos
-        self.can_send_video_notes: bool | None = can_send_video_notes
-        self.can_send_voice_notes: bool | None = can_send_voice_notes
-        self.can_edit_tag: bool | None = can_edit_tag
-        self.can_react_to_messages: bool | None = can_react_to_messages
-
-        self._id_attrs = (
-            self.can_send_messages,
-            self.can_send_polls,
-            self.can_send_other_messages,
-            self.can_add_web_page_previews,
-            self.can_change_info,
-            self.can_invite_users,
-            self.can_pin_messages,
-            self.can_manage_topics,
-            self.can_send_audios,
-            self.can_send_documents,
-            self.can_send_photos,
-            self.can_send_videos,
-            self.can_send_video_notes,
-            self.can_send_voice_notes,
-            self.can_edit_tag,
-            self.can_react_to_messages,
-        )
-
-        self._freeze()
+    # Optional
+    can_send_messages: bool | None = tg_field(compare=True, default=None)
+    can_send_polls: bool | None = tg_field(compare=True, default=None)
+    can_send_other_messages: bool | None = tg_field(compare=True, default=None)
+    can_add_web_page_previews: bool | None = tg_field(compare=True, default=None)
+    can_change_info: bool | None = tg_field(compare=True, default=None)
+    can_invite_users: bool | None = tg_field(compare=True, default=None)
+    can_pin_messages: bool | None = tg_field(compare=True, default=None)
+    can_manage_topics: bool | None = tg_field(compare=True, default=None)
+    can_send_audios: bool | None = tg_field(compare=True, default=None)
+    can_send_documents: bool | None = tg_field(compare=True, default=None)
+    can_send_photos: bool | None = tg_field(compare=True, default=None)
+    can_send_videos: bool | None = tg_field(compare=True, default=None)
+    can_send_video_notes: bool | None = tg_field(compare=True, default=None)
+    can_send_voice_notes: bool | None = tg_field(compare=True, default=None)
+    can_edit_tag: bool | None = tg_field(compare=True, default=None)
+    can_react_to_messages: bool | None = tg_field(compare=True, default=None)
 
     @classmethod
     def all_permissions(cls) -> "ChatPermissions":
@@ -250,7 +191,9 @@ class ChatPermissions(TelegramObject):
         .. versionadded:: 20.0
 
         """
-        return cls(*(True,) * len(cls.__slots__))
+        return cls(
+            *(True for field in dataclasses.fields(cls) if field.init and not field.kw_only)
+        )
 
     @classmethod
     def no_permissions(cls) -> "ChatPermissions":
@@ -260,4 +203,6 @@ class ChatPermissions(TelegramObject):
 
         .. versionadded:: 20.0
         """
-        return cls(*(False,) * len(cls.__slots__))
+        return cls(
+            *(False for field in dataclasses.fields(cls) if field.init and not field.kw_only)
+        )

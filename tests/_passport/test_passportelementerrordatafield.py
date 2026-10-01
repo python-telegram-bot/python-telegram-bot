@@ -41,6 +41,7 @@ class PassportElementErrorDataFieldTestBase:
 
 
 class TestPassportElementErrorDataFieldWithoutRequest(PassportElementErrorDataFieldTestBase):
+    # tags: deprecated NEXT.VERSION
     def test_slot_behaviour(self, passport_element_error_data_field):
         inst = passport_element_error_data_field
         for attr in inst.__slots__:

@@ -16,19 +16,18 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program. If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains the classes for Telegram Stars transactions."""
 
 import datetime as dtm
-from collections.abc import Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 from .transactionpartner import TransactionPartner
 
 
+@tg_dataclass()
 class StarTransaction(TelegramObject):
     """Describes a Telegram Star transaction.
     Note that if the buyer initiates a chargeback with the payment provider from whom they
@@ -81,35 +80,17 @@ class StarTransaction(TelegramObject):
             outgoing transactions.
     """
 
-    __slots__ = ("amount", "date", "id", "nanostar_amount", "receiver", "source")
-
-    def __init__(
-        self,
-        id: str,
-        amount: int,
-        date: dtm.datetime,
-        source: TransactionPartner | None = None,
-        receiver: TransactionPartner | None = None,
-        nanostar_amount: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self.amount: int = amount
-        self.date: dtm.datetime = date
-        self.source: TransactionPartner | None = source
-        self.receiver: TransactionPartner | None = receiver
-        self.nanostar_amount: int | None = nanostar_amount
-
-        self._id_attrs = (
-            self.id,
-            self.source,
-            self.receiver,
-        )
-        self._freeze()
+    # Required
+    id: str = tg_field(compare=True)
+    amount: int = tg_field()
+    date: dtm.datetime = tg_field()
+    # Optional
+    source: TransactionPartner | None = tg_field(compare=True, default=None)
+    receiver: TransactionPartner | None = tg_field(compare=True, default=None)
+    nanostar_amount: int | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class StarTransactions(TelegramObject):
     """
     Contains a list of Telegram Star transactions.
@@ -126,13 +107,6 @@ class StarTransactions(TelegramObject):
         transactions (tuple[:class:`telegram.StarTransaction`]): The list of transactions.
     """
 
-    __slots__ = ("transactions",)
-
-    def __init__(
-        self, transactions: Sequence[StarTransaction], *, api_kwargs: JSONDict | None = None
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.transactions: tuple[StarTransaction, ...] = parse_sequence_arg(transactions)
-
-        self._id_attrs = (self.transactions,)
-        self._freeze()
+    transactions: tuple[StarTransaction, ...] = tg_field(
+        compare=True, converter=parse_sequence_arg
+    )

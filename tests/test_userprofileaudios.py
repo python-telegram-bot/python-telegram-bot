@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 from telegram import Audio, UserProfileAudios
-from tests.auxil.slots import mro_slots
 
 
 class UserProfileAudiosTestBase:
@@ -29,12 +28,6 @@ class UserProfileAudiosTestBase:
 
 
 class TestUserProfileAudiosWithoutRequest(UserProfileAudiosTestBase):
-    def test_slot_behaviour(self):
-        inst = UserProfileAudios(self.total_count, self.audios)
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {"total_count": 2, "audios": [x.to_dict() for x in self.audios]}
         user_profile_audios = UserProfileAudios.de_json(json_dict, offline_bot)

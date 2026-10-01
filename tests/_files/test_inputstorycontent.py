@@ -24,7 +24,6 @@ import pytest
 from telegram import InputFile, InputStoryContent, InputStoryContentPhoto, InputStoryContentVideo
 from telegram.constants import InputStoryContentType
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -39,12 +38,6 @@ class InputStoryContentTestBase:
 
 
 class TestInputStoryContent(InputStoryContentTestBase):
-    def test_slot_behaviour(self, input_story_content):
-        inst = input_story_content
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self):
         assert type(InputStoryContent(type="video").type) is InputStoryContentType
         assert InputStoryContent(type="unknown").type == "unknown"
@@ -61,12 +54,6 @@ class InputStoryContentPhotoTestBase:
 
 
 class TestInputStoryContentPhotoWithoutRequest(InputStoryContentPhotoTestBase):
-    def test_slot_behaviour(self, input_story_content_photo):
-        inst = input_story_content_photo
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_story_content_photo):
         inst = input_story_content_photo
         assert inst.type is self.type
@@ -107,12 +94,6 @@ class InputStoryContentVideoTestBase:
 
 
 class TestInputStoryContentVideoWithoutRequest(InputStoryContentVideoTestBase):
-    def test_slot_behaviour(self, input_story_content_video):
-        inst = input_story_content_video
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_story_content_video):
         inst = input_story_content_video
         assert inst.type is self.type

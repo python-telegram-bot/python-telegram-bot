@@ -19,14 +19,22 @@
 # pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram PassportElementError."""
 
-from collections.abc import Sequence
+import dataclasses
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.types import JSONDict
 
 
-class PassportElementError(TelegramObject):
+@tg_dataclass()
+class _BasePassportElementError(TelegramObject):
+    source: str = tg_field(compare=True)
+    type: str = tg_field(compare=True)
+
+
+@dataclasses.dataclass(frozen=True, slots=False, repr=False, eq=False, match_args=False)
+class PassportElementError(_BasePassportElementError):
     """Baseclass for the PassportElementError* classes.
 
     This object represents an error in the Telegram Passport element which was submitted that
@@ -47,22 +55,27 @@ class PassportElementError(TelegramObject):
 
     """
 
-    __slots__ = ("message", "source", "type")
+    # tags: deprecated NEXT.VERSION
+    # Use automatic slots and __init__
+    # We currently define explicit slots instead of dataclass fields
+    # to allow subclasses to control `message` parameter ordering
+
+    __slots__ = ("message",)
 
     def __init__(
-        self, source: str, type: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.source: str = str(source)
-        self.type: str = str(type)
-        self.message: str = str(message)
+        self,
+        source: str,
+        type: str,
+        message: str,
+        *,
+        api_kwargs: JSONDict | None = None,
+    ) -> None:
+        super().__init__(source, type, api_kwargs=api_kwargs)
 
-        self._id_attrs = (self.source, self.type)
-
-        self._freeze()
+        object.__setattr__(self, "message", str(message))
 
 
+@tg_dataclass()
 class PassportElementErrorDataField(PassportElementError):
     """
     Represents an issue in one of the data fields that was provided by the user. The error is
@@ -72,6 +85,10 @@ class PassportElementErrorDataField(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`field_name`, :attr:`data_hash` and :attr:`message` are equal.
 
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
             ``"personal_details"``, ``"passport"``, ``"driver_license"``, ``"identity_card"``,
@@ -90,32 +107,17 @@ class PassportElementErrorDataField(PassportElementError):
 
     """
 
-    __slots__ = ("data_hash", "field_name")
-
-    def __init__(
-        self,
-        type: str,
-        field_name: str,
-        data_hash: str,
-        message: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__("data", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.field_name: str = field_name
-            self.data_hash: str = data_hash
-
-            self._id_attrs = (
-                self.source,
-                self.type,
-                self.field_name,
-                self.data_hash,
-                self.message,
-            )
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="data")
+    # Required
+    field_name: str = tg_field(compare=True)
+    data_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorFile(PassportElementError):
     """
     Represents an issue with a document scan. The error is considered resolved when the file with
@@ -125,6 +127,10 @@ class PassportElementErrorFile(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
@@ -141,19 +147,16 @@ class PassportElementErrorFile(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
-
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("file", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="file")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorFiles(PassportElementError):
     """
     Represents an issue with a list of scans. The error is considered resolved when the list of
@@ -163,6 +166,10 @@ class PassportElementErrorFiles(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
 
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
@@ -185,24 +192,16 @@ class PassportElementErrorFiles(PassportElementError):
 
     """
 
-    __slots__ = ("file_hashes",)
-
-    def __init__(
-        self,
-        type: str,
-        file_hashes: Sequence[str],
-        message: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__("files", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hashes: tuple[str, ...] = parse_sequence_arg(file_hashes)
-
-            self._id_attrs = (self.source, self.type, self.message, self.file_hashes)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="files")
+    # Required
+    file_hashes: tuple[str, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorFrontSide(PassportElementError):
     """
     Represents an issue with the front side of a document. The error is considered resolved when
@@ -212,6 +211,10 @@ class PassportElementErrorFrontSide(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
@@ -228,19 +231,16 @@ class PassportElementErrorFrontSide(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
-
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("front_side", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="front_side")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorReverseSide(PassportElementError):
     """
     Represents an issue with the reverse side of a document. The error is considered resolved when
@@ -250,6 +250,10 @@ class PassportElementErrorReverseSide(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"driver_license"``, ``"identity_card"``.
@@ -266,19 +270,16 @@ class PassportElementErrorReverseSide(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
-
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("reverse_side", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="reverse_side")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorSelfie(PassportElementError):
     """
     Represents an issue with the selfie with a document. The error is considered resolved when
@@ -288,6 +289,10 @@ class PassportElementErrorSelfie(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
+
     Args:
         type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
             ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
@@ -302,19 +307,16 @@ class PassportElementErrorSelfie(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
-
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("selfie", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="selfie")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorTranslationFile(PassportElementError):
     """
     Represents an issue with one of the files that constitute the translation of a document.
@@ -324,6 +326,10 @@ class PassportElementErrorTranslationFile(PassportElementError):
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hash`, and :attr:`message` are equal.
 
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
+
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
             one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
@@ -342,19 +348,16 @@ class PassportElementErrorTranslationFile(PassportElementError):
 
     """
 
-    __slots__ = ("file_hash",)
-
-    def __init__(
-        self, type: str, file_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("translation_file", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hash: str = file_hash
-
-            self._id_attrs = (self.source, self.type, self.file_hash, self.message)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="translation_file")
+    # Required
+    file_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorTranslationFiles(PassportElementError):
     """
     Represents an issue with the translated version of a document. The error is considered
@@ -363,6 +366,10 @@ class PassportElementErrorTranslationFiles(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`file_hashes`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
@@ -388,24 +395,16 @@ class PassportElementErrorTranslationFiles(PassportElementError):
 
     """
 
-    __slots__ = ("file_hashes",)
-
-    def __init__(
-        self,
-        type: str,
-        file_hashes: Sequence[str],
-        message: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__("translation_files", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.file_hashes: tuple[str, ...] = parse_sequence_arg(file_hashes)
-
-            self._id_attrs = (self.source, self.type, self.message, self.file_hashes)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="translation_files")
+    # Required
+    file_hashes: tuple[str, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class PassportElementErrorUnspecified(PassportElementError):
     """
     Represents an issue in an unspecified place. The error is considered resolved when new
@@ -414,6 +413,10 @@ class PassportElementErrorUnspecified(PassportElementError):
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`~telegram.PassportElementError.source`, :attr:`type`,
     :attr:`element_hash`, and :attr:`message` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        Passing :paramref:`message` positionally is deprecated. Its position will change in
+        a future release.
 
     Args:
         type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
@@ -427,14 +430,10 @@ class PassportElementErrorUnspecified(PassportElementError):
 
     """
 
-    __slots__ = ("element_hash",)
-
-    def __init__(
-        self, type: str, element_hash: str, message: str, *, api_kwargs: JSONDict | None = None
-    ):
-        # Required
-        super().__init__("unspecified", type, message, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.element_hash: str = element_hash
-
-            self._id_attrs = (self.source, self.type, self.element_hash, self.message)
+    # Attribute only (init=False)
+    source: str = tg_field(compare=True, init=False, default="unspecified")
+    # Required
+    element_hash: str = tg_field(compare=True)
+    # tags: deprecated NEXT.VERSION
+    # Remove for next relase
+    message: str = tg_field(compare=True)

@@ -29,7 +29,6 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import RevenueWithdrawalStateType
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -61,12 +60,6 @@ class RevenueWithdrawalStateTestBase:
 
 
 class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
-    def test_slot_behaviour(self, revenue_withdrawal_state):
-        inst = revenue_withdrawal_state
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self):
         assert type(RevenueWithdrawalState("failed").type) is RevenueWithdrawalStateType
         assert RevenueWithdrawalState("unknown").type == "unknown"
@@ -114,12 +107,6 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
 
 
 class TestRevenueWithdrawalStatePendingWithoutRequest(RevenueWithdrawalStateTestBase):
-    def test_slot_behaviour(self, revenue_withdrawal_state_pending):
-        inst = revenue_withdrawal_state_pending
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {}
         rws = RevenueWithdrawalStatePending.de_json(json_dict, offline_bot)
@@ -148,12 +135,6 @@ class TestRevenueWithdrawalStatePendingWithoutRequest(RevenueWithdrawalStateTest
 
 class TestRevenueWithdrawalStateSucceededWithoutRequest(RevenueWithdrawalStateTestBase):
     state = RevenueWithdrawalStateType.SUCCEEDED
-
-    def test_slot_behaviour(self, revenue_withdrawal_state_succeeded):
-        inst = revenue_withdrawal_state_succeeded
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {"date": to_timestamp(self.date), "url": self.url}
@@ -193,12 +174,6 @@ class TestRevenueWithdrawalStateSucceededWithoutRequest(RevenueWithdrawalStateTe
 
 class TestRevenueWithdrawalStateFailedWithoutRequest(RevenueWithdrawalStateTestBase):
     state = RevenueWithdrawalStateType.FAILED
-
-    def test_slot_behaviour(self, revenue_withdrawal_state_failed):
-        inst = revenue_withdrawal_state_failed
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {}

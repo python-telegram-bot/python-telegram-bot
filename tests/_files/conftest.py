@@ -222,8 +222,7 @@ async def sticker(bot, chat_id):
     with data_file("telegram.webp").open("rb") as f:
         sticker = (await bot.send_sticker(chat_id, sticker=f, read_timeout=50)).sticker
         # necessary to properly test needs_repainting
-        with sticker._unfrozen():
-            sticker.needs_repainting = True
+        object.__setattr__(sticker, "needs_repainting", True)
         return sticker
 
 

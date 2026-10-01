@@ -23,10 +23,11 @@ import datetime as dtm
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
+@tg_dataclass()
 class ChatInviteLink(TelegramObject):
     """This object represents an invite link for a chat.
 
@@ -122,63 +123,22 @@ class ChatInviteLink(TelegramObject):
 
     """
 
-    __slots__ = (
-        "_subscription_period",
-        "creates_join_request",
-        "creator",
-        "expire_date",
-        "invite_link",
-        "is_primary",
-        "is_revoked",
-        "member_limit",
-        "name",
-        "pending_join_request_count",
-        "subscription_price",
+    # Required
+    invite_link: str = tg_field(compare=True)
+    creator: User = tg_field(compare=True)
+    creates_join_request: bool = tg_field(compare=True)
+    is_primary: bool = tg_field(compare=True)
+    is_revoked: bool = tg_field(compare=True)
+
+    # Optionals
+    expire_date: dtm.datetime | None = tg_field(default=None)
+    member_limit: int | None = tg_field(default=None)
+    name: str | None = tg_field(default=None)
+    pending_join_request_count: int | None = tg_field(default=None)
+    _subscription_period: dtm.timedelta | None = tg_field(
+        default=None, alias="subscription_period", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        invite_link: str,
-        creator: User,
-        creates_join_request: bool,
-        is_primary: bool,
-        is_revoked: bool,
-        expire_date: dtm.datetime | None = None,
-        member_limit: int | None = None,
-        name: str | None = None,
-        pending_join_request_count: int | None = None,
-        subscription_period: TimePeriod | None = None,
-        subscription_price: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.invite_link: str = invite_link
-        self.creator: User = creator
-        self.creates_join_request: bool = creates_join_request
-        self.is_primary: bool = is_primary
-        self.is_revoked: bool = is_revoked
-
-        # Optionals
-        self.expire_date: dtm.datetime | None = expire_date
-        self.member_limit: int | None = member_limit
-        self.name: str | None = name
-        self.pending_join_request_count: int | None = (
-            int(pending_join_request_count) if pending_join_request_count is not None else None
-        )
-        self._subscription_period: dtm.timedelta | None = to_timedelta(subscription_period)
-        self.subscription_price: int | None = subscription_price
-
-        self._id_attrs = (
-            self.invite_link,
-            self.creates_join_request,
-            self.creator,
-            self.is_primary,
-            self.is_revoked,
-        )
-
-        self._freeze()
+    subscription_price: int | None = tg_field(default=None)
 
     @property
     def subscription_period(self) -> int | dtm.timedelta | None:

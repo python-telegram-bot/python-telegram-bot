@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import BotName
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -32,11 +31,6 @@ class BotNameTestBase:
 
 
 class TestBotNameWithoutRequest(BotNameTestBase):
-    def test_slot_behaviour(self, bot_name):
-        for attr in bot_name.__slots__:
-            assert getattr(bot_name, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(bot_name)) == len(set(mro_slots(bot_name))), "duplicate slot"
-
     def test_to_dict(self, bot_name):
         bot_name_dict = bot_name.to_dict()
 

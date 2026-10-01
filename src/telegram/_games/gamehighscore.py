@@ -20,9 +20,10 @@
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class GameHighScore(TelegramObject):
     """This object represents one row of the high scores table for a game.
 
@@ -41,16 +42,6 @@ class GameHighScore(TelegramObject):
 
     """
 
-    __slots__ = ("position", "score", "user")
-
-    def __init__(
-        self, position: int, user: User, score: int, *, api_kwargs: JSONDict | None = None
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.position: int = position
-        self.user: User = user
-        self.score: int = score
-
-        self._id_attrs = (self.position, self.user, self.score)
-
-        self._freeze()
+    position: int = tg_field(compare=True)
+    user: User = tg_field(compare=True)
+    score: int = tg_field(compare=True)

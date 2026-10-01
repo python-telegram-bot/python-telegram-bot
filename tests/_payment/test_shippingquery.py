@@ -25,7 +25,6 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -48,12 +47,6 @@ class ShippingQueryTestBase:
 
 
 class TestShippingQueryWithoutRequest(ShippingQueryTestBase):
-    def test_slot_behaviour(self, shipping_query):
-        inst = shipping_query
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,

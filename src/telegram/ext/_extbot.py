@@ -17,6 +17,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# ruff: noqa: UP008
+# pylint: disable=super-with-arguments
 """This module contains an object that represents a Telegram Bot with convenience extensions."""
 
 import datetime as dtm
@@ -95,6 +97,7 @@ from telegram import (
     Voice,
     WebhookInfo,
 )
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE, DefaultValue
 from telegram._utils.logging import get_logger
@@ -142,6 +145,7 @@ HandledTypes = TypeVar("HandledTypes", bound=Message | CallbackQuery | ChatFullI
 KT = TypeVar("KT", bound=ReplyMarkup)
 
 
+@tg_dataclass(eq=False)
 class ExtBot(Bot, Generic[RLARGS]):
     """This object represents a Telegram Bot with convenience extensions.
 
@@ -196,7 +200,9 @@ class ExtBot(Bot, Generic[RLARGS]):
 
     """
 
-    __slots__ = ("_callback_data_cache", "_defaults", "_rate_limiter")
+    _callback_data_cache: CallbackDataCache | None = tg_field(init=False)
+    _defaults: "Defaults | None" = tg_field(init=False)
+    _rate_limiter: "BaseRateLimiter[RLARGS] | None" = tg_field(init=False)
 
     _LOGGER = get_logger(__name__, class_name="ExtBot")
 
@@ -248,7 +254,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         local_mode: bool = False,
         rate_limiter: "BaseRateLimiter[RLARGS] | None" = None,
     ):
-        super().__init__(
+        super(ExtBot, self).__init__(
             token=token,
             base_url=base_url,
             base_file_url=base_file_url,
@@ -258,21 +264,22 @@ class ExtBot(Bot, Generic[RLARGS]):
             private_key_password=private_key_password,
             local_mode=local_mode,
         )
-        with self._unfrozen():
-            self._defaults: Defaults | None = defaults
-            self._rate_limiter: BaseRateLimiter | None = rate_limiter
-            self._callback_data_cache: CallbackDataCache | None = None
+        object.__setattr__(self, "_defaults", defaults)
+        object.__setattr__(self, "_rate_limiter", rate_limiter)
+        object.__setattr__(self, "_callback_data_cache", None)
 
-            # set up callback_data
-            if arbitrary_callback_data is False:
-                return
+        # set up callback_data
+        if arbitrary_callback_data is False:
+            return
 
-            if not isinstance(arbitrary_callback_data, bool):
-                maxsize = cast("int", arbitrary_callback_data)
-            else:
-                maxsize = 1024
+        if not isinstance(arbitrary_callback_data, bool):
+            maxsize = cast("int", arbitrary_callback_data)
+        else:
+            maxsize = 1024
 
-            self._callback_data_cache = CallbackDataCache(bot=self, maxsize=maxsize)
+        object.__setattr__(
+            self, "_callback_data_cache", CallbackDataCache(bot=self, maxsize=maxsize)
+        )
 
     def __repr__(self) -> str:
         """Give a string representation of the bot in the form ``ExtBot[token=...]``.
@@ -295,7 +302,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         """We override this method to add one more level to the stacklevel, so that the warning
         points to the user's code, not to the PTB code.
         """
-        super()._warn(message=message, category=category, stacklevel=stacklevel + 2)
+        super(ExtBot, cls)._warn(message=message, category=category, stacklevel=stacklevel + 2)
 
     @property
     def callback_data_cache(self) -> CallbackDataCache | None:
@@ -320,7 +327,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         # Initialize before calling super, because super calls get_me
         if self.rate_limiter:
             await self.rate_limiter.initialize()
-        await super().initialize()
+        await super(ExtBot, self).initialize()
 
     async def shutdown(self) -> None:
         """See :meth:`telegram.Bot.shutdown`. Also shuts down the
@@ -330,7 +337,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         # Shut down the rate limiter before shutting down the request objects!
         if self.rate_limiter:
             await self.rate_limiter.shutdown()
-        await super().shutdown()
+        await super(ExtBot, self).shutdown()
 
     @classmethod
     def _merge_api_rl_kwargs(
@@ -374,7 +381,7 @@ class ExtBot(Bot, Generic[RLARGS]):
 
         # getting updates should not be rate limited!
         if endpoint == "getUpdates" or not self.rate_limiter:
-            return await super()._do_post(
+            return await super(ExtBot, self)._do_post(
                 endpoint=endpoint,
                 data=data,
                 write_timeout=write_timeout,
@@ -395,7 +402,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             rate_limit_args,
         )
         return await self.rate_limiter.process_request(
-            callback=super()._do_post,
+            callback=super(ExtBot, self)._do_post,
             args=(endpoint, data),
             kwargs=kwargs,
             endpoint=endpoint,
@@ -437,7 +444,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                     if isinstance(orig_attr := getattr(lpo, attr), DefaultValue)
                     else orig_attr
                 )
-                for attr in defaults_lpo.__slots__
+                for attr in defaults_lpo.__slots__  # type: ignore[attr-defined]
             }
         )
 
@@ -452,7 +459,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         """
         if self.defaults is None:
             # If we have no defaults to insert, the behavior is the same as in `tg.Bot`
-            super()._insert_defaults(data)
+            super(ExtBot, self)._insert_defaults(data)
             return
 
         # if we have Defaults, we
@@ -476,8 +483,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 # Copy object as not to edit it in-place
                 copied_val = copy(val)
-                with copied_val._unfrozen():
-                    copied_val.parse_mode = self.defaults.parse_mode
+                object.__setattr__(copied_val, "parse_mode", self.defaults.parse_mode)
                 data[key] = copied_val
             elif (
                 key == "media"
@@ -488,8 +494,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
                     if media.parse_mode is DEFAULT_NONE:
-                        with media._unfrozen():
-                            media.parse_mode = self.defaults.parse_mode
+                        object.__setattr__(media, "parse_mode", self.defaults.parse_mode)
 
                 data[key] = copy_list
 
@@ -504,17 +509,24 @@ class ExtBot(Bot, Generic[RLARGS]):
                 or self.defaults.quote_parse_mode is not None
             ):
                 new_value = copy(val)
-                with new_value._unfrozen():
-                    new_value.allow_sending_without_reply = (
+                object.__setattr__(
+                    new_value,
+                    "allow_sending_without_reply",
+                    (
                         defaults_aswr
                         if isinstance(val.allow_sending_without_reply, DefaultValue)
                         else val.allow_sending_without_reply
-                    )
-                    new_value.quote_parse_mode = (
+                    ),
+                )
+                object.__setattr__(
+                    new_value,
+                    "quote_parse_mode",
+                    (
                         self.defaults.quote_parse_mode
                         if isinstance(val.quote_parse_mode, DefaultValue)
                         else val.quote_parse_mode
-                    )
+                    ),
+                )
 
                 data[key] = new_value
 
@@ -530,8 +542,9 @@ class ExtBot(Bot, Generic[RLARGS]):
                         new_val.append(option)
                     else:
                         new_option = copy(option)
-                        with new_option._unfrozen():
-                            new_option.text_parse_mode = self.defaults.text_parse_mode
+                        object.__setattr__(
+                            new_option, "text_parse_mode", self.defaults.text_parse_mode
+                        )
                         new_val.append(new_option)
                 data[key] = new_val
 
@@ -636,7 +649,7 @@ class ExtBot(Bot, Generic[RLARGS]):
     ) -> Any:
         # We override this method to call self._replace_keyboard and self._insert_callback_data.
         # This covers most methods that have a reply_markup
-        result = await super()._send_message(
+        result = await super(ExtBot, self)._send_message(
             endpoint=endpoint,
             data=data,
             reply_to_message_id=reply_to_message_id,
@@ -678,7 +691,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         api_kwargs: JSONDict | None = None,
     ) -> tuple[Update, ...]:
-        updates = await super().get_updates(
+        updates = await super(ExtBot, self).get_updates(
             offset=offset,
             limit=limit,
             timeout=timeout,
@@ -706,7 +719,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         """This method is called by Bot.answer_inline_query to build the actual results list.
         Overriding this to call self._replace_keyboard suffices
         """
-        effective_results, next_offset = super()._effective_inline_results(
+        effective_results, next_offset = super(ExtBot, self)._effective_inline_results(
             results=results, next_offset=next_offset, current_offset=current_offset
         )
 
@@ -723,9 +736,8 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # We build a new result in case the user wants to use the same object in
                 # different places
                 new_result = copy(result)
-                with new_result._unfrozen():
-                    markup = self._replace_keyboard(result.reply_markup)
-                    new_result.reply_markup = markup
+                markup = self._replace_keyboard(result.reply_markup)
+                object.__setattr__(new_result, "reply_markup", markup)
 
                 results.append(new_result)
 
@@ -739,15 +751,14 @@ class ExtBot(Bot, Generic[RLARGS]):
         """
         if self.defaults is None:
             # If we have no defaults to insert, the behavior is the same as in `tg.Bot`
-            return super()._insert_defaults_for_ilq_results(res)
+            return super(ExtBot, self)._insert_defaults_for_ilq_results(res)
 
         # Copy the objects that need modification to avoid modifying the original object
         copied = False
         if hasattr(res, "parse_mode") and res.parse_mode is DEFAULT_NONE:
             res = copy(res)
-            with res._unfrozen():
-                copied = True
-                res.parse_mode = self.defaults.parse_mode
+            copied = True
+            object.__setattr__(res, "parse_mode", self.defaults.parse_mode)
         if hasattr(res, "input_message_content") and res.input_message_content:
             if (
                 hasattr(res.input_message_content, "parse_mode")
@@ -756,21 +767,25 @@ class ExtBot(Bot, Generic[RLARGS]):
                 if not copied:
                     res = copy(res)
                     copied = True
-                with res.input_message_content._unfrozen():
-                    res.input_message_content.parse_mode = self.defaults.parse_mode
+                object.__setattr__(
+                    res.input_message_content, "parse_mode", self.defaults.parse_mode
+                )
             if hasattr(res.input_message_content, "link_preview_options"):
                 if not copied:
                     res = copy(res)
-                with res.input_message_content._unfrozen():
-                    if res.input_message_content.link_preview_options is DEFAULT_NONE:
-                        res.input_message_content.link_preview_options = (
-                            self.defaults.link_preview_options
-                        )
-                    else:
-                        # merge the existing options with the defaults
-                        res.input_message_content.link_preview_options = self._merge_lpo_defaults(
-                            res.input_message_content.link_preview_options
-                        )
+                if res.input_message_content.link_preview_options is DEFAULT_NONE:
+                    object.__setattr__(
+                        res.input_message_content,
+                        "link_preview_options",
+                        self.defaults.link_preview_options,
+                    )
+                else:
+                    # merge the existing options with the defaults
+                    object.__setattr__(
+                        res.input_message_content,
+                        "link_preview_options",
+                        self._merge_lpo_defaults(res.input_message_content.link_preview_options),
+                    )
 
         return res
 
@@ -786,7 +801,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         pool_timeout: ODVInput[float] = DEFAULT_NONE,
         rate_limit_args: RLARGS | None = None,
     ) -> Any:
-        return await super().do_api_request(
+        return await super(ExtBot, self).do_api_request(
             endpoint=endpoint,
             api_kwargs=self._merge_api_rl_kwargs(api_kwargs, rate_limit_args),
             return_type=return_type,
@@ -811,7 +826,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> Poll:
         # We override this method to call self._replace_keyboard
-        return await super().stop_poll(
+        return await super(ExtBot, self).stop_poll(
             chat_id=chat_id,
             message_id=message_id,
             reply_markup=self._replace_keyboard(reply_markup),
@@ -853,7 +868,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> MessageId:
         # We override this method to call self._replace_keyboard
-        return await super().copy_message(
+        return await super(ExtBot, self).copy_message(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -899,7 +914,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> tuple["MessageId", ...]:
         # We override this method to call self._replace_keyboard
-        return await super().copy_messages(
+        return await super(ExtBot, self).copy_messages(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_ids=message_ids,
@@ -927,7 +942,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> ChatFullInfo:
         # We override this method to call self._insert_callback_data
-        result = await super().get_chat(
+        result = await super(ExtBot, self).get_chat(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -950,7 +965,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().add_sticker_to_set(
+        return await super(ExtBot, self).add_sticker_to_set(
             user_id=user_id,
             name=name,
             sticker=sticker,
@@ -976,7 +991,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().answer_callback_query(
+        return await super(ExtBot, self).answer_callback_query(
             callback_query_id=callback_query_id,
             text=text,
             show_alert=show_alert,
@@ -1008,7 +1023,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().answer_inline_query(
+        return await super(ExtBot, self).answer_inline_query(
             inline_query_id=inline_query_id,
             results=results,
             cache_time=cache_time,
@@ -1039,7 +1054,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> PreparedInlineMessage:
-        return await super().save_prepared_inline_message(
+        return await super(ExtBot, self).save_prepared_inline_message(
             user_id=user_id,
             result=result,
             allow_user_chats=allow_user_chats,
@@ -1066,7 +1081,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().answer_pre_checkout_query(
+        return await super(ExtBot, self).answer_pre_checkout_query(
             pre_checkout_query_id=pre_checkout_query_id,
             ok=ok,
             error_message=error_message,
@@ -1091,7 +1106,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().answer_shipping_query(
+        return await super(ExtBot, self).answer_shipping_query(
             shipping_query_id=shipping_query_id,
             ok=ok,
             shipping_options=shipping_options,
@@ -1115,7 +1130,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> SentWebAppMessage:
-        return await super().answer_web_app_query(
+        return await super(ExtBot, self).answer_web_app_query(
             web_app_query_id=web_app_query_id,
             result=result,
             read_timeout=read_timeout,
@@ -1137,7 +1152,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> SentGuestMessage:
-        return await super().answer_guest_query(
+        return await super(ExtBot, self).answer_guest_query(
             guest_query_id=guest_query_id,
             result=result,
             read_timeout=read_timeout,
@@ -1159,7 +1174,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().approve_chat_join_request(
+        return await super(ExtBot, self).approve_chat_join_request(
             chat_id=chat_id,
             user_id=user_id,
             read_timeout=read_timeout,
@@ -1183,7 +1198,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().ban_chat_member(
+        return await super(ExtBot, self).ban_chat_member(
             chat_id=chat_id,
             user_id=user_id,
             until_date=until_date,
@@ -1207,7 +1222,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().ban_chat_sender_chat(
+        return await super(ExtBot, self).ban_chat_sender_chat(
             chat_id=chat_id,
             sender_chat_id=sender_chat_id,
             read_timeout=read_timeout,
@@ -1232,7 +1247,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ChatInviteLink:
-        return await super().create_chat_invite_link(
+        return await super(ExtBot, self).create_chat_invite_link(
             chat_id=chat_id,
             expire_date=expire_date,
             member_limit=member_limit,
@@ -1277,7 +1292,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> str:
-        return await super().create_invoice_link(
+        return await super(ExtBot, self).create_invoice_link(
             title=title,
             description=description,
             payload=payload,
@@ -1323,7 +1338,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().create_new_sticker_set(
+        return await super(ExtBot, self).create_new_sticker_set(
             user_id=user_id,
             name=name,
             title=title,
@@ -1349,7 +1364,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().decline_chat_join_request(
+        return await super(ExtBot, self).decline_chat_join_request(
             chat_id=chat_id,
             user_id=user_id,
             read_timeout=read_timeout,
@@ -1370,7 +1385,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_chat_photo(
+        return await super(ExtBot, self).delete_chat_photo(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1390,7 +1405,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_chat_sticker_set(
+        return await super(ExtBot, self).delete_chat_sticker_set(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1411,7 +1426,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_forum_topic(
+        return await super(ExtBot, self).delete_forum_topic(
             chat_id=chat_id,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,
@@ -1433,7 +1448,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_message(
+        return await super(ExtBot, self).delete_message(
             chat_id=chat_id,
             message_id=message_id,
             read_timeout=read_timeout,
@@ -1455,7 +1470,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_messages(
+        return await super(ExtBot, self).delete_messages(
             chat_id=chat_id,
             message_ids=message_ids,
             read_timeout=read_timeout,
@@ -1477,7 +1492,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_my_commands(
+        return await super(ExtBot, self).delete_my_commands(
             scope=scope,
             language_code=language_code,
             read_timeout=read_timeout,
@@ -1498,7 +1513,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_sticker_from_set(
+        return await super(ExtBot, self).delete_sticker_from_set(
             sticker=sticker,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1518,7 +1533,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_webhook(
+        return await super(ExtBot, self).delete_webhook(
             drop_pending_updates=drop_pending_updates,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1543,7 +1558,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ChatInviteLink:
-        return await super().edit_chat_invite_link(
+        return await super(ExtBot, self).edit_chat_invite_link(
             chat_id=chat_id,
             invite_link=invite_link,
             expire_date=expire_date,
@@ -1571,7 +1586,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().edit_forum_topic(
+        return await super(ExtBot, self).edit_forum_topic(
             chat_id=chat_id,
             message_thread_id=message_thread_id,
             name=name,
@@ -1595,7 +1610,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().edit_general_forum_topic(
+        return await super(ExtBot, self).edit_general_forum_topic(
             chat_id=chat_id,
             name=name,
             read_timeout=read_timeout,
@@ -1624,7 +1639,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "Message | bool":
-        return await super().edit_message_caption(
+        return await super(ExtBot, self).edit_message_caption(
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -1663,7 +1678,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "Message | bool":
-        return await super().edit_message_live_location(
+        return await super(ExtBot, self).edit_message_live_location(
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -1699,7 +1714,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "Message | bool":
-        return await super().edit_message_media(
+        return await super(ExtBot, self).edit_message_media(
             media=media,
             chat_id=chat_id,
             message_id=message_id,
@@ -1728,7 +1743,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "Message | bool":
-        return await super().edit_message_reply_markup(
+        return await super(ExtBot, self).edit_message_reply_markup(
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -1761,7 +1776,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "Message | bool":
-        return await super().edit_message_text(
+        return await super(ExtBot, self).edit_message_text(
             text=text,
             chat_id=chat_id,
             message_id=message_id,
@@ -1790,7 +1805,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> str:
-        return await super().export_chat_invite_link(
+        return await super(ExtBot, self).export_chat_invite_link(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1819,7 +1834,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().forward_message(
+        return await super(ExtBot, self).forward_message(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_id=message_id,
@@ -1854,7 +1869,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> tuple[MessageId, ...]:
-        return await super().forward_messages(
+        return await super(ExtBot, self).forward_messages(
             chat_id=chat_id,
             from_chat_id=from_chat_id,
             message_ids=message_ids,
@@ -1881,7 +1896,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> tuple[ChatMember, ...]:
-        return await super().get_chat_administrators(
+        return await super(ExtBot, self).get_chat_administrators(
             chat_id=chat_id,
             return_bots=return_bots,
             read_timeout=read_timeout,
@@ -1903,7 +1918,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ChatMember:
-        return await super().get_chat_member(
+        return await super(ExtBot, self).get_chat_member(
             chat_id=chat_id,
             user_id=user_id,
             read_timeout=read_timeout,
@@ -1924,7 +1939,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> int:
-        return await super().get_chat_member_count(
+        return await super(ExtBot, self).get_chat_member_count(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1944,7 +1959,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> MenuButton:
-        return await super().get_chat_menu_button(
+        return await super(ExtBot, self).get_chat_menu_button(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1975,7 +1990,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> File:
-        return await super().get_file(
+        return await super(ExtBot, self).get_file(
             file_id=file_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -1994,7 +2009,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> tuple[Sticker, ...]:
-        return await super().get_forum_topic_icon_stickers(
+        return await super(ExtBot, self).get_forum_topic_icon_stickers(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2016,7 +2031,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> tuple[GameHighScore, ...]:
-        return await super().get_game_high_scores(
+        return await super(ExtBot, self).get_game_high_scores(
             user_id=user_id,
             chat_id=chat_id,
             message_id=message_id,
@@ -2038,7 +2053,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> User:
-        return await super().get_me(
+        return await super(ExtBot, self).get_me(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2058,7 +2073,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> tuple[BotCommand, ...]:
-        return await super().get_my_commands(
+        return await super(ExtBot, self).get_my_commands(
             scope=scope,
             language_code=language_code,
             read_timeout=read_timeout,
@@ -2079,7 +2094,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ChatAdministratorRights:
-        return await super().get_my_default_administrator_rights(
+        return await super(ExtBot, self).get_my_default_administrator_rights(
             for_channels=for_channels,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2099,7 +2114,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> StickerSet:
-        return await super().get_sticker_set(
+        return await super(ExtBot, self).get_sticker_set(
             name=name,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2119,7 +2134,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> tuple[Sticker, ...]:
-        return await super().get_custom_emoji_stickers(
+        return await super(ExtBot, self).get_custom_emoji_stickers(
             custom_emoji_ids=custom_emoji_ids,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2141,7 +2156,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "UserProfilePhotos":
-        return await super().get_user_profile_photos(
+        return await super(ExtBot, self).get_user_profile_photos(
             user_id=user_id,
             offset=offset,
             limit=limit,
@@ -2162,7 +2177,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> WebhookInfo:
-        return await super().get_webhook_info(
+        return await super(ExtBot, self).get_webhook_info(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2181,7 +2196,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().leave_chat(
+        return await super(ExtBot, self).leave_chat(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2200,7 +2215,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().log_out(
+        return await super(ExtBot, self).log_out(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2218,7 +2233,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().close(
+        return await super(ExtBot, self).close(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -2238,7 +2253,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().close_forum_topic(
+        return await super(ExtBot, self).close_forum_topic(
             chat_id=chat_id,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,
@@ -2259,7 +2274,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().close_general_forum_topic(
+        return await super(ExtBot, self).close_general_forum_topic(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2282,7 +2297,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ForumTopic:
-        return await super().create_forum_topic(
+        return await super(ExtBot, self).create_forum_topic(
             chat_id=chat_id,
             name=name,
             icon_color=icon_color,
@@ -2305,7 +2320,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().reopen_general_forum_topic(
+        return await super(ExtBot, self).reopen_general_forum_topic(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2325,7 +2340,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().hide_general_forum_topic(
+        return await super(ExtBot, self).hide_general_forum_topic(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2345,7 +2360,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().unhide_general_forum_topic(
+        return await super(ExtBot, self).unhide_general_forum_topic(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -2368,7 +2383,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().pin_chat_message(
+        return await super(ExtBot, self).pin_chat_message(
             chat_id=chat_id,
             message_id=message_id,
             disable_notification=disable_notification,
@@ -2409,7 +2424,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().promote_chat_member(
+        return await super(ExtBot, self).promote_chat_member(
             chat_id=chat_id,
             user_id=user_id,
             can_change_info=can_change_info,
@@ -2448,7 +2463,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().reopen_forum_topic(
+        return await super(ExtBot, self).reopen_forum_topic(
             chat_id=chat_id,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,
@@ -2473,7 +2488,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().restrict_chat_member(
+        return await super(ExtBot, self).restrict_chat_member(
             chat_id=chat_id,
             user_id=user_id,
             permissions=permissions,
@@ -2498,7 +2513,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ChatInviteLink:
-        return await super().revoke_chat_invite_link(
+        return await super(ExtBot, self).revoke_chat_invite_link(
             chat_id=chat_id,
             invite_link=invite_link,
             read_timeout=read_timeout,
@@ -2542,7 +2557,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_animation(
+        return await super(ExtBot, self).send_animation(
             chat_id=chat_id,
             animation=animation,
             duration=duration,
@@ -2606,7 +2621,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_audio(
+        return await super(ExtBot, self).send_audio(
             chat_id=chat_id,
             audio=audio,
             duration=duration,
@@ -2650,7 +2665,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().send_chat_action(
+        return await super(ExtBot, self).send_chat_action(
             chat_id=chat_id,
             business_connection_id=business_connection_id,
             action=action,
@@ -2690,7 +2705,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_contact(
+        return await super(ExtBot, self).send_contact(
             chat_id=chat_id,
             phone_number=phone_number,
             first_name=first_name,
@@ -2736,7 +2751,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_checklist(
+        return await super(ExtBot, self).send_checklist(
             business_connection_id=business_connection_id,
             chat_id=chat_id,
             checklist=checklist,
@@ -2769,7 +2784,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().edit_message_checklist(
+        return await super(ExtBot, self).edit_message_checklist(
             business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
@@ -2806,7 +2821,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_dice(
+        return await super(ExtBot, self).send_dice(
             chat_id=chat_id,
             disable_notification=disable_notification,
             business_connection_id=business_connection_id,
@@ -2858,7 +2873,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_document(
+        return await super(ExtBot, self).send_document(
             chat_id=chat_id,
             document=document,
             caption=caption,
@@ -2908,7 +2923,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_game(
+        return await super(ExtBot, self).send_game(
             chat_id=chat_id,
             game_short_name=game_short_name,
             disable_notification=disable_notification,
@@ -2971,7 +2986,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_invoice(
+        return await super(ExtBot, self).send_invoice(
             chat_id=chat_id,
             title=title,
             description=description,
@@ -3042,7 +3057,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_location(
+        return await super(ExtBot, self).send_location(
             chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
@@ -3097,7 +3112,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         parse_mode: ODVInput[str] = DEFAULT_NONE,
         caption_entities: Sequence["MessageEntity"] | None = None,
     ) -> tuple[Message, ...]:
-        return await super().send_media_group(
+        return await super(ExtBot, self).send_media_group(
             chat_id=chat_id,
             media=media,
             disable_notification=disable_notification,
@@ -3148,7 +3163,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_message(
+        return await super(ExtBot, self).send_message(
             chat_id=chat_id,
             text=text,
             parse_mode=parse_mode,
@@ -3190,7 +3205,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().send_message_draft(
+        return await super(ExtBot, self).send_message_draft(
             chat_id=chat_id,
             draft_id=draft_id,
             text=text,
@@ -3234,7 +3249,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_photo(
+        return await super(ExtBot, self).send_photo(
             chat_id=chat_id,
             photo=photo,
             caption=caption,
@@ -3308,7 +3323,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_poll(
+        return await super(ExtBot, self).send_poll(
             chat_id=chat_id,
             question=question,
             options=options,
@@ -3377,7 +3392,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_sticker(
+        return await super(ExtBot, self).send_sticker(
             chat_id=chat_id,
             sticker=sticker,
             disable_notification=disable_notification,
@@ -3432,7 +3447,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_venue(
+        return await super(ExtBot, self).send_venue(
             chat_id=chat_id,
             latitude=latitude,
             longitude=longitude,
@@ -3499,7 +3514,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_video(
+        return await super(ExtBot, self).send_video(
             chat_id=chat_id,
             video=video,
             duration=duration,
@@ -3562,7 +3577,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_video_note(
+        return await super(ExtBot, self).send_video_note(
             chat_id=chat_id,
             video_note=video_note,
             duration=duration,
@@ -3617,7 +3632,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_voice(
+        return await super(ExtBot, self).send_voice(
             chat_id=chat_id,
             voice=voice,
             duration=duration,
@@ -3657,7 +3672,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_administrator_custom_title(
+        return await super(ExtBot, self).set_chat_administrator_custom_title(
             chat_id=chat_id,
             user_id=user_id,
             custom_title=custom_title,
@@ -3680,7 +3695,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_description(
+        return await super(ExtBot, self).set_chat_description(
             chat_id=chat_id,
             description=description,
             read_timeout=read_timeout,
@@ -3703,7 +3718,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_user_emoji_status(
+        return await super(ExtBot, self).set_user_emoji_status(
             user_id=user_id,
             emoji_status_custom_emoji_id=emoji_status_custom_emoji_id,
             emoji_status_expiration_date=emoji_status_expiration_date,
@@ -3726,7 +3741,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_menu_button(
+        return await super(ExtBot, self).set_chat_menu_button(
             chat_id=chat_id,
             menu_button=menu_button,
             read_timeout=read_timeout,
@@ -3749,7 +3764,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_permissions(
+        return await super(ExtBot, self).set_chat_permissions(
             chat_id=chat_id,
             permissions=permissions,
             use_independent_chat_permissions=use_independent_chat_permissions,
@@ -3772,7 +3787,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_photo(
+        return await super(ExtBot, self).set_chat_photo(
             chat_id=chat_id,
             photo=photo,
             read_timeout=read_timeout,
@@ -3794,7 +3809,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_sticker_set(
+        return await super(ExtBot, self).set_chat_sticker_set(
             chat_id=chat_id,
             sticker_set_name=sticker_set_name,
             read_timeout=read_timeout,
@@ -3816,7 +3831,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_title(
+        return await super(ExtBot, self).set_chat_title(
             chat_id=chat_id,
             title=title,
             read_timeout=read_timeout,
@@ -3843,7 +3858,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "Message | bool":
-        return await super().set_game_score(
+        return await super(ExtBot, self).set_game_score(
             user_id=user_id,
             score=score,
             chat_id=chat_id,
@@ -3871,7 +3886,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_my_commands(
+        return await super(ExtBot, self).set_my_commands(
             commands=commands,
             scope=scope,
             language_code=language_code,
@@ -3894,7 +3909,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_my_default_administrator_rights(
+        return await super(ExtBot, self).set_my_default_administrator_rights(
             rights=rights,
             for_channels=for_channels,
             read_timeout=read_timeout,
@@ -3916,7 +3931,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_passport_data_errors(
+        return await super(ExtBot, self).set_passport_data_errors(
             user_id=user_id,
             errors=errors,
             read_timeout=read_timeout,
@@ -3938,7 +3953,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_sticker_position_in_set(
+        return await super(ExtBot, self).set_sticker_position_in_set(
             sticker=sticker,
             position=position,
             read_timeout=read_timeout,
@@ -3962,7 +3977,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_sticker_set_thumbnail(
+        return await super(ExtBot, self).set_sticker_set_thumbnail(
             name=name,
             user_id=user_id,
             thumbnail=thumbnail,
@@ -3991,7 +4006,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_webhook(
+        return await super(ExtBot, self).set_webhook(
             url=url,
             certificate=certificate,
             max_connections=max_connections,
@@ -4021,7 +4036,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> "Message | bool":
-        return await super().stop_message_live_location(
+        return await super(ExtBot, self).stop_message_live_location(
             chat_id=chat_id,
             message_id=message_id,
             inline_message_id=inline_message_id,
@@ -4047,7 +4062,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().unban_chat_member(
+        return await super(ExtBot, self).unban_chat_member(
             chat_id=chat_id,
             user_id=user_id,
             only_if_banned=only_if_banned,
@@ -4070,7 +4085,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().unban_chat_sender_chat(
+        return await super(ExtBot, self).unban_chat_sender_chat(
             chat_id=chat_id,
             sender_chat_id=sender_chat_id,
             read_timeout=read_timeout,
@@ -4091,7 +4106,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().unpin_all_chat_messages(
+        return await super(ExtBot, self).unpin_all_chat_messages(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4113,7 +4128,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().unpin_chat_message(
+        return await super(ExtBot, self).unpin_chat_message(
             chat_id=chat_id,
             message_id=message_id,
             read_timeout=read_timeout,
@@ -4136,7 +4151,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().unpin_all_forum_topic_messages(
+        return await super(ExtBot, self).unpin_all_forum_topic_messages(
             chat_id=chat_id,
             message_thread_id=message_thread_id,
             read_timeout=read_timeout,
@@ -4157,7 +4172,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().unpin_all_general_forum_topic_messages(
+        return await super(ExtBot, self).unpin_all_general_forum_topic_messages(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4179,7 +4194,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> File:
-        return await super().upload_sticker_file(
+        return await super(ExtBot, self).upload_sticker_file(
             user_id=user_id,
             sticker=sticker,
             sticker_format=sticker_format,
@@ -4202,7 +4217,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_my_description(
+        return await super(ExtBot, self).set_my_description(
             description=description,
             language_code=language_code,
             read_timeout=read_timeout,
@@ -4224,7 +4239,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_my_short_description(
+        return await super(ExtBot, self).set_my_short_description(
             short_description=short_description,
             language_code=language_code,
             read_timeout=read_timeout,
@@ -4245,7 +4260,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> BotDescription:
-        return await super().get_my_description(
+        return await super(ExtBot, self).get_my_description(
             language_code=language_code,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4265,7 +4280,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> BotShortDescription:
-        return await super().get_my_short_description(
+        return await super(ExtBot, self).get_my_short_description(
             language_code=language_code,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4286,7 +4301,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_my_name(
+        return await super(ExtBot, self).set_my_name(
             name=name,
             language_code=language_code,
             read_timeout=read_timeout,
@@ -4307,7 +4322,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> BotName:
-        return await super().get_my_name(
+        return await super(ExtBot, self).get_my_name(
             language_code=language_code,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4328,7 +4343,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_custom_emoji_sticker_set_thumbnail(
+        return await super(ExtBot, self).set_custom_emoji_sticker_set_thumbnail(
             name=name,
             custom_emoji_id=custom_emoji_id,
             read_timeout=read_timeout,
@@ -4350,7 +4365,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_sticker_set_title(
+        return await super(ExtBot, self).set_sticker_set_title(
             name=name,
             title=title,
             read_timeout=read_timeout,
@@ -4371,7 +4386,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_sticker_set(
+        return await super(ExtBot, self).delete_sticker_set(
             name=name,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4392,7 +4407,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_sticker_emoji_list(
+        return await super(ExtBot, self).set_sticker_emoji_list(
             sticker=sticker,
             emoji_list=emoji_list,
             read_timeout=read_timeout,
@@ -4414,7 +4429,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_sticker_keywords(
+        return await super(ExtBot, self).set_sticker_keywords(
             sticker=sticker,
             keywords=keywords,
             read_timeout=read_timeout,
@@ -4436,7 +4451,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_sticker_mask_position(
+        return await super(ExtBot, self).set_sticker_mask_position(
             sticker=sticker,
             mask_position=mask_position,
             read_timeout=read_timeout,
@@ -4458,7 +4473,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> UserChatBoosts:
-        return await super().get_user_chat_boosts(
+        return await super(ExtBot, self).get_user_chat_boosts(
             chat_id=chat_id,
             user_id=user_id,
             read_timeout=read_timeout,
@@ -4482,7 +4497,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_message_reaction(
+        return await super(ExtBot, self).set_message_reaction(
             chat_id=chat_id,
             message_id=message_id,
             reaction=reaction,
@@ -4510,7 +4525,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().gift_premium_subscription(
+        return await super(ExtBot, self).gift_premium_subscription(
             user_id=user_id,
             month_count=month_count,
             star_count=star_count,
@@ -4535,7 +4550,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> BusinessConnection:
-        return await super().get_business_connection(
+        return await super(ExtBot, self).get_business_connection(
             business_connection_id=business_connection_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4565,7 +4580,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> OwnedGifts:
-        return await super().get_business_account_gifts(
+        return await super(ExtBot, self).get_business_account_gifts(
             business_connection_id=business_connection_id,
             exclude_unsaved=exclude_unsaved,
             exclude_saved=exclude_saved,
@@ -4595,7 +4610,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> StarAmount:
-        return await super().get_business_account_star_balance(
+        return await super(ExtBot, self).get_business_account_star_balance(
             business_connection_id=business_connection_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -4617,7 +4632,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().read_business_message(
+        return await super(ExtBot, self).read_business_message(
             business_connection_id=business_connection_id,
             chat_id=chat_id,
             message_id=message_id,
@@ -4640,7 +4655,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_business_messages(
+        return await super(ExtBot, self).delete_business_messages(
             business_connection_id=business_connection_id,
             message_ids=message_ids,
             read_timeout=read_timeout,
@@ -4669,7 +4684,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Story:
-        return await super().post_story(
+        return await super(ExtBot, self).post_story(
             business_connection_id=business_connection_id,
             content=content,
             active_period=active_period,
@@ -4703,7 +4718,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Story:
-        return await super().edit_story(
+        return await super(ExtBot, self).edit_story(
             business_connection_id=business_connection_id,
             story_id=story_id,
             content=content,
@@ -4730,7 +4745,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_story(
+        return await super(ExtBot, self).delete_story(
             business_connection_id=business_connection_id,
             story_id=story_id,
             read_timeout=read_timeout,
@@ -4753,7 +4768,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_business_account_name(
+        return await super(ExtBot, self).set_business_account_name(
             business_connection_id=business_connection_id,
             first_name=first_name,
             last_name=last_name,
@@ -4776,7 +4791,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_business_account_username(
+        return await super(ExtBot, self).set_business_account_username(
             business_connection_id=business_connection_id,
             username=username,
             read_timeout=read_timeout,
@@ -4798,7 +4813,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_business_account_bio(
+        return await super(ExtBot, self).set_business_account_bio(
             business_connection_id=business_connection_id,
             bio=bio,
             read_timeout=read_timeout,
@@ -4821,7 +4836,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_business_account_gift_settings(
+        return await super(ExtBot, self).set_business_account_gift_settings(
             business_connection_id=business_connection_id,
             show_gift_button=show_gift_button,
             accepted_gift_types=accepted_gift_types,
@@ -4845,7 +4860,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_business_account_profile_photo(
+        return await super(ExtBot, self).set_business_account_profile_photo(
             business_connection_id=business_connection_id,
             photo=photo,
             is_public=is_public,
@@ -4868,7 +4883,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().remove_business_account_profile_photo(
+        return await super(ExtBot, self).remove_business_account_profile_photo(
             business_connection_id=business_connection_id,
             is_public=is_public,
             read_timeout=read_timeout,
@@ -4890,7 +4905,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().convert_gift_to_stars(
+        return await super(ExtBot, self).convert_gift_to_stars(
             business_connection_id=business_connection_id,
             owned_gift_id=owned_gift_id,
             read_timeout=read_timeout,
@@ -4914,7 +4929,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().upgrade_gift(
+        return await super(ExtBot, self).upgrade_gift(
             business_connection_id=business_connection_id,
             owned_gift_id=owned_gift_id,
             keep_original_details=keep_original_details,
@@ -4940,7 +4955,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().transfer_gift(
+        return await super(ExtBot, self).transfer_gift(
             business_connection_id=business_connection_id,
             owned_gift_id=owned_gift_id,
             new_owner_chat_id=new_owner_chat_id,
@@ -4964,7 +4979,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().transfer_business_account_stars(
+        return await super(ExtBot, self).transfer_business_account_stars(
             business_connection_id=business_connection_id,
             star_count=star_count,
             read_timeout=read_timeout,
@@ -4988,7 +5003,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().replace_sticker_in_set(
+        return await super(ExtBot, self).replace_sticker_in_set(
             user_id=user_id,
             name=name,
             old_sticker=old_sticker,
@@ -5012,7 +5027,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().refund_star_payment(
+        return await super(ExtBot, self).refund_star_payment(
             user_id=user_id,
             telegram_payment_charge_id=telegram_payment_charge_id,
             read_timeout=read_timeout,
@@ -5034,7 +5049,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> StarTransactions:
-        return await super().get_star_transactions(
+        return await super(ExtBot, self).get_star_transactions(
             offset=offset,
             limit=limit,
             read_timeout=read_timeout,
@@ -5057,7 +5072,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().edit_user_star_subscription(
+        return await super(ExtBot, self).edit_user_star_subscription(
             user_id=user_id,
             telegram_payment_charge_id=telegram_payment_charge_id,
             is_canceled=is_canceled,
@@ -5080,7 +5095,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> BotAccessSettings:
 
-        return await super().get_managed_bot_access_settings(
+        return await super(ExtBot, self).get_managed_bot_access_settings(
             user_id=user_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -5103,7 +5118,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
 
-        return await super().set_managed_bot_access_settings(
+        return await super(ExtBot, self).set_managed_bot_access_settings(
             user_id=user_id,
             is_access_restricted=is_access_restricted,
             added_user_ids=added_user_ids,
@@ -5126,7 +5141,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> tuple[Message, ...]:
-        return await super().get_user_personal_chat_messages(
+        return await super(ExtBot, self).get_user_personal_chat_messages(
             user_id=user_id,
             limit=limit,
             read_timeout=read_timeout,
@@ -5165,7 +5180,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
-        return await super().send_paid_media(
+        return await super(ExtBot, self).send_paid_media(
             chat_id=chat_id,
             star_count=star_count,
             media=media,
@@ -5206,7 +5221,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ChatInviteLink:
-        return await super().create_chat_subscription_invite_link(
+        return await super(ExtBot, self).create_chat_subscription_invite_link(
             chat_id=chat_id,
             subscription_period=subscription_period,
             subscription_price=subscription_price,
@@ -5231,7 +5246,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> ChatInviteLink:
-        return await super().edit_chat_subscription_invite_link(
+        return await super(ExtBot, self).edit_chat_subscription_invite_link(
             chat_id=chat_id,
             invite_link=invite_link,
             name=name,
@@ -5252,7 +5267,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Gifts:
-        return await super().get_available_gifts(
+        return await super(ExtBot, self).get_available_gifts(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -5277,7 +5292,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().send_gift(
+        return await super(ExtBot, self).send_gift(
             user_id=user_id,
             chat_id=chat_id,
             gift_id=gift_id,
@@ -5304,7 +5319,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().verify_chat(
+        return await super(ExtBot, self).verify_chat(
             chat_id=chat_id,
             custom_description=custom_description,
             read_timeout=read_timeout,
@@ -5326,7 +5341,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().verify_user(
+        return await super(ExtBot, self).verify_user(
             user_id=user_id,
             custom_description=custom_description,
             read_timeout=read_timeout,
@@ -5347,7 +5362,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().remove_chat_verification(
+        return await super(ExtBot, self).remove_chat_verification(
             chat_id=chat_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -5367,7 +5382,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().remove_user_verification(
+        return await super(ExtBot, self).remove_user_verification(
             user_id=user_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -5386,7 +5401,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> StarAmount:
-        return await super().get_my_star_balance(
+        return await super(ExtBot, self).get_my_star_balance(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -5407,7 +5422,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().decline_suggested_post(
+        return await super(ExtBot, self).decline_suggested_post(
             chat_id=chat_id,
             message_id=message_id,
             comment=comment,
@@ -5431,7 +5446,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().approve_suggested_post(
+        return await super(ExtBot, self).approve_suggested_post(
             chat_id=chat_id,
             message_id=message_id,
             send_date=send_date,
@@ -5458,7 +5473,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> Story:
-        return await super().repost_story(
+        return await super(ExtBot, self).repost_story(
             business_connection_id=business_connection_id,
             from_chat_id=from_chat_id,
             from_story_id=from_story_id,
@@ -5491,7 +5506,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> OwnedGifts:
-        return await super().get_user_gifts(
+        return await super(ExtBot, self).get_user_gifts(
             user_id=user_id,
             exclude_unlimited=exclude_unlimited,
             exclude_limited_upgradable=exclude_limited_upgradable,
@@ -5529,7 +5544,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> OwnedGifts:
-        return await super().get_chat_gifts(
+        return await super(ExtBot, self).get_chat_gifts(
             chat_id=chat_id,
             exclude_unsaved=exclude_unsaved,
             exclude_saved=exclude_saved,
@@ -5559,7 +5574,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_my_profile_photo(
+        return await super(ExtBot, self).set_my_profile_photo(
             photo=photo,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -5578,7 +5593,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().remove_my_profile_photo(
+        return await super(ExtBot, self).remove_my_profile_photo(
             read_timeout=read_timeout,
             write_timeout=write_timeout,
             connect_timeout=connect_timeout,
@@ -5599,7 +5614,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> UserProfileAudios:
-        return await super().get_user_profile_audios(
+        return await super(ExtBot, self).get_user_profile_audios(
             user_id=user_id,
             offset=offset,
             limit=limit,
@@ -5623,7 +5638,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().set_chat_member_tag(
+        return await super(ExtBot, self).set_chat_member_tag(
             chat_id=chat_id,
             user_id=user_id,
             tag=tag,
@@ -5645,7 +5660,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> str:
-        return await super().get_managed_bot_token(
+        return await super(ExtBot, self).get_managed_bot_token(
             user_id=user_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -5665,7 +5680,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> str:
-        return await super().replace_managed_bot_token(
+        return await super(ExtBot, self).replace_managed_bot_token(
             user_id=user_id,
             read_timeout=read_timeout,
             write_timeout=write_timeout,
@@ -5687,7 +5702,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> PreparedKeyboardButton:
 
-        return await super().save_prepared_keyboard_button(
+        return await super(ExtBot, self).save_prepared_keyboard_button(
             user_id=user_id,
             button=button,
             read_timeout=read_timeout,
@@ -5729,7 +5744,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         rate_limit_args: RLARGS | None = None,
     ) -> Message:
 
-        return await super().send_live_photo(
+        return await super(ExtBot, self).send_live_photo(
             chat_id=chat_id,
             live_photo=live_photo,
             photo=photo,
@@ -5772,7 +5787,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_message_reaction(
+        return await super(ExtBot, self).delete_message_reaction(
             chat_id=chat_id,
             message_id=message_id,
             user_id=user_id,
@@ -5797,7 +5812,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         api_kwargs: JSONDict | None = None,
         rate_limit_args: RLARGS | None = None,
     ) -> bool:
-        return await super().delete_all_message_reactions(
+        return await super(ExtBot, self).delete_all_message_reactions(
             chat_id=chat_id,
             user_id=user_id,
             actor_chat_id=actor_chat_id,
