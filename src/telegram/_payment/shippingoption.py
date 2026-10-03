@@ -42,18 +42,6 @@ class ShippingOption(TelegramObject):
         id (:obj:`str`): Shipping option identifier.
         title (:obj:`str`): Option title.
         prices (Sequence[:class:`telegram.LabeledPrice`]): List of price portions.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
-    Attributes:
-        id (:obj:`str`): Shipping option identifier.
-        title (:obj:`str`): Option title.
-        prices (tuple[:class:`telegram.LabeledPrice`]): List of price portions.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
     """
 
     __slots__ = ("id", "prices", "title")

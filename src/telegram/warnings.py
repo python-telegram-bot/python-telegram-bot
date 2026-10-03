@@ -62,14 +62,6 @@ class PTBDeprecationWarning(PTBUserWarning, DeprecationWarning):
         message (:obj:`str`): The message to display.
 
             .. versionadded:: 21.2
-
-    Attributes:
-        version (:obj:`str`): The version in which the feature was deprecated.
-
-            .. versionadded:: 21.2
-        message (:obj:`str`): The message to display.
-
-            .. versionadded:: 21.2
     """
 
     __slots__ = ("message", "version")

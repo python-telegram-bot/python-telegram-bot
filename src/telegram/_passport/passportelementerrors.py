@@ -27,7 +27,7 @@ from telegram._utils.types import JSONDict
 
 
 class PassportElementError(TelegramObject):
-    """Baseclass for the PassportElementError* classes.
+    """Base class for the PassportElementError* classes.
 
     This object represents an error in the Telegram Passport element which was submitted that
     should be resolved by the user.
@@ -39,12 +39,6 @@ class PassportElementError(TelegramObject):
         source (:obj:`str`): Error source.
         type (:obj:`str`): The section of the user's Telegram Passport which has the error.
         message (:obj:`str`): Error message.
-
-    Attributes:
-        source (:obj:`str`): Error source.
-        type (:obj:`str`): The section of the user's Telegram Passport which has the error.
-        message (:obj:`str`): Error message.
-
     """
 
     __slots__ = ("message", "source", "type")
@@ -81,13 +75,7 @@ class PassportElementErrorDataField(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): The section of the user's Telegram Passport which has the error, one of
-            ``"personal_details"``, ``"passport"``, ``"driver_license"``, ``"identity_card"``,
-            ``"internal_passport"``, ``"address"``.
-        field_name (:obj:`str`): Name of the data field which has the error.
-        data_hash (:obj:`str`): Base64-encoded data hash.
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"data"``.
     """
 
     __slots__ = ("data_hash", "field_name")
@@ -133,12 +121,7 @@ class PassportElementErrorFile(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
-            ``"passport_registration"``, ``"temporary_registration"``.
-        file_hash (:obj:`str`): Base64-encoded file hash.
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"file"``.
     """
 
     __slots__ = ("file_hash",)
@@ -168,21 +151,10 @@ class PassportElementErrorFiles(PassportElementError):
             ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
             ``"passport_registration"``, ``"temporary_registration"``.
         file_hashes (Sequence[:obj:`str`]): List of base64-encoded file hashes.
-
-            .. versionchanged:: 22.0
-                |sequenceargs|
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            ``"utility_bill"``, ``"bank_statement"``, ``"rental_agreement"``,
-            ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (tuple[:obj:`str`]): List of base64-encoded file hashes.
-
-            .. versionchanged:: 22.0
-                |tupleclassattrs|
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"files"``.
     """
 
     __slots__ = ("file_hashes",)
@@ -220,12 +192,7 @@ class PassportElementErrorFrontSide(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
-        file_hash (:obj:`str`): Base64-encoded hash of the file with the front side of the
-            document.
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"front_side"``.
     """
 
     __slots__ = ("file_hash",)
@@ -258,12 +225,7 @@ class PassportElementErrorReverseSide(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            ``"driver_license"``, ``"identity_card"``.
-        file_hash (:obj:`str`): Base64-encoded hash of the file with the reverse side of the
-            document.
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"reverse_side"``.
     """
 
     __slots__ = ("file_hash",)
@@ -295,11 +257,7 @@ class PassportElementErrorSelfie(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): The section of the user's Telegram Passport which has the issue, one of
-            ``"passport"``, ``"driver_license"``, ``"identity_card"``, ``"internal_passport"``.
-        file_hash (:obj:`str`): Base64-encoded hash of the file with the selfie.
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"selfie"``.
     """
 
     __slots__ = ("file_hash",)
@@ -333,13 +291,7 @@ class PassportElementErrorTranslationFile(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
-            one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
-            ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
-            ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
-        file_hash (:obj:`str`): Base64-encoded hash of the file.
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"translation_file"``.
     """
 
     __slots__ = ("file_hash",)
@@ -376,16 +328,7 @@ class PassportElementErrorTranslationFiles(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue,
-            one of ``"passport"``, ``"driver_license"``, ``"identity_card"``,
-            ``"internal_passport"``, ``"utility_bill"``, ``"bank_statement"``,
-            ``"rental_agreement"``, ``"passport_registration"``, ``"temporary_registration"``.
-        file_hashes (tuple[:obj:`str`]): List of base64-encoded file hashes.
-
-            .. versionchanged:: 22.0
-                |tupleclassattrs|
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"translation_files"``.
     """
 
     __slots__ = ("file_hashes",)
@@ -421,10 +364,7 @@ class PassportElementErrorUnspecified(PassportElementError):
         message (:obj:`str`): Error message.
 
     Attributes:
-        type (:obj:`str`): Type of element of the user's Telegram Passport which has the issue.
-        element_hash (:obj:`str`): Base64-encoded element hash.
-        message (:obj:`str`): Error message.
-
+        source (:obj:`str`): Error source, always ``"unspecified"``.
     """
 
     __slots__ = ("element_hash",)
