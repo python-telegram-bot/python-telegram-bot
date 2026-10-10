@@ -9,9 +9,12 @@ repos:
     -   id: ruff-format
         name: ruff format
 -   repo: https://github.com/PyCQA/pylint
-    rev: v4.0.8
+    rev: v4.1.2
     hooks:
     -   id: pylint
+        # Run on the minimum supported Python; dill crashes on 3.15 in parallel mode.
+        # https://github.com/pylint-dev/pylint/issues/11528
+        language_version: python3.14
         files: ^(?!(tests|docs)).*\.py$
         language: python
         additional_dependencies:

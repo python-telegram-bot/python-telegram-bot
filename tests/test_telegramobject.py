@@ -85,9 +85,7 @@ class TestDeJsonWithoutRequest:
 
         telegram_object = TimestampedObject.de_json({"created_at": 1_700_000_000})
 
-        assert telegram_object.created_at == dtm.datetime(
-            2023, 11, 14, 22, 13, 20, tzinfo=dtm.timezone.utc
-        )
+        assert telegram_object.created_at == dtm.datetime(2023, 11, 14, 22, 13, 20, tzinfo=dtm.UTC)
 
     def test_nested_object_is_deserialized_and_receives_bot(self, offline_bot):
         class Container(TelegramObject):

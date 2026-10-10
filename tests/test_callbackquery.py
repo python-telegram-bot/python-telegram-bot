@@ -69,7 +69,10 @@ class CallbackQueryTestBase:
     from_user = User(1, "test_user", False)
     chat_instance = "chat_instance"
     message = Message(
-        3, dtm.datetime.utcnow(), Chat(4, "private"), from_user=User(5, "bot", False)
+        3,
+        dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+        Chat(4, "private"),
+        from_user=User(5, "bot", False),
     )
     data = "data"
     inline_message_id = "inline_message_id"

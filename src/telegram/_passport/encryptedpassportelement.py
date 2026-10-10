@@ -19,7 +19,7 @@
 
 from base64 import b64decode
 from collections.abc import Sequence
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from telegram._passport.credentials import decrypt_json
 from telegram._passport.data import IdDocumentData, PersonalDetails, ResidentialAddress
@@ -213,7 +213,7 @@ class EncryptedPassportElement(TelegramObject):
     @classmethod
     def de_json_decrypted(
         cls, data: JSONDict, bot: "Bot | None", credentials: "Credentials"
-    ) -> "EncryptedPassportElement":
+    ) -> Self:
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.
 

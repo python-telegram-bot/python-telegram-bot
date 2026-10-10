@@ -143,7 +143,7 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         c = StarTransaction(
             id="3",
             amount=3,
-            date=to_timestamp(dtm.datetime.utcnow()),
+            date=to_timestamp(dtm.datetime.now(dtm.UTC).replace(tzinfo=None)),
             source=TransactionPartnerUser(
                 transaction_type="other_type",
                 user=User(

@@ -21,14 +21,12 @@
 from abc import ABC, abstractmethod
 from contextlib import AbstractAsyncContextManager
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, TypeVar, final
+from typing import TYPE_CHECKING, Any, Self, final
 
 from telegram.ext._utils.asyncio import TrackedBoundedSemaphore
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable
-
-_BUPT = TypeVar("_BUPT", bound="BaseUpdateProcessor")
 
 
 class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], ABC):
@@ -75,7 +73,7 @@ class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], AB
             raise ValueError("`max_concurrent_updates` must be a positive integer!")
         self._semaphore = TrackedBoundedSemaphore(self.max_concurrent_updates)
 
-    async def __aenter__(self: _BUPT) -> _BUPT:
+    async def __aenter__(self) -> Self:
         """|async_context_manager| :meth:`initializes <initialize>` the Processor.
 
         Returns:

@@ -50,12 +50,14 @@ def update():
         0,
         Message(
             0,
-            dtm.datetime.utcnow(),
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
             Chat(0, "private"),
             from_user=User(0, "Testuser", False),
             via_bot=User(0, "Testbot", True),
             sender_chat=Chat(0, "Channel"),
-            forward_origin=MessageOriginUser(dtm.datetime.utcnow(), User(0, "Testuser", False)),
+            forward_origin=MessageOriginUser(
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None), User(0, "Testuser", False)
+            ),
         ),
     )
     update._unfreeze()
@@ -85,7 +87,9 @@ def base_class(request):
 
 @pytest.fixture(scope="class")
 def message_origin_user():
-    return MessageOriginUser(dtm.datetime.utcnow(), User(1, "TestOther", False))
+    return MessageOriginUser(
+        dtm.datetime.now(dtm.UTC).replace(tzinfo=None), User(1, "TestOther", False)
+    )
 
 
 class TestFilters:
@@ -627,7 +631,7 @@ class TestFilters:
     def test_filters_reply(self, update):
         another_message = Message(
             1,
-            dtm.datetime.utcnow(),
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
             Chat(0, "private"),
             from_user=User(1, "TestOther", False),
         )
@@ -1211,7 +1215,9 @@ class TestFilters:
 
     def test_filters_forwarded(self, update):
         assert filters.FORWARDED.check_update(update)
-        update.message.forward_origin = MessageOriginHiddenUser(dtm.datetime.utcnow(), 1)
+        update.message.forward_origin = MessageOriginHiddenUser(
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None), 1
+        )
         assert filters.FORWARDED.check_update(update)
         update.message.forward_origin = None
         assert not filters.FORWARDED.check_update(update)
@@ -2812,7 +2818,7 @@ class TestFilters:
             0,
             Message(
                 0,
-                dtm.datetime.utcnow(),
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
                 Chat(0, "private"),
                 document=Document("str", "other_str"),
             ),

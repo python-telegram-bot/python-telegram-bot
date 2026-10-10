@@ -19,9 +19,7 @@
 
 """
 This module is intentionally named without "test_" prefix.
-These tests are supposed to be run on GitHub when building docs.
-The tests require Python 3.10+ (just like AdmonitionInserter being tested),
-so they cannot be included in the main suite while older versions of Python are supported.
+These tests are run separately from the main suite to check documentation generation on GitHub.
 """
 
 import collections.abc

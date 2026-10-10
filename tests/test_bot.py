@@ -2011,7 +2011,7 @@ class TestBotWithoutRequest:
 
         message = Message(
             1,
-            dtm.datetime.utcnow(),
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
             get_dummy_object(Chat),
             reply_markup=offline_bot.callback_data_cache.process_keyboard(reply_markup),
         )
@@ -2025,7 +2025,7 @@ class TestBotWithoutRequest:
                 **{
                     message_type: Message(
                         1,
-                        dtm.datetime.utcnow(),
+                        dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
                         get_dummy_object(Chat),
                         pinned_message=message,
                         reply_to_message=Message.de_json(message.to_dict(), offline_bot),
@@ -2075,7 +2075,7 @@ class TestBotWithoutRequest:
                         message=Message(
                             1,
                             from_user=User(1, "", False),
-                            date=dtm.datetime.utcnow(),
+                            date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
                             chat=Chat(1, ""),
                             text="Webhook",
                         ),
@@ -2168,7 +2168,7 @@ class TestBotWithoutRequest:
         reply_markup = bot.callback_data_cache.process_keyboard(reply_markup)
         message = Message(
             1,
-            dtm.datetime.utcnow(),
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
             get_dummy_object(Chat),
             reply_markup=reply_markup,
             via_bot=bot.bot if self_sender else User(1, "first", False),
@@ -3420,7 +3420,9 @@ class TestBotWithRequest:
         )
 
         if close_date:
-            close_date = dtm.datetime.utcnow() + dtm.timedelta(seconds=5.05)
+            close_date = dtm.datetime.now(dtm.UTC).replace(tzinfo=None) + dtm.timedelta(
+                seconds=5.05
+            )
 
         message = await bot.send_poll(
             chat_id=super_group_id,
@@ -4245,7 +4247,7 @@ class TestBotWithRequest:
     @pytest.mark.parametrize("datetime", argvalues=[True, False], ids=["datetime", "integer"])
     async def test_advanced_chat_invite_links(self, bot, channel_id, datetime):
         # we are testing this all in one function in order to save api calls
-        timestamp = dtm.datetime.utcnow()
+        timestamp = dtm.datetime.now(dtm.UTC).replace(tzinfo=None)
         add_seconds = dtm.timedelta(0, 70)
         time_in_future = timestamp + add_seconds
         expire_time = time_in_future if datetime else to_timestamp(time_in_future)
@@ -4947,9 +4949,9 @@ class TestBotWithRequest:
             bot.callback_data_cache.clear_callback_queries()
 
     async def test_set_get_my_description(self, bot):
-        default_description = f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
-        en_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
-        de_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+        default_description = f"{bot.username} - default - {dtm.datetime.now(dtm.UTC).isoformat()}"
+        en_description = f"{bot.username} - en - {dtm.datetime.now(dtm.UTC).isoformat()}"
+        de_description = f"{bot.username} - de - {dtm.datetime.now(dtm.UTC).isoformat()}"
 
         # Set the descriptions
         assert all(
@@ -4985,10 +4987,10 @@ class TestBotWithRequest:
 
     async def test_set_get_my_short_description(self, bot):
         default_short_description = (
-            f"{bot.username} - default - {dtm.datetime.utcnow().isoformat()}"
+            f"{bot.username} - default - {dtm.datetime.now(dtm.UTC).isoformat()}"
         )
-        en_short_description = f"{bot.username} - en - {dtm.datetime.utcnow().isoformat()}"
-        de_short_description = f"{bot.username} - de - {dtm.datetime.utcnow().isoformat()}"
+        en_short_description = f"{bot.username} - en - {dtm.datetime.now(dtm.UTC).isoformat()}"
+        de_short_description = f"{bot.username} - de - {dtm.datetime.now(dtm.UTC).isoformat()}"
 
         # Set the short_descriptions
         assert all(
