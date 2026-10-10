@@ -39,6 +39,7 @@ class PassportElementErrorReverseSideTestBase:
 
 
 class TestPassportElementErrorReverseSideWithoutRequest(PassportElementErrorReverseSideTestBase):
+    # tags: deprecated NEXT.VERSION
     def test_slot_behaviour(self, passport_element_error_reverse_side):
         inst = passport_element_error_reverse_side
         for attr in inst.__slots__:

@@ -34,6 +34,7 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, CallbackQueryHandler, InvalidCallbackData, JobQueue
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -68,9 +69,8 @@ def false_update(request):
 @pytest.fixture
 def callback_query(bot):
     update = Update(0, callback_query=CallbackQuery(2, User(1, "", False), None, data="test data"))
-    update._unfreeze()
-    update.callback_query._unfreeze()
-    return update
+    with unfrozen(update), unfrozen(update.callback_query):
+        yield update
 
 
 class TestCallbackQueryHandler:

@@ -34,7 +34,6 @@ from telegram._storyarea import (
     StoryAreaTypeWeather,
 )
 from telegram.constants import StoryAreaTypeType
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -59,12 +58,6 @@ class StoryAreaPositionTestBase:
 
 
 class TestStoryAreaPositionWithoutRequest(StoryAreaPositionTestBase):
-    def test_slot_behaviour(self, story_area_position):
-        inst = story_area_position
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, story_area_position):
         assert story_area_position.x_percentage == self.x_percentage
         assert story_area_position.y_percentage == self.y_percentage
@@ -130,12 +123,6 @@ class LocationAddressTestBase:
 
 
 class TestLocationAddressWithoutRequest(LocationAddressTestBase):
-    def test_slot_behaviour(self, location_address):
-        inst = location_address
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, location_address):
         assert location_address.country_code == self.country_code
         assert location_address.state == self.state
@@ -186,12 +173,6 @@ class StoryAreaTestBase:
 
 
 class TestStoryAreaWithoutRequest(StoryAreaTestBase):
-    def test_slot_behaviour(self, story_area):
-        inst = story_area
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, story_area):
         assert story_area.position == self.position
         assert story_area.type == self.type
@@ -243,12 +224,6 @@ class StoryAreaTypeTestBase:
 
 
 class TestStoryAreaTypeWithoutRequest(StoryAreaTypeTestBase):
-    def test_slot_behaviour(self, story_area_type):
-        inst = story_area_type
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, story_area_type):
         assert story_area_type.type == self.type
 
@@ -286,12 +261,6 @@ def story_area_type_location():
 
 class TestStoryAreaTypeLocationWithoutRequest(StoryAreaTypeTestBase):
     type = StoryAreaTypeType.LOCATION
-
-    def test_slot_behaviour(self, story_area_type_location):
-        inst = story_area_type_location
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, story_area_type_location):
         assert story_area_type_location.type == self.type
@@ -336,12 +305,6 @@ def story_area_type_suggested_reaction():
 class TestStoryAreaTypeSuggestedReactionWithoutRequest(StoryAreaTypeTestBase):
     type = StoryAreaTypeType.SUGGESTED_REACTION
 
-    def test_slot_behaviour(self, story_area_type_suggested_reaction):
-        inst = story_area_type_suggested_reaction
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, story_area_type_suggested_reaction):
         assert story_area_type_suggested_reaction.type == self.type
         assert story_area_type_suggested_reaction.reaction_type == self.reaction_type
@@ -383,12 +346,6 @@ def story_area_type_link():
 class TestStoryAreaTypeLinkWithoutRequest(StoryAreaTypeTestBase):
     type = StoryAreaTypeType.LINK
 
-    def test_slot_behaviour(self, story_area_type_link):
-        inst = story_area_type_link
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, story_area_type_link):
         assert story_area_type_link.type == self.type
         assert story_area_type_link.url == self.url
@@ -427,12 +384,6 @@ def story_area_type_weather():
 
 class TestStoryAreaTypeWeatherWithoutRequest(StoryAreaTypeTestBase):
     type = StoryAreaTypeType.WEATHER
-
-    def test_slot_behaviour(self, story_area_type_weather):
-        inst = story_area_type_weather
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, story_area_type_weather):
         assert story_area_type_weather.type == self.type
@@ -474,12 +425,6 @@ def story_area_type_unique_gift():
 
 class TestStoryAreaTypeUniqueGiftWithoutRequest(StoryAreaTypeTestBase):
     type = StoryAreaTypeType.UNIQUE_GIFT
-
-    def test_slot_behaviour(self, story_area_type_unique_gift):
-        inst = story_area_type_unique_gift
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, story_area_type_unique_gift):
         assert story_area_type_unique_gift.type == self.type

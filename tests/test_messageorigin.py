@@ -33,7 +33,6 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, to_timestamp
-from tests.auxil.slots import mro_slots
 
 ignored = ["self", "api_kwargs"]
 
@@ -130,12 +129,6 @@ def message_origin_type(request):
     indirect=True,
 )
 class TestMessageOriginTypesWithoutRequest:
-    def test_slot_behaviour(self, message_origin_type):
-        inst = message_origin_type
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json_required_args(self, offline_bot, message_origin_type):
         cls = message_origin_type.__class__
 

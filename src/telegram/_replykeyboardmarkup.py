@@ -19,15 +19,16 @@
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
 from collections.abc import Sequence
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.markup import check_keyboard_type
-from telegram._utils.types import JSONDict
 
 
+@tg_dataclass()
 class ReplyKeyboardMarkup(TelegramObject):
     """This object represents a custom keyboard with reply options. Not supported in channels and
     for messages sent on behalf of a Telegram Business account.
@@ -121,49 +122,30 @@ class ReplyKeyboardMarkup(TelegramObject):
 
     """
 
-    __slots__ = (
-        "input_field_placeholder",
-        "is_persistent",
-        "keyboard",
-        "one_time_keyboard",
-        "resize_keyboard",
-        "selective",
-    )
-
-    def __init__(
-        self,
-        keyboard: Sequence[Sequence[str | KeyboardButton]],
-        resize_keyboard: bool | None = None,
-        one_time_keyboard: bool | None = None,
-        selective: bool | None = None,
-        input_field_placeholder: str | None = None,
-        is_persistent: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        if not check_keyboard_type(keyboard):
+    @staticmethod
+    def _keyboard_converter(
+        value: Sequence[Sequence[str | KeyboardButton]],
+    ) -> tuple[tuple[KeyboardButton, ...], ...]:
+        if not check_keyboard_type(value):
             raise ValueError(
                 "The parameter `keyboard` should be a sequence of sequences of "
                 "strings or KeyboardButtons"
             )
-
-        # Required
-        self.keyboard: tuple[tuple[KeyboardButton, ...], ...] = tuple(
+        return tuple(
             tuple(KeyboardButton(button) if isinstance(button, str) else button for button in row)
-            for row in keyboard
+            for row in value
         )
 
-        # Optionals
-        self.resize_keyboard: bool | None = resize_keyboard
-        self.one_time_keyboard: bool | None = one_time_keyboard
-        self.selective: bool | None = selective
-        self.input_field_placeholder: str | None = input_field_placeholder
-        self.is_persistent: bool | None = is_persistent
-
-        self._id_attrs = (self.keyboard,)
-
-        self._freeze()
+    # Required
+    keyboard: tuple[tuple[KeyboardButton, ...], ...] = tg_field(
+        compare=True, converter=_keyboard_converter
+    )
+    # Optional
+    resize_keyboard: bool | None = tg_field(default=None)
+    one_time_keyboard: bool | None = tg_field(default=None)
+    selective: bool | None = tg_field(default=None)
+    input_field_placeholder: str | None = tg_field(default=None)
+    is_persistent: bool | None = tg_field(default=None)
 
     @classmethod
     def from_button(
@@ -348,12 +330,12 @@ class ReplyKeyboardMarkup(TelegramObject):
             **kwargs,  # type: ignore[arg-type]
         )
 
-    MIN_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
+    MIN_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MIN_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0
     """
-    MAX_INPUT_FIELD_PLACEHOLDER: Final[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
+    MAX_INPUT_FIELD_PLACEHOLDER: ClassVar[int] = constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER
     """:const:`telegram.constants.ReplyLimit.MAX_INPUT_FIELD_PLACEHOLDER`
 
     .. versionadded:: 20.0

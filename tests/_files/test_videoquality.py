@@ -18,7 +18,6 @@
 import pytest
 
 from telegram import PhotoSize, VideoQuality
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -74,13 +73,6 @@ class TestVideoQualityWithoutRequest(VideoQualityTestBase):
         # Subsequent tests relie on the forwarded video
         # having exactly one video quality.
         assert len(offline_video_quality_list) == 1
-
-    def test_slot_behaviour(self, offline_video_quality):
-        for attr in offline_video_quality.__slots__:
-            assert getattr(offline_video_quality, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(offline_video_quality)) == len(
-            set(mro_slots(offline_video_quality))
-        ), "duplicate slot"
 
     def test_creation(self, offline_video_quality):
         assert isinstance(offline_video_quality, VideoQuality)

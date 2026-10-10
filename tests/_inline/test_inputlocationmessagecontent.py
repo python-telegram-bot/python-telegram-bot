@@ -22,7 +22,6 @@ import pytest
 
 from telegram import InputLocationMessageContent, Location
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -47,12 +46,6 @@ class InputLocationMessageContentTestBase:
 
 
 class TestInputLocationMessageContentWithoutRequest(InputLocationMessageContentTestBase):
-    def test_slot_behaviour(self, input_location_message_content):
-        inst = input_location_message_content
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_location_message_content):
         assert input_location_message_content.longitude == self.longitude
         assert input_location_message_content.latitude == self.latitude

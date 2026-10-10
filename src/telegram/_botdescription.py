@@ -19,9 +19,10 @@
 """This module contains two objects that represent a Telegram bots (short) description."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class BotDescription(TelegramObject):
     """This object represents the bot's description.
 
@@ -38,17 +39,10 @@ class BotDescription(TelegramObject):
 
     """
 
-    __slots__ = ("description",)
-
-    def __init__(self, description: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.description: str = description
-
-        self._id_attrs = (self.description,)
-
-        self._freeze()
+    description: str = tg_field(compare=True)
 
 
+@tg_dataclass()
 class BotShortDescription(TelegramObject):
     """This object represents the bot's short description.
 
@@ -65,12 +59,4 @@ class BotShortDescription(TelegramObject):
 
     """
 
-    __slots__ = ("short_description",)
-
-    def __init__(self, short_description: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.short_description: str = short_description
-
-        self._id_attrs = (self.short_description,)
-
-        self._freeze()
+    short_description: str = tg_field(compare=True)

@@ -20,12 +20,13 @@
 """This module contains an object that represents a Telegram InlineQuery."""
 
 from collections.abc import Callable, Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._inline.inlinequeryresultsbutton import InlineQueryResultsButton
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
@@ -34,6 +35,7 @@ if TYPE_CHECKING:
     from telegram._files.location import Location
 
 
+@tg_dataclass()
 class InlineQuery(TelegramObject):
     """
     This object represents an incoming inline query. When the user sends an empty query, your bot
@@ -103,33 +105,14 @@ class InlineQuery(TelegramObject):
 
     """
 
-    __slots__ = ("chat_type", "from_user", "id", "location", "offset", "query")
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        from_user: User,
-        query: str,
-        offset: str,
-        location: "Location | None" = None,
-        chat_type: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.id: str = id
-        self.from_user: User = from_user
-        self.query: str = query
-        self.offset: str = offset
-
-        # Optional
-        self.location: Location | None = location
-        self.chat_type: str | None = chat_type
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    # Required
+    id: str = tg_field(compare=True)
+    from_user: User = tg_field()
+    query: str = tg_field()
+    offset: str = tg_field()
+    # Optional
+    location: "Location | None" = tg_field(default=None)
+    chat_type: str | None = tg_field(default=None)
 
     async def answer(
         self,
@@ -192,17 +175,17 @@ class InlineQuery(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    MAX_RESULTS: Final[int] = constants.InlineQueryLimit.RESULTS
+    MAX_RESULTS: ClassVar[int] = constants.InlineQueryLimit.RESULTS
     """:const:`telegram.constants.InlineQueryLimit.RESULTS`
 
     .. versionadded:: 13.2
     """
-    MAX_OFFSET_LENGTH: Final[int] = constants.InlineQueryLimit.MAX_OFFSET_LENGTH
+    MAX_OFFSET_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_OFFSET_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.MAX_OFFSET_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_QUERY_LENGTH: Final[int] = constants.InlineQueryLimit.MAX_QUERY_LENGTH
+    MAX_QUERY_LENGTH: ClassVar[int] = constants.InlineQueryLimit.MAX_QUERY_LENGTH
     """:const:`telegram.constants.InlineQueryLimit.MAX_QUERY_LENGTH`
 
     .. versionadded:: 20.0

@@ -20,17 +20,10 @@ import datetime as dtm
 
 from telegram import MessageAutoDeleteTimerChanged, VideoChatEnded
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 class TestMessageAutoDeleteTimerChangedWithoutRequest:
     message_auto_delete_time = dtm.timedelta(seconds=100)
-
-    def test_slot_behaviour(self):
-        action = MessageAutoDeleteTimerChanged(self.message_auto_delete_time)
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
         json_dict = {

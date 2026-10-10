@@ -37,6 +37,7 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.ext import CallbackContext, ChatJoinRequestHandler, JobQueue
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -164,9 +165,9 @@ class TestChatJoinRequestHandler:
         handler = ChatJoinRequestHandler(self.callback, username=["@user_b"])
         assert not handler.check_update(chat_join_request_update)
 
-        chat_join_request_update.chat_join_request.from_user._unfreeze()
-        chat_join_request_update.chat_join_request.from_user.username = None
-        assert not handler.check_update(chat_join_request_update)
+        with unfrozen(chat_join_request_update.chat_join_request.from_user):
+            chat_join_request_update.chat_join_request.from_user.username = None
+            assert not handler.check_update(chat_join_request_update)
 
     def test_other_update_types(self, false_update):
         handler = ChatJoinRequestHandler(self.callback)

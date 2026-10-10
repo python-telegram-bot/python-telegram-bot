@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import ChatLocation, Location, User
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -34,12 +33,6 @@ class ChatLocationTestBase:
 
 
 class TestChatLocationWithoutRequest(ChatLocationTestBase):
-    def test_slot_behaviour(self, chat_location):
-        inst = chat_location
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "location": self.location.to_dict(),

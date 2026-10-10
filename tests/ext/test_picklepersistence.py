@@ -16,16 +16,19 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import dataclasses
 import datetime as dtm
 import gzip
 import os
 import pickle
 import sys
 from pathlib import Path
+from typing import Any
 
 import pytest
 
 from telegram import Chat, Message, TelegramObject, Update, User
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.ext import ContextTypes, PersistenceInput, PicklePersistence
 from telegram.warnings import PTBUserWarning
 from tests.auxil.files import SOURCE_ROOT_PATH
@@ -238,20 +241,15 @@ class TestPicklePersistence:
     """Just tests the PicklePersistence interface. Integration of persistence into Applictation
     is tested in TestBasePersistence!"""
 
-    class DictSub(TelegramObject):  # Used for testing our custom (Un)Pickler.
-        def __init__(self, private, normal, b):
-            super().__init__()
-            self._private = private
-            self.normal = normal
-            self._bot = b
+    @dataclasses.dataclass(frozen=True, slots=False)
+    class DictSub(TelegramObject):
+        _private: Any
+        normal: Any
 
+    @tg_dataclass()
     class SlotsSub(TelegramObject):
-        __slots__ = ("_private", "new_var")
-
-        def __init__(self, new_var, private):
-            super().__init__()
-            self.new_var = new_var
-            self._private = private
+        new_var: Any = tg_field()
+        _private: Any = tg_field(alias="private")
 
     class NormalClass:
         def __init__(self, my_var):
@@ -928,7 +926,9 @@ class TestPicklePersistence:
     ):
         bot = cdc_bot
 
-        dict_s = self.DictSub("private", "normal", bot)
+        dict_s = self.DictSub("private", "normal")
+        dict_s.set_bot(bot)
+
         slot_s = self.SlotsSub("new_var", "private_var")
         regular = self.NormalClass(12)
 

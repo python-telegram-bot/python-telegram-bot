@@ -26,14 +26,16 @@ from typing import TYPE_CHECKING, BinaryIO
 
 from telegram._passport.credentials import decrypt
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.files import is_local_file
-from telegram._utils.types import FilePathInput, JSONDict, ODVInput
+from telegram._utils.types import FilePathInput, ODVInput
 
 if TYPE_CHECKING:
     from telegram import FileCredentials
 
 
+@tg_dataclass()
 class File(TelegramObject):
     """
     This object represents a file ready to be downloaded. The file can be e.g. downloaded with
@@ -74,37 +76,14 @@ class File(TelegramObject):
             file.
     """
 
-    __slots__ = (
-        "_credentials",
-        "file_id",
-        "file_path",
-        "file_size",
-        "file_unique_id",
-    )
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        file_size: int | None = None,
-        file_path: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.file_id: str = str(file_id)
-        self.file_unique_id: str = str(file_unique_id)
-        # Optionals
-        self.file_size: int | None = file_size
-        self.file_path: str | None = file_path
-
-        self._credentials: FileCredentials | None = None
-
-        self._id_attrs = (self.file_unique_id,)
-
-        self._freeze()
+    # Required
+    file_id: str = tg_field()
+    file_unique_id: str = tg_field(compare=True)
+    # Optional
+    file_size: int | None = tg_field(default=None)
+    file_path: str | None = tg_field(default=None)
+    # Attribute only (init=False)
+    _credentials: "FileCredentials | None" = tg_field(init=False, default=None)
 
     def _get_encoded_url(self) -> str:
         """Convert any UTF-8 char in :obj:`File.file_path` into a url encoded ASCII string."""
@@ -369,4 +348,4 @@ class File(TelegramObject):
         Args:
             credentials (:class:`telegram.FileCredentials`): The credentials.
         """
-        self._credentials = credentials
+        object.__setattr__(self, "_credentials", credentials)

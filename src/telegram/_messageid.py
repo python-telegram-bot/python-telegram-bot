@@ -19,9 +19,10 @@
 """This module contains an object that represents an instance of a Telegram MessageId."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class MessageId(TelegramObject):
     """This object represents a unique message identifier.
 
@@ -41,12 +42,4 @@ class MessageId(TelegramObject):
             ``0`` and the relevant message will be unusable until it is actually sent.
     """
 
-    __slots__ = ("message_id",)
-
-    def __init__(self, message_id: int, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.message_id: int = message_id
-
-        self._id_attrs = (self.message_id,)
-
-        self._freeze()
+    message_id: int = tg_field(compare=True)

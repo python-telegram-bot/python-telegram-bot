@@ -42,6 +42,7 @@ from telegram import (
 )
 from telegram.ext import filters
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture
@@ -58,15 +59,17 @@ def update():
             forward_origin=MessageOriginUser(dtm.datetime.utcnow(), User(0, "Testuser", False)),
         ),
     )
-    update._unfreeze()
-    update.message._unfreeze()
-    update.message.chat._unfreeze()
-    update.message.from_user._unfreeze()
-    update.message.via_bot._unfreeze()
-    update.message.sender_chat._unfreeze()
-    update.message.forward_origin._unfreeze()
-    update.message.forward_origin.sender_user._unfreeze()
-    return update
+    with (
+        unfrozen(update),
+        unfrozen(update.message),
+        unfrozen(update.message.chat),
+        unfrozen(update.message.from_user),
+        unfrozen(update.message.via_bot),
+        unfrozen(update.message.sender_chat),
+        unfrozen(update.message.forward_origin),
+        unfrozen(update.message.forward_origin.sender_user),
+    ):
+        yield update
 
 
 @pytest.fixture(params=MessageEntity.ALL_TYPES)
@@ -650,114 +653,121 @@ class TestFilters:
         update.message.document = Document(
             "file_id", "unique_id", mime_type="application/vnd.android.package-archive"
         )
-        update.message.document._unfreeze()
         assert filters.Document.APK.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.DOC.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "application/msword"
+        object.__setattr__(update.message.document, "mime_type", "application/msword")
         assert filters.Document.DOC.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.DOCX.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = (
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+        object.__setattr__(
+            update.message.document,
+            "mime_type",
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
         assert filters.Document.DOCX.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.EXE.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "application/octet-stream"
+        object.__setattr__(update.message.document, "mime_type", "application/octet-stream")
         # Python 3.15 changes the "exe" mime type to application/vnd.microsoft.portable-executable
         if int(platform.python_version_tuple()[1]) <= 14:
             assert filters.Document.EXE.check_update(update)
         else:
             assert not filters.Document.EXE.check_update(update)
-            update.message.document.mime_type = "application/vnd.microsoft.portable-executable"
+            object.__setattr__(
+                update.message.document,
+                "mime_type",
+                "application/vnd.microsoft.portable-executable",
+            )
             assert filters.Document.EXE.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.DOCX.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "image/gif"
+        object.__setattr__(update.message.document, "mime_type", "image/gif")
         assert filters.Document.GIF.check_update(update)
         assert filters.Document.IMAGE.check_update(update)
         assert not filters.Document.JPG.check_update(update)
         assert not filters.Document.TEXT.check_update(update)
 
-        update.message.document.mime_type = "image/jpeg"
+        object.__setattr__(update.message.document, "mime_type", "image/jpeg")
         assert filters.Document.JPG.check_update(update)
         assert filters.Document.IMAGE.check_update(update)
         assert not filters.Document.MP3.check_update(update)
         assert not filters.Document.VIDEO.check_update(update)
 
-        update.message.document.mime_type = "audio/mpeg"
+        object.__setattr__(update.message.document, "mime_type", "audio/mpeg")
         assert filters.Document.MP3.check_update(update)
         assert filters.Document.AUDIO.check_update(update)
         assert not filters.Document.PDF.check_update(update)
         assert not filters.Document.IMAGE.check_update(update)
 
-        update.message.document.mime_type = "application/pdf"
+        object.__setattr__(update.message.document, "mime_type", "application/pdf")
         assert filters.Document.PDF.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.PY.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "text/x-python"
+        object.__setattr__(update.message.document, "mime_type", "text/x-python")
         assert filters.Document.PY.check_update(update)
         assert filters.Document.TEXT.check_update(update)
         assert not filters.Document.SVG.check_update(update)
         assert not filters.Document.APPLICATION.check_update(update)
 
-        update.message.document.mime_type = "image/svg+xml"
+        object.__setattr__(update.message.document, "mime_type", "image/svg+xml")
         assert filters.Document.SVG.check_update(update)
         assert filters.Document.IMAGE.check_update(update)
         assert not filters.Document.TXT.check_update(update)
         assert not filters.Document.VIDEO.check_update(update)
 
-        update.message.document.mime_type = "text/plain"
+        object.__setattr__(update.message.document, "mime_type", "text/plain")
         assert filters.Document.TXT.check_update(update)
         assert filters.Document.TEXT.check_update(update)
         assert not filters.Document.TARGZ.check_update(update)
         assert not filters.Document.APPLICATION.check_update(update)
 
-        update.message.document.mime_type = "application/x-compressed-tar"
+        object.__setattr__(update.message.document, "mime_type", "application/x-compressed-tar")
         assert filters.Document.TARGZ.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.WAV.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = (
-            "audio/x-wav" if int(platform.python_version_tuple()[1]) < 14 else "audio/vnd.wave"
+        object.__setattr__(
+            update.message.document,
+            "mime_type",
+            ("audio/x-wav" if int(platform.python_version_tuple()[1]) < 14 else "audio/vnd.wave"),
         )
         assert filters.Document.WAV.check_update(update)
         assert filters.Document.AUDIO.check_update(update)
         assert not filters.Document.XML.check_update(update)
         assert not filters.Document.IMAGE.check_update(update)
 
-        update.message.document.mime_type = "text/xml"
+        object.__setattr__(update.message.document, "mime_type", "text/xml")
         assert filters.Document.XML.check_update(update)
         assert filters.Document.TEXT.check_update(update)
         assert not filters.Document.ZIP.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "application/zip"
+        object.__setattr__(update.message.document, "mime_type", "application/zip")
         assert filters.Document.ZIP.check_update(update)
         assert filters.Document.APPLICATION.check_update(update)
         assert not filters.Document.APK.check_update(update)
         assert not filters.Document.AUDIO.check_update(update)
 
-        update.message.document.mime_type = "image/x-rgb"
+        object.__setattr__(update.message.document, "mime_type", "image/x-rgb")
         assert not filters.Document.Category("application/").check_update(update)
         assert not filters.Document.MimeType("application/x-sh").check_update(update)
-        update.message.document.mime_type = "application/x-sh"
+        object.__setattr__(update.message.document, "mime_type", "application/x-sh")
         assert filters.Document.Category("application/").check_update(update)
         assert filters.Document.MimeType("application/x-sh").check_update(update)
 
-        update.message.document.mime_type = None
+        object.__setattr__(update.message.document, "mime_type", None)
         assert not filters.Document.Category("application/").check_update(update)
         assert not filters.Document.MimeType("application/x-sh").check_update(update)
 
@@ -768,21 +778,20 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
-        update.message.document._unfreeze()
         assert filters.Document.FileExtension("jpg").check_update(update)
         assert not filters.Document.FileExtension("jpeg").check_update(update)
         assert not filters.Document.FileExtension("file.jpg").check_update(update)
 
-        update.message.document.file_name = "file.tar.gz"
+        object.__setattr__(update.message.document, "file_name", "file.tar.gz")
         assert filters.Document.FileExtension("tar.gz").check_update(update)
         assert filters.Document.FileExtension("gz").check_update(update)
         assert not filters.Document.FileExtension("tgz").check_update(update)
         assert not filters.Document.FileExtension("jpg").check_update(update)
 
-        update.message.document.file_name = None
+        object.__setattr__(update.message.document, "file_name", None)
         assert not filters.Document.FileExtension("jpg").check_update(update)
 
-        update.message.document = None
+        object.__setattr__(update.message, "document", None)
         assert not filters.Document.FileExtension("jpg").check_update(update)
 
     def test_filters_file_extension_minds_dots(self, update):
@@ -792,27 +801,26 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
-        update.message.document._unfreeze()
         assert not filters.Document.FileExtension(".jpg").check_update(update)
         assert not filters.Document.FileExtension("e.jpg").check_update(update)
         assert not filters.Document.FileExtension("file.jpg").check_update(update)
         assert not filters.Document.FileExtension("").check_update(update)
 
-        update.message.document.file_name = "file..jpg"
+        object.__setattr__(update.message.document, "file_name", "file..jpg")
         assert filters.Document.FileExtension("jpg").check_update(update)
         assert filters.Document.FileExtension(".jpg").check_update(update)
         assert not filters.Document.FileExtension("..jpg").check_update(update)
 
-        update.message.document.file_name = "file.docx"
+        object.__setattr__(update.message.document, "file_name", "file.docx")
         assert filters.Document.FileExtension("docx").check_update(update)
         assert not filters.Document.FileExtension("doc").check_update(update)
         assert not filters.Document.FileExtension("ocx").check_update(update)
 
-        update.message.document.file_name = "file"
+        object.__setattr__(update.message.document, "file_name", "file")
         assert not filters.Document.FileExtension("").check_update(update)
         assert not filters.Document.FileExtension("file").check_update(update)
 
-        update.message.document.file_name = "file."
+        object.__setattr__(update.message.document, "file_name", "file.")
         assert filters.Document.FileExtension("").check_update(update)
 
     def test_filters_file_extension_none_arg(self, update):
@@ -822,17 +830,16 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
-        update.message.document._unfreeze()
         assert not filters.Document.FileExtension(None).check_update(update)
 
-        update.message.document.file_name = "file"
+        object.__setattr__(update.message.document, "file_name", "file")
         assert filters.Document.FileExtension(None).check_update(update)
         assert not filters.Document.FileExtension("None").check_update(update)
 
-        update.message.document.file_name = "file."
+        object.__setattr__(update.message.document, "file_name", "file.")
         assert not filters.Document.FileExtension(None).check_update(update)
 
-        update.message.document = None
+        object.__setattr__(update.message, "document", None)
         assert not filters.Document.FileExtension(None).check_update(update)
 
     def test_filters_file_extension_case_sensitivity(self, update):
@@ -842,15 +849,14 @@ class TestFilters:
             file_name="file.jpg",
             mime_type="image/jpeg",
         )
-        update.message.document._unfreeze()
         assert filters.Document.FileExtension("JPG").check_update(update)
         assert filters.Document.FileExtension("jpG").check_update(update)
 
-        update.message.document.file_name = "file.JPG"
+        object.__setattr__(update.message.document, "file_name", "file.JPG")
         assert filters.Document.FileExtension("jpg").check_update(update)
         assert not filters.Document.FileExtension("jpg", case_sensitive=True).check_update(update)
 
-        update.message.document.file_name = "file.Dockerfile"
+        object.__setattr__(update.message.document, "file_name", "file.Dockerfile")
         assert filters.Document.FileExtension("Dockerfile", case_sensitive=True).check_update(
             update
         )
@@ -892,23 +898,24 @@ class TestFilters:
     def test_filters_sticker(self, update):
         assert not filters.Sticker.ALL.check_update(update)
         update.message.sticker = Sticker("1", "uniq", 1, 2, False, False, Sticker.REGULAR)
-        update.message.sticker._unfreeze()
         assert filters.Sticker.ALL.check_update(update)
         assert filters.Sticker.STATIC.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)
         assert not filters.Sticker.PREMIUM.check_update(update)
-        update.message.sticker.is_animated = True
+        object.__setattr__(update.message.sticker, "is_animated", True)
         assert filters.Sticker.ANIMATED.check_update(update)
         assert not filters.Sticker.VIDEO.check_update(update)
         assert not filters.Sticker.STATIC.check_update(update)
         assert not filters.Sticker.PREMIUM.check_update(update)
-        update.message.sticker.is_animated = False
-        update.message.sticker.is_video = True
+        object.__setattr__(update.message.sticker, "is_animated", False)
+        object.__setattr__(update.message.sticker, "is_video", True)
         assert not filters.Sticker.ANIMATED.check_update(update)
         assert not filters.Sticker.STATIC.check_update(update)
         assert filters.Sticker.VIDEO.check_update(update)
         assert not filters.Sticker.PREMIUM.check_update(update)
-        update.message.sticker.premium_animation = File("string", "uniqueString")
+        object.__setattr__(
+            update.message.sticker, "premium_animation", File("string", "uniqueString")
+        )
         assert not filters.Sticker.ANIMATED.check_update(update)
         # premium stickers can be animated, video, or probably also static,
         # it doesn't really matter for the test

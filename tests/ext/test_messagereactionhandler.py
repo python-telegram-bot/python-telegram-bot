@@ -39,6 +39,7 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.ext import CallbackContext, JobQueue, MessageReactionHandler
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -89,10 +90,8 @@ def message_reaction_updated(time, bot):
         actor_chat=Chat(2, Chat.SUPERGROUP),
     )
     mr.set_bot(bot)
-    mr._unfreeze()
-    mr.chat._unfreeze()
-    mr.user._unfreeze()
-    return mr
+    with unfrozen(mr), unfrozen(mr.chat), unfrozen(mr.user):
+        yield mr
 
 
 @pytest.fixture(scope="class")
@@ -107,9 +106,8 @@ def message_reaction_count_updated(time, bot):
         ],
     )
     mr.set_bot(bot)
-    mr._unfreeze()
-    mr.chat._unfreeze()
-    return mr
+    with unfrozen(mr), unfrozen(mr.chat):
+        yield mr
 
 
 @pytest.fixture

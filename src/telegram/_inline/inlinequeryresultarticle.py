@@ -22,13 +22,14 @@ from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultArticle(InlineQueryResult):
     """This object represents a Telegram InlineQueryResultArticle.
 
@@ -89,41 +90,15 @@ class InlineQueryResultArticle(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "description",
-        "input_message_content",
-        "reply_markup",
-        "thumbnail_height",
-        "thumbnail_url",
-        "thumbnail_width",
-        "title",
-        "url",
-    )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        title: str,
-        input_message_content: "InputMessageContent",
-        reply_markup: InlineKeyboardMarkup | None = None,
-        url: str | None = None,
-        description: str | None = None,
-        thumbnail_url: str | None = None,
-        thumbnail_width: int | None = None,
-        thumbnail_height: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.ARTICLE, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.title: str = title
-            self.input_message_content: InputMessageContent = input_message_content
-
-            # Optional
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.url: str | None = url
-            self.description: str | None = description
-            self.thumbnail_url: str | None = thumbnail_url
-            self.thumbnail_width: int | None = thumbnail_width
-            self.thumbnail_height: int | None = thumbnail_height
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.ARTICLE)
+    # Required
+    title: str = tg_field()
+    input_message_content: "InputMessageContent" = tg_field()
+    # Optional
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    url: str | None = tg_field(default=None)
+    description: str | None = tg_field(default=None)
+    thumbnail_url: str | None = tg_field(default=None)
+    thumbnail_width: int | None = tg_field(default=None)
+    thumbnail_height: int | None = tg_field(default=None)

@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import KeyboardButtonRequestManagedBot
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -39,12 +38,6 @@ class KeyboardButtonRequestManagedBotTestBase:
 
 
 class TestKeyboardButtonRequestManagedBotWithoutRequest(KeyboardButtonRequestManagedBotTestBase):
-    def test_slot_behaviour(self, keyboard_button_request_managed_bot):
-        inst = keyboard_button_request_managed_bot
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "request_id": self.request_id,

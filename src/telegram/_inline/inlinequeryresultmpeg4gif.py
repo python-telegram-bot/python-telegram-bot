@@ -19,22 +19,23 @@
 """This module contains the classes that represent Telegram InlineQueryResultMpeg4Gif."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput, TimePeriod
+from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultMpeg4Gif(InlineQueryResult):
     """
     Represents a link to a video animation (H.264/MPEG-4 AVC video without sound). By default, this
@@ -132,59 +133,27 @@ class InlineQueryResultMpeg4Gif(InlineQueryResult):
             .. versionadded:: 21.3
     """
 
-    __slots__ = (
-        "_mpeg4_duration",
-        "caption",
-        "caption_entities",
-        "input_message_content",
-        "mpeg4_height",
-        "mpeg4_url",
-        "mpeg4_width",
-        "parse_mode",
-        "reply_markup",
-        "show_caption_above_media",
-        "thumbnail_mime_type",
-        "thumbnail_url",
-        "title",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.MPEG4GIF)
+    # Required
+    mpeg4_url: str = tg_field()
+    thumbnail_url: str = tg_field()
+    # Optional
+    mpeg4_width: int | None = tg_field(default=None)
+    mpeg4_height: int | None = tg_field(default=None)
+    title: str | None = tg_field(default=None)
+    caption: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    _mpeg4_duration: dtm.timedelta | None = tg_field(
+        default=None, alias="mpeg4_duration", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        mpeg4_url: str,
-        thumbnail_url: str,
-        mpeg4_width: int | None = None,
-        mpeg4_height: int | None = None,
-        title: str | None = None,
-        caption: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        mpeg4_duration: TimePeriod | None = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        thumbnail_mime_type: str | None = None,
-        show_caption_above_media: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.MPEG4GIF, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.mpeg4_url: str = mpeg4_url
-            self.thumbnail_url: str = thumbnail_url
-
-            # Optional
-            self.mpeg4_width: int | None = mpeg4_width
-            self.mpeg4_height: int | None = mpeg4_height
-            self._mpeg4_duration: dtm.timedelta | None = to_timedelta(mpeg4_duration)
-            self.title: str | None = title
-            self.caption: str | None = caption
-            self.parse_mode: ODVInput[str] = parse_mode
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
-            self.thumbnail_mime_type: str | None = thumbnail_mime_type
-            self.show_caption_above_media: bool | None = show_caption_above_media
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
+    )
+    thumbnail_mime_type: str | None = tg_field(default=None)
+    show_caption_above_media: bool | None = tg_field(default=None)
 
     @property
     def mpeg4_duration(self) -> int | dtm.timedelta | None:

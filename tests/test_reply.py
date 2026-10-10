@@ -38,7 +38,6 @@ from telegram import (
     TextQuote,
     User,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -88,13 +87,6 @@ class ExternalReplyInfoTestBase:
 
 
 class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
-    def test_slot_behaviour(self, external_reply_info):
-        for attr in external_reply_info.__slots__:
-            assert getattr(external_reply_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(external_reply_info)) == len(set(mro_slots(external_reply_info))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "origin": self.origin.to_dict(),
@@ -172,11 +164,6 @@ class TextQuoteTestBase:
 
 
 class TestTextQuoteWithoutRequest(TextQuoteTestBase):
-    def test_slot_behaviour(self, text_quote):
-        for attr in text_quote.__slots__:
-            assert getattr(text_quote, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(text_quote)) == len(set(mro_slots(text_quote))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "text": self.text,
@@ -254,13 +241,6 @@ class ReplyParametersTestBase:
 
 
 class TestReplyParametersWithoutRequest(ReplyParametersTestBase):
-    def test_slot_behaviour(self, reply_parameters):
-        for attr in reply_parameters.__slots__:
-            assert getattr(reply_parameters, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(reply_parameters)) == len(set(mro_slots(reply_parameters))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "message_id": self.message_id,

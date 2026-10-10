@@ -28,7 +28,6 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
-from tests.auxil.slots import mro_slots
 
 
 def star_transaction_factory():
@@ -74,12 +73,6 @@ class StarTransactionTestBase:
 
 
 class TestStarTransactionWithoutRequest(StarTransactionTestBase):
-    def test_slot_behaviour(self, star_transaction):
-        inst = star_transaction
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id,
@@ -167,12 +160,6 @@ class StarTransactionsTestBase:
 
 
 class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
-    def test_slot_behaviour(self, star_transactions):
-        inst = star_transactions
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "transactions": [t.to_dict() for t in self.transactions],

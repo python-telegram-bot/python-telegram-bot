@@ -19,13 +19,13 @@
 """This module contains an object that represents a Telegram WebhookInfo."""
 
 import datetime as dtm
-from collections.abc import Sequence
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class WebhookInfo(TelegramObject):
     """This object represents a Telegram WebhookInfo.
 
@@ -106,56 +106,16 @@ class WebhookInfo(TelegramObject):
                 |datetime_localization|
     """
 
-    __slots__ = (
-        "allowed_updates",
-        "has_custom_certificate",
-        "ip_address",
-        "last_error_date",
-        "last_error_message",
-        "last_synchronization_error_date",
-        "max_connections",
-        "pending_update_count",
-        "url",
+    # Required
+    url: str = tg_field(compare=True)
+    has_custom_certificate: bool = tg_field(compare=True)
+    pending_update_count: int = tg_field(compare=True)
+    # Optional
+    last_error_date: dtm.datetime | None = tg_field(compare=True, default=None)
+    last_error_message: str | None = tg_field(compare=True, default=None)
+    max_connections: int | None = tg_field(compare=True, default=None)
+    allowed_updates: tuple[str, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        url: str,
-        has_custom_certificate: bool,
-        pending_update_count: int,
-        last_error_date: dtm.datetime | None = None,
-        last_error_message: str | None = None,
-        max_connections: int | None = None,
-        allowed_updates: Sequence[str] | None = None,
-        ip_address: str | None = None,
-        last_synchronization_error_date: dtm.datetime | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.url: str = url
-        self.has_custom_certificate: bool = has_custom_certificate
-        self.pending_update_count: int = pending_update_count
-
-        # Optional
-        self.ip_address: str | None = ip_address
-        self.last_error_date: dtm.datetime | None = last_error_date
-        self.last_error_message: str | None = last_error_message
-        self.max_connections: int | None = max_connections
-        self.allowed_updates: tuple[str, ...] = parse_sequence_arg(allowed_updates)
-        self.last_synchronization_error_date: dtm.datetime | None = last_synchronization_error_date
-
-        self._id_attrs = (
-            self.url,
-            self.has_custom_certificate,
-            self.pending_update_count,
-            self.ip_address,
-            self.last_error_date,
-            self.last_error_message,
-            self.max_connections,
-            self.allowed_updates,
-            self.last_synchronization_error_date,
-        )
-
-        self._freeze()
+    ip_address: str | None = tg_field(compare=True, default=None)
+    last_synchronization_error_date: dtm.datetime | None = tg_field(compare=True, default=None)

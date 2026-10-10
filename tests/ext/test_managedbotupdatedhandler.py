@@ -36,6 +36,7 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.ext import CallbackContext, JobQueue, ManagedBotUpdatedHandler
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -159,9 +160,9 @@ class TestManagedBotUpdatedHandler:
         handler = ManagedBotUpdatedHandler(self.callback, username=["@user_b"])
         assert not handler.check_update(managed_bot_updated_update)
 
-        managed_bot_updated_update.managed_bot.user._unfreeze()
-        managed_bot_updated_update.managed_bot.user.username = None
-        assert not handler.check_update(managed_bot_updated_update)
+        with unfrozen(managed_bot_updated_update.managed_bot.user):
+            managed_bot_updated_update.managed_bot.user.username = None
+            assert not handler.check_update(managed_bot_updated_update)
 
     def test_other_update_types(self, false_update):
         handler = ManagedBotUpdatedHandler(self.callback)

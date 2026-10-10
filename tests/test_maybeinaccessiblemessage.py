@@ -42,6 +42,7 @@ class MaybeInaccessibleMessageTestBase:
 
 
 class TestMaybeInaccessibleMessageWithoutRequest(MaybeInaccessibleMessageTestBase):
+    # tags: deprecated NEXT.VERSION
     def test_slot_behaviour(self, maybe_inaccessible_message):
         for attr in maybe_inaccessible_message.__slots__:
             assert getattr(maybe_inaccessible_message, attr, "err") != "err", (
