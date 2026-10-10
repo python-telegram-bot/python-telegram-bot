@@ -1,0 +1,5 @@
+breaking = "Remove support for Python 3.10"
+[[pull_requests]]
+uid = "5374"
+author_uids = ["harshil21"]
+closes_threads = []
