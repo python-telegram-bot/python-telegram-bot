@@ -184,6 +184,7 @@ select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET
 "src/telegram/**.py" = ["TRY003"]
 # These timeouts are Telegram long-polling parameters, not limits on coroutine execution.
 "src/telegram/_bot.py" = ["ASYNC109"]
+"src/telegram/ext/_extbot.py" = ["ASYNC109"]
 "src/telegram/ext/_updater.py" = ["ASYNC109"]
 "src/telegram/ext/_applicationbuilder.py" = ["TRY004"]
 "src/telegram/ext/filters.py" = ["D102"]
