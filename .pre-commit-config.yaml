@@ -1,6 +1,14 @@
 repos:
+-   repo: local
+    hooks:
+    -   id: sync-lazy-modules
+        name: sync lazy modules
+        entry: python .github/prek-hooks/sync_lazy_modules.py
+        language: python
+        files: '^(src/telegram/(ext/)?__init__\.py|.github/prek-hooks/sync_lazy_modules\.py)$'
+        pass_filenames: false
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.16.8'
+    rev: 'v0.17.0'
     hooks:
     # Run the linter:
     -   id: ruff-check

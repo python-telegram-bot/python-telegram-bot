@@ -65,6 +65,48 @@ __all__ = (
     "filters",
 )
 
+__lazy_modules__ = [
+    "telegram.ext",
+    "telegram.ext._aioratelimiter",
+    "telegram.ext._application",
+    "telegram.ext._applicationbuilder",
+    "telegram.ext._basepersistence",
+    "telegram.ext._baseratelimiter",
+    "telegram.ext._baseupdateprocessor",
+    "telegram.ext._callbackcontext",
+    "telegram.ext._callbackdatacache",
+    "telegram.ext._contexttypes",
+    "telegram.ext._defaults",
+    "telegram.ext._dictpersistence",
+    "telegram.ext._extbot",
+    "telegram.ext._handlers.basehandler",
+    "telegram.ext._handlers.businessconnectionhandler",
+    "telegram.ext._handlers.businessmessagesdeletedhandler",
+    "telegram.ext._handlers.callbackqueryhandler",
+    "telegram.ext._handlers.chatboosthandler",
+    "telegram.ext._handlers.chatjoinrequesthandler",
+    "telegram.ext._handlers.chatmemberhandler",
+    "telegram.ext._handlers.choseninlineresulthandler",
+    "telegram.ext._handlers.commandhandler",
+    "telegram.ext._handlers.conversationhandler",
+    "telegram.ext._handlers.inlinequeryhandler",
+    "telegram.ext._handlers.managedbotupdatedhandler",
+    "telegram.ext._handlers.messagehandler",
+    "telegram.ext._handlers.messagereactionhandler",
+    "telegram.ext._handlers.paidmediapurchasedhandler",
+    "telegram.ext._handlers.pollanswerhandler",
+    "telegram.ext._handlers.pollhandler",
+    "telegram.ext._handlers.precheckoutqueryhandler",
+    "telegram.ext._handlers.prefixhandler",
+    "telegram.ext._handlers.shippingqueryhandler",
+    "telegram.ext._handlers.stringcommandhandler",
+    "telegram.ext._handlers.stringregexhandler",
+    "telegram.ext._handlers.typehandler",
+    "telegram.ext._jobqueue",
+    "telegram.ext._picklepersistence",
+    "telegram.ext._updater",
+]
+
 from . import filters
 from ._aioratelimiter import AIORateLimiter
 from ._application import Application, ApplicationHandlerStop

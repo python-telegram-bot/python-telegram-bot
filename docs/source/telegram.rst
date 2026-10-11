@@ -20,4 +20,3 @@ Classes in this package
     telegram.payments-tree.rst
     telegram.games-tree.rst
     telegram.passport-tree.rst
-

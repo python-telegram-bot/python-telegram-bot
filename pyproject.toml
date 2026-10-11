@@ -135,7 +135,7 @@ docs = [
 ]
 linting = [
     "prek",
-    "ruff==0.16.8",
+    "ruff==0.17.0",
     "mypy==1.20.2",
     "pylint==4.0.8"
 ]
@@ -158,6 +158,8 @@ packages = ["src/telegram"]
 # uv
 [tool.uv]
 exclude-newer = "7 days"
+# Ruff 0.17.0 supplies the stable lazy-import checks and is newer than the holdback.
+exclude-newer-package = { ruff = false }
 
 # CHANGO
 [tool.chango]
@@ -168,6 +170,7 @@ chango_instance = { name= "chango_instance", module = "config" }
 [tool.ruff]
 line-length = 99
 show-fixes = true
+target-version = "py311"
 
 [tool.ruff.lint]
 typing-extensions = false
@@ -175,10 +178,12 @@ ignore = ["PLR2004", "PLR0911", "PLR0912", "PLR0913", "PLR0915", "PERF203", "ASY
 select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET", "RSE",
           "G", "ISC", "PT", "ASYNC", "TCH", "SLOT", "PERF", "PYI", "FLY", "AIR", "RUF022",
           "RUF023", "Q", "INP", "W", "YTT", "DTZ", "ARG", "T20", "FURB", "DOC", "TRY",
-          "D100", "D101", "D102", "D103", "D300", "D418", "D419", "S"]
+          "D100", "D101", "D102", "D103", "D300", "D418", "D419", "S", "TID254", "TID255"]
 # Add "A (flake8-builtins)" after we drop pylint
 
 [tool.ruff.lint.per-file-ignores]
+# Require lazy re-exports only in the two public package initializers.
+"!src/telegram/{__init__.py,ext/__init__.py}" = ["TID254"]
 "tests/*.py" = ["B018"]
 "tests/**.py" = ["RUF012", "ASYNC230", "DTZ", "ARG", "T201", "ASYNC109", "D", "S", "TRY"]
 "src/telegram/**.py" = ["TRY003"]
@@ -193,6 +198,10 @@ select = ["E", "F", "I", "PL", "UP", "RUF", "PTH", "C4", "B", "PIE", "SIM", "RET
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"
+
+[tool.ruff.lint.flake8-tidy-imports]
+# Ruff checks literal __lazy_modules__ declarations without requiring Python 3.15 syntax.
+require-lazy = { include = ["telegram"], exclude = ["telegram._version", "telegram.constants"] }
 
 # PYLINT:
 [tool.pylint."messages control"]
