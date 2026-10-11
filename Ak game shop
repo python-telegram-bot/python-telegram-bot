@@ -1,0 +1,566 @@
+import asyncio
+import logging
+import re
+from aiogram import Bot, Dispatcher, types, F
+from aiogram.filters import Command
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.fsm.storage.memory import MemoryStorage
+from aiogram.fsm.state import State, StatesGroup
+from aiogram.fsm.context import FSMContext
+import json
+import os
+from datetime import datetime
+
+# ၁။ သတ်မှတ်ချက်များ
+TOKEN = "8591613079:AAERWJfEzLichvdkokryM7tS7GhHGfni1D4"
+ADMIN_ID = 8917831478  # သင့် Admin ID ကို ဒီမှာထည့်ပါ
+TOKEN = "8404553125:AAFxbJRUSurUVtxV6iwwy4xUoQSQkPDGsC8"
+ADMIN_ID =  8532587449 # သင့် Admin ID ကို ဒီမှာထည့်ပါ
+
+bot = Bot(token=TOKEN)
+storage = MemoryStorage()
+dp = Dispatcher(storage=storage)
+
+# User Data သိမ်းမယ့် File
+USER_DATA_FILE = "user_balances.json"
+ORDERS_FILE = "orders.json"
+
+# User Data တွေကို Load/Save လုပ်မယ်
+def load_user_data():
+    if os.path.exists(USER_DATA_FILE):
+        with open(USER_DATA_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {}
+
+def save_user_data(data):
+    with open(USER_DATA_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+# Order Data တွေကို Load/Save လုပ်မယ်
+def load_orders():
+    if os.path.exists(ORDERS_FILE):
+        with open(ORDERS_FILE, 'r', encoding='utf-8') as f:
+            return json.load(f)
+    return {"pending": [], "completed": [], "cancelled": []}
+
+def save_orders(data):
+    with open(ORDERS_FILE, 'w', encoding='utf-8') as f:
+        json.dump(data, f, indent=4, ensure_ascii=False)
+
+# ၂။ Keyboard
+kb = [
+    [KeyboardButton(text="💎 စိန်ဈေးကြည့်ရန်"), KeyboardButton(text="🎮 PUBG UC ဈေးနှုန်း")],
+    [KeyboardButton(text="💰 Balance"), KeyboardButton(text="📞 Admin ကိုဆက်သွယ်ရန်")],
+    [KeyboardButton(text="📥 ငွေသွင်းရန်"), KeyboardButton(text="📝 အော်ဒါတင်ရန်")],
+    [KeyboardButton(text="🔙 Back Menu")]
+]
+keyboard = ReplyKeyboardMarkup(keyboard=kb, resize_keyboard=True)
+
+# Admin Keyboard
+admin_kb = [
+    [KeyboardButton(text="📢 Broadcast ပို့ရန်"), KeyboardButton(text="👥 User စာရင်း")],
+    [KeyboardButton(text="📊 စာရင်းအင်း"), KeyboardButton(text="🔙 ပင်မမီနူး")]
+]
+admin_keyboard = ReplyKeyboardMarkup(keyboard=admin_kb, resize_keyboard=True)
+
+# ML Diamond Price List
+ML_DIAMONDS = {
+    "86": 4880,
+    "172": 9700,
+    "257": 14880,
+    "343": 19880,
+    "429": 24880,
+    "514": 29880,
+    "600": 34880,
+    "706": 39880,
+    "963": 53970,
+    "1049":58950 ,
+    "1135": 63950,
+    "Weeklypas": 5950,
+}
+
+# PUBG UC Price List
+PUBG_UC = {
+    "60": 4500,
+    "120": 7900,
+    "180": 11850,
+    "325": 19800,
+    "385": 23750,
+    "445": 27700,
+    "660": 39500,
+    "985": 59300,
+    "1320": 79000,
+    "1800": 98000,
+}
+
+# ၃။ FSM States
+class DepositState(StatesGroup):
+    waiting_for_photo = State()
+    waiting_for_amount = State()
+    waiting_for_id = State()
+
+class OrderState(StatesGroup):
+    waiting_for_game = State()
+    waiting_for_item = State()
+    waiting_for_id = State()
+    waiting_for_confirm = State()
+
+class BroadcastState(StatesGroup):
+    waiting_for_message = State()
+    waiting_for_confirm = State()
+
+# ၄။ Start Command
+@dp.message(Command("start"))
+async def start_cmd(message: types.Message, state: FSMContext):
+    user_id = str(message.from_user.id)
+    user_data = load_user_data()
+    
+    # User အသစ်ဆိုရင် Data အသစ်ထည့်မယ်
+    if user_id not in user_data:
+        user_data[user_id] = {
+            "username": message.from_user.username or message.from_user.full_name,
+            "full_name": message.from_user.full_name,
+            "balance": 0,
+            "deposit_history": [],
+            "order_history": [],
+            "created_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "last_active": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        }
+        save_user_data(user_data)
+    else:
+        # Update last active
+        user_data[user_id]["last_active"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        save_user_data(user_data)
+        
+        # Old user data ကို update လုပ်မယ်
+        if user_data[user_id].get("deposit_history") and len(user_data[user_id]["deposit_history"]) > 0:
+            first_item = user_data[user_id]["deposit_history"][0]
+            if isinstance(first_item, int):
+                new_history = []
+                for amount in user_data[user_id]["deposit_history"]:
+                    new_history.append({
+                        "amount": amount,
+                        "date": "2024-01-01 00:00:00",
+                        "admin": "System Update"
+                    })
+                user_data[user_id]["deposit_history"] = new_history
+                save_user_data(user_data)
+    
+    # Admin ဆိုရင် Admin Menu ပြမယ်
+    if message.from_user.id == ADMIN_ID:
+        await message.answer(
+            "👑 **Admin Menu မှ ကြိုဆိုပါတယ်**\n\n"
+            "သင်သည် Admin ဖြစ်ပါသည်။ အောက်ပါမီနူးမှ ရွေးချယ်နိုင်ပါသည်။",
+            parse_mode="Markdown",
+            reply_markup=admin_keyboard
+        )
+    else:
+        await message.answer(
+            "𝘼𝙆 𝙂𝘼𝙈𝙀 𝙎𝙃𝙊𝙋မှ ကြိုဆိုပါတယ်။\n"
+            "ငွေလွှဲပြီးပါက 'ငွေသွင်းရန်' ခလုတ်ကိုနှိပ်ပြီး ပြေစာပုံနှင့် ငွေပမာဏကို ပို့ပေးပါ။",
+            reply_markup=keyboard
+        )
+
+# ၅။ Back Menu
+@dp.message(F.text == "🔙 Back Menu")
+async def back_menu(message: types.Message, state: FSMContext):
+    await state.clear()
+    if message.from_user.id == ADMIN_ID:
+        await message.answer("Admin မီနူးသို့ ပြန်လည်ရောက်ရှိပါပြီ။", reply_markup=admin_keyboard)
+    else:
+        await message.answer("ပင်မမီနူးသို့ ပြန်လည်ရောက်ရှိပါပြီ။", reply_markup=keyboard)
+
+# ၆။ Admin Menu မှ ပင်မမီနူးသို့
+@dp.message(F.text == "🔙 ပင်မမီနူး")
+async def back_to_main(message: types.Message, state: FSMContext):
+    await state.clear()
+    if message.from_user.id == ADMIN_ID:
+        await message.answer("Admin မီနူးသို့ ပြန်လည်ရောက်ရှိပါပြီ။", reply_markup=admin_keyboard)
+    else:
+        await message.answer("ပင်မမီနူးသို့ ပြန်လည်ရောက်ရှိပါပြီ။", reply_markup=keyboard)
+
+# ၇။ Broadcast ပို့ရန်
+@dp.message(F.text == "📢 Broadcast ပို့ရန်")
+async def broadcast_start(message: types.Message, state: FSMContext):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("ဤလုပ်ဆောင်ချက်သည် Admin များအတွက်သာ ဖြစ်ပါသည်။")
+        return
+    
+    await message.answer(
+        "📢 **Broadcast Message**\n\n"
+        "ကျေးဇူးပြု၍ User အားလုံးကို ပို့လိုသော စာသားကို ရိုက်ထည့်ပါ။\n"
+        "သင်သည် စာသား၊ ဓာတ်ပုံ၊ ဗီဒီယို စသည်ဖြင့် မည်သည့်အရာမဆို ပို့နိုင်ပါသည်။\n\n"
+        "ပယ်ဖျက်လိုပါက /cancel ကိုနှိပ်ပါ။",
+        parse_mode="Markdown"
+    )
+    await state.set_state(BroadcastState.waiting_for_message)
+
+# ၈။ Cancel Command
+@dp.message(Command("cancel"))
+async def cancel_broadcast(message: types.Message, state: FSMContext):
+    current_state = await state.get_state()
+    if current_state is None:
+        return
+    
+    await state.clear()
+    await message.answer("လုပ်ဆောင်ချက်ကို ဖျက်သိမ်းလိုက်သည်။", reply_markup=admin_keyboard)
+
+# ၉။ Broadcast Message လက်ခံခြင်း
+@dp.message(BroadcastState.waiting_for_message)
+async def broadcast_receive(message: types.Message, state: FSMContext):
+    if message.from_user.id != ADMIN_ID:
+        await state.clear()
+        return
+    
+    # Message data ကို သိမ်းမယ်
+    message_data = {
+        "type": "text",
+        "content": message.text,
+        "has_media": False
+    }
+    
+    # Photo ပါလာရင်
+    if message.photo:
+        message_data["type"] = "photo"
+        message_data["photo_id"] = message.photo[-1].file_id
+        message_data["caption"] = message.caption or ""
+        message_data["has_media"] = True
+    
+    # Video ပါလာရင်
+    elif message.video:
+        message_data["type"] = "video"
+        message_data["video_id"] = message.video.file_id
+        message_data["caption"] = message.caption or ""
+        message_data["has_media"] = True
+    
+    # Document ပါလာရင်
+    elif message.document:
+        message_data["type"] = "document"
+        message_data["document_id"] = message.document.file_id
+        message_data["caption"] = message.caption or ""
+        message_data["has_media"] = True
+    
+    # Animation (GIF) ပါလာရင်
+    elif message.animation:
+        message_data["type"] = "animation"
+        message_data["animation_id"] = message.animation.file_id
+        message_data["caption"] = message.caption or ""
+        message_data["has_media"] = True
+    
+    await state.update_data(message_data=message_data)
+    
+    # အတည်ပြုရန် ပြမယ်
+    user_data = load_user_data()
+    total_users = len(user_data)
+    
+    confirm_text = (
+        f"📢 **Broadcast အတည်ပြုရန်**\n\n"
+        f"စုစုပေါင်း User အရေအတွက်: **{total_users}** ယောက်\n\n"
+        f"ဤအကြောင်းအရာကို User အားလုံးဆီ ပို့ရန် အတည်ပြုပါသလား?"
+    )
+    
+    confirm_buttons = [
+        [
+            InlineKeyboardButton(text="✅ ပို့မယ်", callback_data="broadcast_confirm"),
+            InlineKeyboardButton(text="❌ မပို့တော့ပါ", callback_data="broadcast_cancel")
+        ]
+    ]
+    
+    # Message အကြိုကြည့်ရန် ပြမယ်
+    if message_data["has_media"]:
+        if message_data["type"] == "photo":
+            await message.answer_photo(
+                photo=message_data["photo_id"],
+                caption=f"**အကြိုကြည့်ရန် (Preview)**\n\n{message_data['caption']}\n\n{confirm_text}",
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=confirm_buttons)
+            )
+        elif message_data["type"] == "video":
+            await message.answer_video(
+                video=message_data["video_id"],
+                caption=f"**အကြိုကြည့်ရန် (Preview)**\n\n{message_data['caption']}\n\n{confirm_text}",
+                parse_mode="Markdown",
+                reply_markup=InlineKeyboardMarkup(inline_keyboard=confirm_buttons)
+            )
+    else:
+        await message.answer(
+            f"**အကြိုကြည့်ရန် (Preview)**\n\n{message_data['content']}\n\n{confirm_text}",
+            parse_mode="Markdown",
+            reply_markup=InlineKeyboardMarkup(inline_keyboard=confirm_buttons)
+        )
+    
+    await state.set_state(BroadcastState.waiting_for_confirm)
+
+# ၁၀။ Broadcast အတည်ပြုခြင်း
+@dp.callback_query(lambda c: c.data in ["broadcast_confirm", "broadcast_cancel"])
+async def broadcast_confirm(callback: types.CallbackQuery, state: FSMContext):
+    if callback.from_user.id != ADMIN_ID:
+        await callback.answer("သင်သည် Admin မဟုတ်ပါ။")
+        return
+    
+    if callback.data == "broadcast_cancel":
+        await state.clear()
+        await callback.message.edit_text("❌ Broadcast ကို ဖျက်သိမ်းလိုက်သည်။")
+        await callback.answer()
+        return
+    
+    # Broadcast စတင်မည်
+    data = await state.get_data()
+    message_data = data.get('message_data')
+    user_data = load_user_data()
+    
+    await callback.message.edit_text("📢 Broadcast စတင်နေပါပြီ... ခဏစောင့်ပါ။")
+    
+    success_count = 0
+    fail_count = 0
+    
+    for user_id in user_data.keys():
+        try:
+            if message_data["has_media"]:
+                if message_data["type"] == "photo":
+                    await bot.send_photo(
+                        chat_id=int(user_id),
+                        photo=message_data["photo_id"],
+                        caption=message_data["caption"]
+                    )
+                elif message_data["type"] == "video":
+                    await bot.send_video(
+                        chat_id=int(user_id),
+                        video=message_data["video_id"],
+                        caption=message_data["caption"]
+                    )
+                elif message_data["type"] == "document":
+                    await bot.send_document(
+                        chat_id=int(user_id),
+                        document=message_data["document_id"],
+                        caption=message_data["caption"]
+                    )
+                elif message_data["type"] == "animation":
+                    await bot.send_animation(
+                        chat_id=int(user_id),
+                        animation=message_data["animation_id"],
+                        caption=message_data["caption"]
+                    )
+            else:
+                await bot.send_message(
+                    chat_id=int(user_id),
+                    text=message_data["content"]
+                )
+            
+            success_count += 1
+            await asyncio.sleep(0.05)  # Rate limit ကိုရှောင်ရန်
+            
+        except Exception as e:
+            fail_count += 1
+            print(f"Failed to send to {user_id}: {e}")
+    
+    # ရလဒ်ပြမယ်
+    result_text = (
+        f"📢 **Broadcast ပြီးဆုံးပါပြီ**\n\n"
+        f"✅ ပို့ပြီးသူ: **{success_count}** ယောက်\n"
+        f"❌ မပို့ရသေးသူ: **{fail_count}** ယောက်\n"
+        f"📊 စုစုပေါင်း: **{success_count + fail_count}** ယောက်"
+    )
+    
+    await callback.message.answer(result_text, parse_mode="Markdown", reply_markup=admin_keyboard)
+    await state.clear()
+    await callback.answer()
+
+# ၁၁။ User စာရင်းကြည့်ရန်
+@dp.message(F.text == "👥 User စာရင်း")
+async def user_list(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("ဤလုပ်ဆောင်ချက်သည် Admin များအတွက်သာ ဖြစ်ပါသည်။")
+        return
+    
+    user_data = load_user_data()
+    
+    # User အရေအတွက်
+    total_users = len(user_data)
+    
+    # စုစုပေါင်းငွေပမာဏ
+    total_balance = sum([u['balance'] for u in user_data.values()])
+    
+    # ယနေ့ဝင်လာသူ
+    today = datetime.now().strftime("%Y-%m-%d")
+    today_active = 0
+    for u in user_data.values():
+        if u.get('last_active', '').startswith(today):
+            today_active += 1
+    
+    # စာရင်းပေါင်းချုပ်
+    summary = (
+        f"👥 **User စာရင်းအချက်အလက်**\n\n"
+        f"📊 စုစုပေါင်း User: **{total_users}** ယောက်\n"
+        f"💰 စုစုပေါင်းလက်ကျန်: **{total_balance:,} Ks**\n"
+        f"📅 ယနေ့ဝင်လာသူ: **{today_active}** ယောက်\n\n"
+        f"**အသေးစိတ်စာရင်း:**\n"
+        f"─────────────────"
+    )
+    
+    # User ၁၀ ယောက်စာ ပြမယ်
+    count = 0
+    for uid, uinfo in user_data.items():
+        if count < 10:
+            summary += (
+                f"\n🆔 ID: `{uid}`\n"
+                f"📝 Username: @{uinfo.get('username', 'N/A')}\n"
+                f"💰 Balance: {uinfo['balance']:,} Ks\n"
+                f"📦 Orders: {len(uinfo.get('order_history', []))}\n"
+                f"─────────────────"
+            )
+            count += 1
+    
+    if total_users > 10:
+        summary += f"\n... နှင့် အခြား {total_users - 10} ယောက်"
+    
+    await message.answer(summary, parse_mode="Markdown")
+
+# ၁၂။ စာရင်းအင်းကြည့်ရန်
+@dp.message(F.text == "📊 စာရင်းအင်း")
+async def statistics(message: types.Message):
+    if message.from_user.id != ADMIN_ID:
+        await message.answer("ဤလုပ်ဆောင်ချက်သည် Admin များအတွက်သာ ဖြစ်ပါသည်။")
+        return
+    
+    user_data = load_user_data()
+    orders = load_orders()
+    
+    # User စာရင်း
+    total_users = len(user_data)
+    
+    # စုစုပေါင်းငွေပမာဏ
+    total_balance = sum([u['balance'] for u in user_data.values()])
+    total_deposit = 0
+    for u in user_data.values():
+        for d in u.get('deposit_history', []):
+            if isinstance(d, dict):
+                total_deposit += d.get('amount', 0)
+            else:
+                total_deposit += d
+    
+    # အော်ဒါစာရင်း
+    pending_orders = len(orders.get('pending', []))
+    completed_orders = len(orders.get('completed', []))
+    cancelled_orders = len(orders.get('cancelled', []))
+    total_orders = pending_orders + completed_orders + cancelled_orders
+    
+    # စုစုပေါင်းရောင်းရငွေ
+    total_sales = sum([o.get('price', 0) for o in orders.get('completed', [])])
+    
+    stats = (
+        f"📊 **စာရင်းအင်းအချက်အလက်များ**\n\n"
+        f"👥 **User ဆိုင်ရာ**\n"
+        f"├ စုစုပေါင်း User: {total_users} ယောက်\n"
+        f"├ စုစုပေါင်းလက်ကျန်: {total_balance:,} Ks\n"
+        f"└ စုစုပေါင်းငွေသွင်း: {total_deposit:,} Ks\n\n"
+        f"📦 **အော်ဒါဆိုင်ရာ**\n"
+        f"├ စုစုပေါင်းအော်ဒါ: {total_orders} ခု\n"
+        f"├ ဆိုင်းငံ့: {pending_orders} ခု\n"
+        f"├ ပြီးဆုံး: {completed_orders} ခု\n"
+        f"├ ပျက်ကွက်: {cancelled_orders} ခု\n"
+        f"└ စုစုပေါင်းရောင်းရငွေ: {total_sales:,} Ks"
+    )
+    
+    await message.answer(stats, parse_mode="Markdown")
+
+# ၁၃။ MLBB စျေးနှုန်းများ
+@dp.message(F.text == "💎 စိန်ဈေးကြည့်ရန်")
+async def ml_prices(message: types.Message):
+    price_text = "💎 Mobile Legends စျေးနှုန်းများ\n"
+    price_text += "─────────────────\n"
+    for diamond, price in ML_DIAMONDS.items():
+        if diamond == "Weeklypas":
+            price_text += f"💎 Weekly Pass - {price} Ks\n"
+        else:
+            price_text += f"💎 {diamond} Diamonds - {price} Ks\n"
+    price_text += "─────────────────"
+    await message.answer(price_text)
+
+# ၁၄။ PUBG စျေးနှုန်းများ
+@dp.message(F.text == "🎮 PUBG UC ဈေးနှုန်း")
+async def pubg_prices(message: types.Message):
+    price_text = "🎮 PUBG UC စျေးနှုန်းများ\n"
+    price_text += "─────────────────\n"
+    for uc, price in PUBG_UC.items():
+        price_text += f"🎮 UC {uc} - {price} Ks\n"
+    price_text += "─────────────────"
+    await message.answer(price_text)
+
+# ၁၅။ Balance ကြည့်ရန်
+@dp.message(F.text == "💰 Balance")
+async def check_balance(message: types.Message):
+    user_id = str(message.from_user.id)
+    user_data = load_user_data()
+    
+    if user_id in user_data:
+        user_info = user_data[user_id]
+        
+        # စုစုပေါင်းငွေသွင်းပမာဏ တွက်ချက်ခြင်း
+        total_deposit = 0
+        if user_info['deposit_history']:
+            if isinstance(user_info['deposit_history'][0], dict):
+                total_deposit = sum([d.get('amount', 0) for d in user_info['deposit_history']])
+            else:
+                total_deposit = sum(user_info['deposit_history'])
+        
+        balance_text = (
+            f"👤 <b>အသုံးပြုသူအချက်အလက်</b>\n"
+            f"─────────────────\n"
+            f"🆔 User ID: <code>{message.from_user.id}</code>\n"
+            f"📝 Username: @{message.from_user.username if message.from_user.username else 'မရှိပါ'}\n"
+            f"💰 လက်ကျန်ငွေ: <b>{user_info['balance']:,} Ks</b>\n"
+            f"📊 စုစုပေါင်းငွေသွင်း: <b>{total_deposit:,} Ks</b>\n"
+            f"📦 စုစုပေါင်းမှာယူမှု: <b>{len(user_info['order_history'])}</b>\n"
+            f"─────────────────"
+        )
+        await message.answer(balance_text, parse_mode="HTML")
+    else:
+        await message.answer("သင့်အကောင့်ကို ရှာမတွေ့ပါ။ /start ကိုနှိပ်ပါ။")
+
+# ၁၆။ အော်ဒါတင်ရန်
+@dp.message(F.text == "📝 အော်ဒါတင်ရန်")
+async def order_start(message: types.Message, state: FSMContext):
+    user_id = str(message.from_user.id)
+    user_data = load_user_data()
+    
+    if user_id not in user_data:
+        await message.answer("ကျေးဇူးပြု၍ /start ကိုအရင်နှိပ်ပါ။")
+        return
+    
+    # Game selection keyboard
+    game_kb = [
+        [KeyboardButton(text="🎮 Mobile Legends")],
+        [KeyboardButton(text="🎯 PUBG Mobile")],
+        [KeyboardButton(text="🔙 Back Menu")]
+    ]
+    
+    await message.answer(
+        f"သင့်လက်ကျန်ငွေ: <b>{user_data[user_id]['balance']:,} Ks</b>\n\n"
+        f"📝 <b>အော်ဒါတင်ရန်</b>\n"
+        f"ကျေးဇူးပြု၍ ဂိမ်းအမျိုးအစားကို ရွေးချယ်ပါ။",
+        parse_mode="HTML",
+        reply_markup=ReplyKeyboardMarkup(keyboard=game_kb, resize_keyboard=True)
+    )
+    await state.set_state(OrderState.waiting_for_game)
+
+# ၁၇။ ဂိမ်းရွေးချယ်ခြင်း
+@dp.message(OrderState.waiting_for_game, F.text)
+async def select_game(message: types.Message, state: FSMContext):
+    if message.text == "🔙 Back Menu":
+        await state.clear()
+        await message.answer("ပင်မမီနူးသို့ ပြန်လည်ရောက်ရှိပါပြီ။", reply_markup=keyboard)
+        return
+    
+    if message.text == "🎮 Mobile Legends":
+        await state.update_data(game="ML")
+        
+        # Diamond selection keyboard
+        diamond_kb = []
+        for d in ML_DIAMONDS.keys():
+            diamond_kb.append([KeyboardButton(text=str(d))])
+        diamond_kb.append([KeyboardButton(text="🔙 Back Menu")])
+        
+        await message.answer(
+            f"🎮 <b>Mobile Legends အော်ဒါတင်ရန်</b>\n\n"
+            f"ကျေးဇူးပြု၍ သင်ဝယ်ယူလို
