@@ -216,7 +216,7 @@ doc strings don't have a separate documentation site they generate, instead, the
 
 User facing documentation
 -------------------------
-We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.10 or above and have the required dependencies installed as explained above.
+We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.12 or above and have the required dependencies installed as explained above.
 Then, run the following from the PTB root directory:
 
 .. code-block:: bash

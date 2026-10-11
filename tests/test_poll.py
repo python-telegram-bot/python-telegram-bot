@@ -256,7 +256,7 @@ class PollOptionTestBase:
     ]
     added_by_user = User(1, "test_user", False)
     added_by_chat = Chat(1, "test_chat")
-    addition_date = dtm.datetime.now(dtm.timezone.utc)
+    addition_date = dtm.datetime.now(dtm.UTC)
     persistent_id = "persistent_id"
     media = PollMedia(location=Location(123, 456))
 
@@ -473,7 +473,7 @@ class PollTestBase:
     ).decode("unicode-escape")
     explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
     open_period = dtm.timedelta(seconds=42)
-    close_date = dtm.datetime.now(dtm.timezone.utc)
+    close_date = dtm.datetime.now(dtm.UTC)
     question_entities = [
         MessageEntity(MessageEntity.BOLD, 0, 4),
         MessageEntity(MessageEntity.ITALIC, 5, 8),
@@ -815,7 +815,7 @@ def poll_option_added():
 class PollOptionAddedTestBase:
     poll_message = MaybeInaccessibleMessage(
         message_id=1,
-        date=dtm.datetime.now(dtm.timezone.utc),
+        date=dtm.datetime.now(dtm.UTC),
         chat=Chat(1, "test_chat"),
     )
     option_persistent_id = "123"
@@ -895,7 +895,7 @@ class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
         )
         c = PollOptionAdded(
             poll_message=MaybeInaccessibleMessage(
-                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
+                2, dtm.datetime.now(dtm.UTC), Chat(1, "test_chat")
             ),
             option_persistent_id=self.option_persistent_id,
             option_text=self.option_text,
@@ -934,7 +934,7 @@ def poll_option_deleted():
 class PollOptionDeletedTestBase:
     poll_message = MaybeInaccessibleMessage(
         message_id=1,
-        date=dtm.datetime.now(dtm.timezone.utc),
+        date=dtm.datetime.now(dtm.UTC),
         chat=Chat(1, "test_chat"),
     )
     option_persistent_id = "123"
@@ -1018,7 +1018,7 @@ class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
         )
         c = PollOptionDeleted(
             poll_message=MaybeInaccessibleMessage(
-                2, dtm.datetime.now(dtm.timezone.utc), Chat(1, "test_chat")
+                2, dtm.datetime.now(dtm.UTC), Chat(1, "test_chat")
             ),
             option_persistent_id=self.option_persistent_id,
             option_text=self.option_text,

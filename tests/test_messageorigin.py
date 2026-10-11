@@ -39,7 +39,7 @@ ignored = ["self", "api_kwargs"]
 
 
 class MODefaults:
-    date: dtm.datetime = to_timestamp(dtm.datetime.utcnow())
+    date: dtm.datetime = to_timestamp(dtm.datetime.now(dtm.UTC).replace(tzinfo=None))
     chat = Chat(1, Chat.CHANNEL)
     message_id = 123
     author_signautre = "PTB"

@@ -52,7 +52,7 @@ from tests.auxil.build_messages import make_message
 _DUMMY_USER = User(
     id=123456, is_bot=False, first_name="Dummy", last_name="User", username="dummy_user"
 )
-_DUMMY_DATE = dtm.datetime(1970, 1, 1, 0, 0, 0, 0, tzinfo=dtm.timezone.utc)
+_DUMMY_DATE = dtm.datetime(1970, 1, 1, 0, 0, 0, 0, tzinfo=dtm.UTC)
 _DUMMY_STICKER = Sticker(
     file_id="dummy_file_id",
     file_unique_id="dummy_file_unique_id",

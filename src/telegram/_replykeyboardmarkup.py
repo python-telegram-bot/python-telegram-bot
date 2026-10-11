@@ -19,7 +19,7 @@
 """This module contains an object that represents a Telegram ReplyKeyboardMarkup."""
 
 from collections.abc import Sequence
-from typing import Final
+from typing import Final, Self
 
 from telegram import constants
 from telegram._keyboardbutton import KeyboardButton
@@ -175,7 +175,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         input_field_placeholder: str | None = None,
         is_persistent: bool | None = None,
         **kwargs: object,
-    ) -> "ReplyKeyboardMarkup":
+    ) -> Self:
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button]], **kwargs)
@@ -233,7 +233,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         input_field_placeholder: str | None = None,
         is_persistent: bool | None = None,
         **kwargs: object,
-    ) -> "ReplyKeyboardMarkup":
+    ) -> Self:
         """Shortcut for::
 
             ReplyKeyboardMarkup([button_row], **kwargs)
@@ -295,7 +295,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         input_field_placeholder: str | None = None,
         is_persistent: bool | None = None,
         **kwargs: object,
-    ) -> "ReplyKeyboardMarkup":
+    ) -> Self:
         """Shortcut for::
 
             ReplyKeyboardMarkup([[button] for button in button_column], **kwargs)

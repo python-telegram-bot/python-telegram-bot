@@ -18,14 +18,9 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """Common base class for media objects with thumbnails"""
 
-from typing import TypeVar
-
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._utils.types import JSONDict
-
-# pylint: disable=invalid-name
-ThumbedMT_co = TypeVar("ThumbedMT_co", bound="_BaseThumbedMedium", covariant=True)
 
 
 class _BaseThumbedMedium(_BaseMedium):

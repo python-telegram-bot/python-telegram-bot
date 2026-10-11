@@ -20,7 +20,7 @@
 
 from collections.abc import Awaitable, Generator
 from re import Match
-from typing import TYPE_CHECKING, Any, Generic, NoReturn, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, NoReturn, Self
 
 from telegram._callbackquery import CallbackQuery
 from telegram._update import Update
@@ -32,15 +32,11 @@ if TYPE_CHECKING:
     from asyncio import Future, Queue
 
     from telegram.ext import Application, Job, JobQueue
-    from telegram.ext._utils.types import CCT
 
 _STORING_DATA_WIKI = (
     "https://github.com/python-telegram-bot/python-telegram-bot"
     "/wiki/Storing-bot%2C-user-and-chat-related-data"
 )
-
-# something like poor mans "typing.Self" for py<3.11
-ST = TypeVar("ST", bound="CallbackContext[Any, Any, Any, Any]")
 
 
 class CallbackContext(Generic[BT, UD, CD, BD]):
@@ -126,12 +122,12 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
     )
 
     def __init__(
-        self: ST,
-        application: "Application[BT, ST, UD, CD, BD, Any]",
+        self,
+        application: "Application[BT, Self, UD, CD, BD, Any]",
         chat_id: int | None = None,
         user_id: int | None = None,
     ):
-        self._application: Application[BT, ST, UD, CD, BD, Any] = application
+        self._application: Application[BT, Self, UD, CD, BD, Any] = application
         self._chat_id: int | None = chat_id
         self._user_id: int | None = user_id
         self.args: list[str] | None = None
@@ -141,9 +137,9 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         self.coroutine: Generator[Future[object] | None, None, Any] | Awaitable[Any] | None = None
 
     @property
-    def application(self) -> "Application[BT, ST, UD, CD, BD, Any]":
+    def application(self) -> "Application[BT, Self, UD, CD, BD, Any]":
         """:class:`telegram.ext.Application`: The application associated with this context."""
-        return self._application  # type: ignore[return-value]
+        return self._application
 
     @property
     def bot_data(self) -> BD:
@@ -269,13 +265,13 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @classmethod
     def from_error(
-        cls: type["CCT"],
+        cls,
         update: object,
         error: Exception,
-        application: "Application[BT, CCT, UD, CD, BD, Any]",
+        application: "Application[BT, Self, UD, CD, BD, Any]",
         job: "Job[Any] | None" = None,
         coroutine: Generator["Future[object] | None", None, Any] | Awaitable[Any] | None = None,
-    ) -> "CCT":
+    ) -> "Self":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the error
         handlers.
@@ -320,10 +316,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @classmethod
     def from_update(
-        cls: type["CCT"],
+        cls,
         update: object,
-        application: "Application[Any, CCT, Any, Any, Any, Any]",
-    ) -> "CCT":
+        application: "Application[Any, Self, Any, Any, Any, Any]",
+    ) -> "Self":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to the
         handlers.
@@ -350,10 +346,10 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
 
     @classmethod
     def from_job(
-        cls: type["CCT"],
-        job: "Job[CCT]",
-        application: "Application[Any, CCT, Any, Any, Any, Any]",
-    ) -> "CCT":
+        cls,
+        job: "Job[Self]",
+        application: "Application[Any, Self, Any, Any, Any, Any]",
+    ) -> "Self":
         """
         Constructs an instance of :class:`telegram.ext.CallbackContext` to be passed to a
         job callback.
@@ -387,7 +383,7 @@ class CallbackContext(Generic[BT, UD, CD, BD]):
         return self._application.bot
 
     @property
-    def job_queue(self) -> "JobQueue[ST] | None":
+    def job_queue(self) -> "JobQueue[Self] | None":
         """
         :class:`telegram.ext.JobQueue`: The :class:`JobQueue` used by the
         :class:`telegram.ext.Application`.

@@ -30,7 +30,7 @@ from typing import (
     TYPE_CHECKING,
     Any,
     NoReturn,
-    TypeVar,
+    Self,
     cast,
     no_type_check,
 )
@@ -144,8 +144,6 @@ if TYPE_CHECKING:
         SuggestedPostParameters,
     )
     from telegram._utils.types import ReplyMarkup
-
-BT = TypeVar("BT", bound="Bot")
 
 
 # Even though we document only {token} as supported insertion, we are a bit more flexible
@@ -400,7 +398,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
 
         self._freeze()
 
-    async def __aenter__(self: BT) -> BT:
+    async def __aenter__(self) -> Self:
         """
         |async_context_manager| :meth:`initializes <initialize>` the Bot.
 
