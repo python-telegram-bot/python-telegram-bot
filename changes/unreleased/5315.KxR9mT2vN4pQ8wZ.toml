@@ -1,0 +1,5 @@
+other = "Add ``filters.IS_BOT`` to filter messages by whether the sender is a bot (:attr:`telegram.User.is_bot`)"
+[[pull_requests]]
+uid = "5315"
+author_uids = ["rahulrajarapu158-arch"]
+closes_threads = ["5315"]
