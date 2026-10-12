@@ -2171,6 +2171,15 @@ class TestFilters:
         update.message.is_topic_message = True
         assert filters.IS_TOPIC_MESSAGE.check_update(update)
 
+    def test_filters_is_bot(self, update):
+        assert not filters.IS_BOT.check_update(update)
+        update.message.from_user.is_bot = True
+        assert filters.IS_BOT.check_update(update)
+        assert not (~filters.IS_BOT).check_update(update)
+        update.message.from_user = None
+        assert not filters.IS_BOT.check_update(update)
+        assert (~filters.IS_BOT).check_update(update)
+
     def test_filters_has_media_spoiler(self, update):
         assert not filters.HAS_MEDIA_SPOILER.check_update(update)
         update.message.has_media_spoiler = True

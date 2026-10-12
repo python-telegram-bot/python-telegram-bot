@@ -62,6 +62,7 @@ __all__ = (
     "IS_AUTOMATIC_FORWARD",
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
+    "IS_BOT",
     "LIVE_PHOTO",
     "LOCATION",
     "PAID_MEDIA",
@@ -1618,6 +1619,24 @@ IS_FROM_OFFLINE = _IsFromOffline(name="filters.IS_FROM_OFFLINE")
 """Messages that contain :attr:`telegram.Message.is_from_offline`.
 
     .. versionadded:: 21.1
+"""
+
+
+class _IsBot(MessageFilter):
+    __slots__ = ()
+
+    def filter(self, message: Message) -> bool:
+        return bool(message.from_user and message.from_user.is_bot)
+
+
+IS_BOT = _IsBot(name="filters.IS_BOT")
+"""Messages whose sender is a bot (:attr:`telegram.User.is_bot`).
+
+    Note:
+        Channel posts and anonymous-admin messages have no :attr:`Message.from_user`
+        and therefore do **not** match; see :attr:`filters.SenderChat` for those.
+
+    .. versionadded:: 22.9
 """
 
 
