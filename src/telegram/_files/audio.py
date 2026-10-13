@@ -36,7 +36,6 @@ class Audio(_BaseThumbedMedium):
     .. versionchanged:: 20.5
       |removed_thumb_note|
 
-
     Args:
         file_id (:obj:`str`): Identifier for this file, which can be used to download
             or reuse the file.
@@ -59,27 +58,11 @@ class Audio(_BaseThumbedMedium):
             .. versionadded:: 20.2
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file, which can be used to download
-            or reuse the file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which is supposed to be
-            the same over time and for different bots. Can't be used to download or reuse the file.
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in seconds as
             defined by the sender.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        performer (:obj:`str`): Optional. Performer of the audio as defined by the sender or by
-            audio tags.
-        title (:obj:`str`): Optional. Title of the audio as defined by the sender or by audio tags.
-        file_name (:obj:`str`): Optional. Original filename as defined by the sender.
-        mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
-        file_size (:obj:`int`): Optional. File size in bytes.
-        thumbnail (:class:`telegram.PhotoSize`): Optional. Thumbnail of the album cover to
-            which the music file belongs.
-
-            .. versionadded:: 20.2
-
-
     """
 
     __slots__ = ("_duration", "file_name", "mime_type", "performer", "title")

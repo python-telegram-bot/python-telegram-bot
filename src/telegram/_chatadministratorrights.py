@@ -114,64 +114,6 @@ class ChatAdministratorRights(TelegramObject):
             value of :attr:`can_pin_messages`.
 
             .. versionadded:: 22.7
-
-    Attributes:
-        is_anonymous (:obj:`bool`): :obj:`True`, if the user's presence in the chat is hidden.
-        can_manage_chat (:obj:`bool`): :obj:`True`, if the administrator can access the chat event
-            log, get boost list, see hidden supergroup and channel members, report spam messages
-            and ignore slow mode. Implied by any other administrator privilege.
-        can_delete_messages (:obj:`bool`): :obj:`True`, if the administrator can delete messages of
-            other users.
-        can_manage_video_chats (:obj:`bool`): :obj:`True`, if the administrator can manage video
-            chats.
-        can_restrict_members (:obj:`bool`): :obj:`True`, if the administrator can restrict, ban or
-            unban chat members, or access supergroup statistics.
-        can_promote_members (:obj:`bool`): :obj:`True`, if the administrator can add new
-            administrators with a subset of their own privileges or demote administrators that he
-            has promoted, directly or indirectly (promoted by administrators that were appointed by
-            the user.)
-        can_change_info (:obj:`bool`): :obj:`True`, if the user is allowed to change the chat title
-            ,photo and other settings.
-        can_invite_users (:obj:`bool`): :obj:`True`, if the user is allowed to invite new users to
-            the chat.
-        can_post_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can post
-            messages in the channel, or access channel statistics; for channels only.
-        can_edit_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit
-            messages of other users and can pin messages; for channels only.
-        can_pin_messages (:obj:`bool`): Optional. :obj:`True`, if the user is allowed to pin
-            messages; for groups and supergroups only.
-        can_post_stories (:obj:`bool`): :obj:`True`, if the administrator can post
-            stories to the chat.
-
-            .. versionadded:: 20.6
-            .. versionchanged:: 21.0
-                |non_optional_story_argument|
-        can_edit_stories (:obj:`bool`): :obj:`True`, if the administrator can edit stories posted
-            by other users, post stories to the chat page, pin chat stories, and access the chat's
-            story archive
-
-            .. versionadded:: 20.6
-            .. versionchanged:: 21.0
-                |non_optional_story_argument|
-        can_delete_stories (:obj:`bool`): :obj:`True`, if the administrator can delete
-            stories posted by other users.
-
-            .. versionadded:: 20.6
-            .. versionchanged:: 21.0
-                |non_optional_story_argument|
-        can_manage_topics (:obj:`bool`): Optional. :obj:`True`, if the user is allowed
-            to create, rename, close, and reopen forum topics; for supergroups only.
-
-            .. versionadded:: 20.0
-        can_manage_direct_messages (:obj:`bool`): Optional. :obj:`True`, if the administrator can
-            manage direct messages of the channel and decline suggested posts; for channels only.
-
-            .. versionadded:: 22.4
-        can_manage_tags (:obj:`bool`): Optional. :obj:`True`, if the administrator can edit the
-            tags of regular members; for groups and supergroups only. If omitted defaults to the
-            value of :attr:`can_pin_messages`.
-
-            .. versionadded:: 22.7
     """
 
     __slots__ = (

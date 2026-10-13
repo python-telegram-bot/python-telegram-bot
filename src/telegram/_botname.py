@@ -35,10 +35,6 @@ class BotName(TelegramObject):
 
     Args:
         name (:obj:`str`): The bot's name.
-
-    Attributes:
-        name (:obj:`str`): The bot's name.
-
     """
 
     __slots__ = ("name",)

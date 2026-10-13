@@ -39,11 +39,6 @@ class Story(TelegramObject):
     Args:
         chat (:class:`telegram.Chat`): Chat that posted the story.
         id (:obj:`int`): Unique identifier for the story in the chat.
-
-    Attributes:
-        chat (:class:`telegram.Chat`): Chat that posted the story.
-        id (:obj:`int`): Unique identifier for the story in the chat.
-
     """
 
     __slots__ = (

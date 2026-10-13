@@ -47,19 +47,11 @@ class Voice(_BaseMedium):
         file_size (:obj:`int`, optional): File size in bytes.
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file, which can be used to download
-            or reuse the file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the audio in seconds as
             defined by the sender.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
-        file_size (:obj:`int`): Optional. File size in bytes.
-
     """
 
     __slots__ = ("_duration", "mime_type")

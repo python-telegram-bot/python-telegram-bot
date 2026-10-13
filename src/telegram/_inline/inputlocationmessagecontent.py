@@ -62,11 +62,6 @@ class InputLocationMessageContent(InputMessageContent):
             if specified.
 
     Attributes:
-        latitude (:obj:`float`): Latitude of the location in degrees.
-        longitude (:obj:`float`): Longitude of the location in degrees.
-        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters; 0-
-            :tg-const:`telegram.InputLocationMessageContent.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Period in seconds for
             which the location can be updated, should be between
             :tg-const:`telegram.InputLocationMessageContent.MIN_LIVE_PERIOD` and
@@ -74,16 +69,6 @@ class InputLocationMessageContent(InputMessageContent):
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
-            moving, in degrees. Must be between
-            :tg-const:`telegram.InputLocationMessageContent.MIN_HEADING` and
-            :tg-const:`telegram.InputLocationMessageContent.MAX_HEADING` if specified.
-        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance
-            for proximity alerts about approaching another chat member, in meters. Must be
-            between :tg-const:`telegram.InputLocationMessageContent.MIN_PROXIMITY_ALERT_RADIUS`
-            and :tg-const:`telegram.InputLocationMessageContent.MAX_PROXIMITY_ALERT_RADIUS`
-            if specified.
-
     """
 
     __slots__ = (

@@ -47,7 +47,7 @@ class InlineQueryResultVoice(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         voice_url (:obj:`str`): A valid URL for the voice recording.
         title (:obj:`str`): Recording title.
         caption (:obj:`str`, optional): Caption,
@@ -55,10 +55,6 @@ class InlineQueryResultVoice(InlineQueryResult):
             parsing.
         parse_mode (:obj:`str`, optional): |parse_mode|
         caption_entities (Sequence[:class:`telegram.MessageEntity`], optional): |caption_entities|
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
         voice_duration (:obj:`int` | :class:`datetime.timedelta`, optional): Recording duration
             in seconds.
 
@@ -71,31 +67,11 @@ class InlineQueryResultVoice(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VOICE`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        voice_url (:obj:`str`): A valid URL for the voice recording.
-        title (:obj:`str`): Recording title.
-        caption (:obj:`str`): Optional. Caption,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after entities
-            parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
         voice_duration (:obj:`int` | :class:`datetime.timedelta`): Optional. Recording duration
             in seconds.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the voice recording.
-
     """
 
     __slots__ = (

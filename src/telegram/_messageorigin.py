@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""This module contains the classes that represent Telegram MessageOigin."""
+"""This module contains the classes that represent Telegram MessageOrigin."""
 
 import datetime as dtm
 from typing import ClassVar, Final
@@ -44,13 +44,6 @@ class MessageOrigin(TelegramObject):
     .. versionadded:: 20.8
 
     Args:
-        type (:obj:`str`): Type of the message origin, can be on of:
-            :attr:`~telegram.MessageOrigin.USER`, :attr:`~telegram.MessageOrigin.HIDDEN_USER`,
-            :attr:`~telegram.MessageOrigin.CHAT`, or :attr:`~telegram.MessageOrigin.CHANNEL`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally.
-            |datetime_localization|
-
-    Attributes:
         type (:obj:`str`): Type of the message origin, can be on of:
             :attr:`~telegram.MessageOrigin.USER`, :attr:`~telegram.MessageOrigin.HIDDEN_USER`,
             :attr:`~telegram.MessageOrigin.CHAT`, or :attr:`~telegram.MessageOrigin.CHANNEL`.
@@ -115,9 +108,6 @@ class MessageOriginUser(MessageOrigin):
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.USER`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally.
-            |datetime_localization|
-        sender_user (:class:`telegram.User`): User that sent the message originally.
     """
 
     __slots__ = ("sender_user",)
@@ -149,9 +139,6 @@ class MessageOriginHiddenUser(MessageOrigin):
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.HIDDEN_USER`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally.
-            |datetime_localization|
-        sender_user_name (:obj:`str`): Name of the user that sent the message originally.
     """
 
     __slots__ = ("sender_user_name",)
@@ -185,11 +172,6 @@ class MessageOriginChat(MessageOrigin):
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.CHAT`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally.
-            |datetime_localization|
-        sender_chat (:class:`telegram.Chat`): Chat that sent the message originally.
-        author_signature (:obj:`str`): Optional. For messages originally sent by an anonymous chat
-            administrator, original message author signature
     """
 
     __slots__ = (
@@ -228,11 +210,6 @@ class MessageOriginChannel(MessageOrigin):
     Attributes:
         type (:obj:`str`): Type of the message origin. Always
             :tg-const:`~telegram.MessageOrigin.CHANNEL`.
-        date (:obj:`datetime.datetime`): Date the message was sent originally.
-            |datetime_localization|
-        chat (:class:`telegram.Chat`): Channel chat to which the message was originally sent.
-        message_id (:obj:`int`): Unique message identifier inside the chat.
-        author_signature (:obj:`str`): Optional. Signature of the original post author.
     """
 
     __slots__ = (

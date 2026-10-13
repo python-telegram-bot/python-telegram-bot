@@ -40,9 +40,6 @@ class InputStoryContent(TelegramObject):
 
     Args:
         type (:obj:`str`): Type of the content.
-
-    Attributes:
-        type (:obj:`str`): Type of the content.
     """
 
     __slots__ = ("type",)
@@ -127,7 +124,7 @@ class InputStoryContentVideo(InputStoryContent):
         cover_frame_timestamp (:class:`datetime.timedelta` | :obj:`int` | :obj:`float`, optional):
             Timestamp in seconds of the frame that will be used as the static cover for the story.
             Defaults to ``0.0``.
-        is_animation (:obj:`bool`, optional): Pass :obj:`True` if the video has no sound
+        is_animation (:obj:`bool`, optional): :obj:`True`, if the video has no sound.
 
     Attributes:
         type (:obj:`str`): Type of the content, must be :attr:`~telegram.InputStoryContent.VIDEO`.
@@ -141,7 +138,6 @@ class InputStoryContentVideo(InputStoryContent):
             0-:tg-const:`telegram.constants.InputStoryContentLimit.MAX_VIDEO_DURATION`
         cover_frame_timestamp (:class:`datetime.timedelta`): Optional. Timestamp in seconds of the
             frame that will be used as the static cover for the story. Defaults to ``0.0``.
-        is_animation (:obj:`bool`): Optional. Pass :obj:`True` if the video has no sound
     """
 
     __slots__ = ("cover_frame_timestamp", "duration", "is_animation", "video")

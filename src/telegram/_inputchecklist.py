@@ -51,23 +51,6 @@ class InputChecklistTask(TelegramObject):
             List of special entities that appear in the text, which can be specified instead of
             parse_mode. Currently, only bold, italic, underline, strikethrough, spoiler,
             custom_emoji, and date_time entities are allowed.
-
-    Attributes:
-        id (:obj:`int`):
-            Unique identifier of the task; must be positive and unique among all task identifiers
-            currently present in the checklist.
-        text (:obj:`str`):
-            Text of the task;
-            :tg-const:`telegram.constants.InputChecklistLimit.MIN_TEXT_LENGTH`\
--:tg-const:`telegram.constants.InputChecklistLimit.MAX_TEXT_LENGTH` characters after
-            entities parsing.
-        parse_mode (:obj:`str`):
-            Optional. |parse_mode|
-        text_entities (Sequence[:class:`telegram.MessageEntity`]):
-            Optional. List of special entities that appear in the text, which can be specified
-            instead of parse_mode. Currently, only bold, italic, underline, strikethrough, spoiler,
-            custom_emoji, and date_time entities are allowed.
-
     """
 
     __slots__ = (
@@ -127,30 +110,6 @@ class InputChecklist(TelegramObject):
             Pass :obj:`True` if other users can add tasks to the checklist.
         others_can_mark_tasks_as_done (:obj:`bool`, optional):
             Pass :obj:`True` if other users can mark tasks as done or not done in the checklist.
-
-    Attributes:
-        title (:obj:`str`):
-            Title of the checklist;
-            :tg-const:`telegram.constants.InputChecklistLimit.MIN_TITLE_LENGTH`\
--:tg-const:`telegram.constants.InputChecklistLimit.MAX_TITLE_LENGTH` characters after
-            entities parsing.
-        parse_mode (:obj:`str`):
-            Optional. |parse_mode|
-        title_entities (Sequence[:class:`telegram.MessageEntity`]):
-            Optional. List of special entities that appear in the title, which
-            can be specified instead of :paramref:`parse_mode`. Currently, only bold, italic,
-            underline, strikethrough, spoiler, and custom_emoji, and date_time entities are allowed
-        tasks (Sequence[:class:`telegram.InputChecklistTask`]):
-            List of
-            :tg-const:`telegram.constants.InputChecklistLimit.MIN_TASK_NUMBER`\
--:tg-const:`telegram.constants.InputChecklistLimit.MAX_TASK_NUMBER` tasks in
-            the checklist.
-        others_can_add_tasks (:obj:`bool`):
-            Optional. Pass :obj:`True` if other users can add tasks to the checklist.
-        others_can_mark_tasks_as_done (:obj:`bool`):
-            Optional. Pass :obj:`True` if other users can mark tasks as done or not done in
-            the checklist.
-
     """
 
     __slots__ = (
