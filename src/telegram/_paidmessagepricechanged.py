@@ -19,9 +19,10 @@
 """This module contains an object that describes a price change of a paid message."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class PaidMessagePriceChanged(TelegramObject):
     """Describes a service message about a change in the price of paid messages within a chat.
 
@@ -39,16 +40,4 @@ class PaidMessagePriceChanged(TelegramObject):
             non-administrator users of the supergroup chat for each sent message
     """
 
-    __slots__ = ("paid_message_star_count",)
-
-    def __init__(
-        self,
-        paid_message_star_count: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.paid_message_star_count: int = paid_message_star_count
-
-        self._id_attrs = (self.paid_message_star_count,)
-        self._freeze()
+    paid_message_star_count: int = tg_field(compare=True)

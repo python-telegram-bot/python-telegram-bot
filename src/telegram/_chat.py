@@ -22,7 +22,7 @@
 import datetime as dtm
 from collections.abc import Sequence
 from html import escape
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._chatpermissions import ChatPermissions
@@ -31,6 +31,7 @@ from telegram._menubutton import MenuButton
 from telegram._reaction import ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
     CorrectOptionIds,
@@ -85,64 +86,52 @@ if TYPE_CHECKING:
     from telegram._utils.types import ReplyMarkup
 
 
+@tg_dataclass()
 class _ChatBase(TelegramObject):
     """Base class for :class:`telegram.Chat` and :class:`telegram.ChatFullInfo`.
 
     .. versionadded:: 21.3
     """
 
-    __slots__ = (
-        "first_name",
-        "id",
-        "is_direct_messages",
-        "is_forum",
-        "last_name",
-        "title",
-        "type",
-        "username",
-    )
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.ChatType, value, value)
 
-    def __init__(
-        self,
-        id: int,
-        type: str,
-        title: str | None = None,
-        username: str | None = None,
-        first_name: str | None = None,
-        last_name: str | None = None,
-        is_forum: bool | None = None,
-        is_direct_messages: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.id: int = id
-        self.type: str = enum.get_member(constants.ChatType, type, type)
-        # Optionals
-        self.title: str | None = title
-        self.username: str | None = username
-        self.first_name: str | None = first_name
-        self.last_name: str | None = last_name
-        self.is_forum: bool | None = is_forum
-        self.is_direct_messages: bool | None = is_direct_messages
+    id: int = tg_field(compare=True)
+    type: str = tg_field(converter=_type_converter)
 
-        self._id_attrs = (self.id,)
+    if TYPE_CHECKING:
+        # These fields are shared and should be be declared by each inheriting class.
+        # They're not declared here since they're optional and some child classes
+        # (e.g ChatFullInfo) have required fields that are unique to them, which leads
+        # to TypeError: non-default argument '..' follows default argument
+        # They are declared here under `TYPE_CHECKING` to support static checking of the shared
+        #  (link, *_name, mention_*) methods below
+        @property
+        def title(self) -> str | None: ...
+        @property
+        def username(self) -> str | None: ...
+        @property
+        def first_name(self) -> str | None: ...
+        @property
+        def last_name(self) -> str | None: ...
+        @property
+        def is_forum(self) -> bool | None: ...
+        @property
+        def is_direct_messages(self) -> bool | None: ...
 
-        self._freeze()
-
-    SENDER: Final[str] = constants.ChatType.SENDER
+    SENDER: ClassVar[str] = constants.ChatType.SENDER
     """:const:`telegram.constants.ChatType.SENDER`
 
     .. versionadded:: 13.5
     """
-    PRIVATE: Final[str] = constants.ChatType.PRIVATE
+    PRIVATE: ClassVar[str] = constants.ChatType.PRIVATE
     """:const:`telegram.constants.ChatType.PRIVATE`"""
-    GROUP: Final[str] = constants.ChatType.GROUP
+    GROUP: ClassVar[str] = constants.ChatType.GROUP
     """:const:`telegram.constants.ChatType.GROUP`"""
-    SUPERGROUP: Final[str] = constants.ChatType.SUPERGROUP
+    SUPERGROUP: ClassVar[str] = constants.ChatType.SUPERGROUP
     """:const:`telegram.constants.ChatType.SUPERGROUP`"""
-    CHANNEL: Final[str] = constants.ChatType.CHANNEL
+    CHANNEL: ClassVar[str] = constants.ChatType.CHANNEL
     """:const:`telegram.constants.ChatType.CHANNEL`"""
 
     @property
@@ -4209,6 +4198,7 @@ class _ChatBase(TelegramObject):
         )
 
 
+@tg_dataclass()
 class Chat(_ChatBase):
     """This object represents a chat.
 
@@ -4271,4 +4261,9 @@ class Chat(_ChatBase):
     .. _topics: https://telegram.org/blog/topics-in-groups-collectible-usernames#topics-in-groups
     """
 
-    __slots__ = ()
+    title: str | None = tg_field(default=None)
+    username: str | None = tg_field(default=None)
+    first_name: str | None = tg_field(default=None)
+    last_name: str | None = tg_field(default=None)
+    is_forum: bool | None = tg_field(default=None)
+    is_direct_messages: bool | None = tg_field(default=None)

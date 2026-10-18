@@ -20,7 +20,6 @@ import pytest
 
 from telegram import InputTextMessageContent, LinkPreviewOptions, MessageEntity
 from telegram.constants import ParseMode
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -42,12 +41,6 @@ class InputTextMessageContentTestBase:
 
 
 class TestInputTextMessageContentWithoutRequest(InputTextMessageContentTestBase):
-    def test_slot_behaviour(self, input_text_message_content):
-        inst = input_text_message_content
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_text_message_content):
         assert input_text_message_content.parse_mode == self.parse_mode
         assert input_text_message_content.message_text == self.message_text

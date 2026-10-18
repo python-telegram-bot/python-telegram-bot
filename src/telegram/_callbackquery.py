@@ -16,17 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains an object that represents a Telegram CallbackQuery"""
 
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._inputchecklist import InputChecklist
 from telegram._message import MaybeInaccessibleMessage, Message
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput, TimePeriod
 
@@ -45,6 +45,7 @@ if TYPE_CHECKING:
     from telegram._utils.types import ReplyMarkup
 
 
+@tg_dataclass()
 class CallbackQuery(TelegramObject):
     """
     This object represents an incoming callback query from a callback button in an inline keyboard.
@@ -114,42 +115,15 @@ class CallbackQuery(TelegramObject):
 
     """
 
-    __slots__ = (
-        "chat_instance",
-        "data",
-        "from_user",
-        "game_short_name",
-        "id",
-        "inline_message_id",
-        "message",
-    )
-
-    def __init__(
-        self,
-        id: str,
-        from_user: User,
-        chat_instance: str,
-        message: MaybeInaccessibleMessage | None = None,
-        data: str | None = None,
-        inline_message_id: str | None = None,
-        game_short_name: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.id: str = id
-        self.from_user: User = from_user
-        self.chat_instance: str = chat_instance
-        # Optionals
-        self.message: MaybeInaccessibleMessage | None = message
-        self.data: str | None = data
-        self.inline_message_id: str | None = inline_message_id
-        self.game_short_name: str | None = game_short_name
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    # Required
+    id: str = tg_field(compare=True)
+    from_user: User = tg_field()
+    chat_instance: str = tg_field()
+    # Optionals
+    message: MaybeInaccessibleMessage | None = tg_field(default=None)
+    data: str | None = tg_field(default=None)
+    inline_message_id: str | None = tg_field(default=None)
+    game_short_name: str | None = tg_field(default=None)
 
     async def answer(
         self,
@@ -917,7 +891,7 @@ class CallbackQuery(TelegramObject):
             message_effect_id=message_effect_id,
         )
 
-    MAX_ANSWER_TEXT_LENGTH: Final[int] = (
+    MAX_ANSWER_TEXT_LENGTH: ClassVar[int] = (
         constants.CallbackQueryLimit.ANSWER_CALLBACK_QUERY_TEXT_LENGTH
     )
     """

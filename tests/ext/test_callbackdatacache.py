@@ -29,6 +29,7 @@ from telegram.ext import ExtBot
 from telegram.ext._callbackdatacache import CallbackDataCache, InvalidCallbackData, _KeyboardData
 from tests.auxil.envvars import TEST_WITH_OPT_DEPS
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture
@@ -195,9 +196,9 @@ class TestCallbackDataCache:
         effective_message = Message(
             message_id=1, date=dtm.datetime.now(), chat=chat, reply_markup=out
         )
-        effective_message._unfreeze()
-        effective_message.reply_to_message = deepcopy(effective_message)
-        effective_message.pinned_message = deepcopy(effective_message)
+        with unfrozen(effective_message):
+            effective_message.reply_to_message = deepcopy(effective_message)
+            effective_message.pinned_message = deepcopy(effective_message)
         cq_id = uuid4().hex
         callback_query = CallbackQuery(
             cq_id,

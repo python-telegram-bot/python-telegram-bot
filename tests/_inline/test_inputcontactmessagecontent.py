@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import InputContactMessageContent, User
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -38,12 +37,6 @@ class InputContactMessageContentTestBase:
 
 
 class TestInputContactMessageContentWithoutRequest(InputContactMessageContentTestBase):
-    def test_slot_behaviour(self, input_contact_message_content):
-        inst = input_contact_message_content
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_contact_message_content):
         assert input_contact_message_content.first_name == self.first_name
         assert input_contact_message_content.phone_number == self.phone_number

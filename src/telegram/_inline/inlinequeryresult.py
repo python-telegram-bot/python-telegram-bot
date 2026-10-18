@@ -16,17 +16,17 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
-# pylint: disable=redefined-builtin
 """This module contains the classes that represent Telegram InlineQueryResult."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils import enum
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class InlineQueryResult(TelegramObject):
     """Baseclass for the InlineQueryResult* classes.
 
@@ -54,25 +54,20 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    __slots__ = ("id", "type")
+    @staticmethod
+    def _type_converter(value: str) -> str:
+        return enum.get_member(constants.InlineQueryResultType, value, value)
 
-    def __init__(self, type: str, id: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
+    # Required
+    type: str = tg_field(converter=_type_converter)
+    id: str = tg_field(compare=True)
 
-        # Required
-        self.type: str = enum.get_member(constants.InlineQueryResultType, type, type)
-        self.id: str = str(id)
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
-
-    MIN_ID_LENGTH: Final[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH
+    MIN_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH
     """:const:`telegram.constants.InlineQueryResultLimit.MIN_ID_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_ID_LENGTH: Final[int] = constants.InlineQueryResultLimit.MAX_ID_LENGTH
+    MAX_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MAX_ID_LENGTH
     """:const:`telegram.constants.InlineQueryResultLimit.MAX_ID_LENGTH`
 
     .. versionadded:: 20.0

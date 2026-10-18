@@ -19,15 +19,16 @@
 """This module contains an object that represents a Telegram Location."""
 
 import datetime as dtm
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
-from telegram._utils.types import JSONDict, TimePeriod
 
 
+@tg_dataclass()
 class Location(TelegramObject):
     """This object represents a point on the map.
 
@@ -70,58 +71,32 @@ class Location(TelegramObject):
 
     """
 
-    __slots__ = (
-        "_live_period",
-        "heading",
-        "horizontal_accuracy",
-        "latitude",
-        "longitude",
-        "proximity_alert_radius",
+    # Required
+    longitude: float = tg_field(compare=True)
+    latitude: float = tg_field(compare=True)
+    # Optional
+    horizontal_accuracy: float | None = tg_field(default=None)
+    _live_period: dtm.timedelta | None = tg_field(
+        default=None, alias="live_period", converter=to_timedelta
     )
-
-    def __init__(
-        self,
-        longitude: float,
-        latitude: float,
-        horizontal_accuracy: float | None = None,
-        live_period: TimePeriod | None = None,
-        heading: int | None = None,
-        proximity_alert_radius: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.longitude: float = longitude
-        self.latitude: float = latitude
-
-        # Optionals
-        self.horizontal_accuracy: float | None = horizontal_accuracy
-        self._live_period: dtm.timedelta | None = to_timedelta(live_period)
-        self.heading: int | None = heading
-        self.proximity_alert_radius: int | None = (
-            int(proximity_alert_radius) if proximity_alert_radius else None
-        )
-
-        self._id_attrs = (self.longitude, self.latitude)
-
-        self._freeze()
+    heading: int | None = tg_field(default=None)
+    proximity_alert_radius: int | None = tg_field(default=None)
 
     @property
     def live_period(self) -> int | dtm.timedelta | None:
         return get_timedelta_value(self._live_period, attribute="live_period")
 
-    HORIZONTAL_ACCURACY: Final[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
+    HORIZONTAL_ACCURACY: ClassVar[int] = constants.LocationLimit.HORIZONTAL_ACCURACY
     """:const:`telegram.constants.LocationLimit.HORIZONTAL_ACCURACY`
 
     .. versionadded:: 20.0
     """
-    MIN_HEADING: Final[int] = constants.LocationLimit.MIN_HEADING
+    MIN_HEADING: ClassVar[int] = constants.LocationLimit.MIN_HEADING
     """:const:`telegram.constants.LocationLimit.MIN_HEADING`
 
     .. versionadded:: 20.0
     """
-    MAX_HEADING: Final[int] = constants.LocationLimit.MAX_HEADING
+    MAX_HEADING: ClassVar[int] = constants.LocationLimit.MAX_HEADING
     """:const:`telegram.constants.LocationLimit.MAX_HEADING`
 
     .. versionadded:: 20.0

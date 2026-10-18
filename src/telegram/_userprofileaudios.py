@@ -18,13 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram UserProfileAudios."""
 
-from collections.abc import Sequence
-
 from telegram._files.audio import Audio
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class UserProfileAudios(TelegramObject):
     """
     This object represents the audios displayed on a user's profile.
@@ -44,20 +44,5 @@ class UserProfileAudios(TelegramObject):
 
     """
 
-    __slots__ = ("audios", "total_count")
-
-    def __init__(
-        self,
-        total_count: int,
-        audios: Sequence[Audio],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.total_count: int = total_count
-        self.audios: tuple[Audio, ...] = tuple(audios)
-
-        self._id_attrs = (self.total_count, self.audios)
-
-        self._freeze()
+    total_count: int = tg_field(compare=True)
+    audios: tuple[Audio, ...] = tg_field(compare=True, converter=parse_sequence_arg)

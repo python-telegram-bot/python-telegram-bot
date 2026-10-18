@@ -25,7 +25,6 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from tests.auxil.build_messages import make_message
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -52,11 +51,6 @@ class VenueTestBase:
 
 
 class TestVenueWithoutRequest(VenueTestBase):
-    def test_slot_behaviour(self, venue):
-        for attr in venue.__slots__:
-            assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(venue)) == len(set(mro_slots(venue))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "location": self.location.to_dict(),

@@ -29,7 +29,6 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -43,12 +42,6 @@ def user2():
 
 
 class TestVideoChatStartedWithoutRequest:
-    def test_slot_behaviour(self):
-        action = VideoChatStarted()
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json(self):
         video_chat_started = VideoChatStarted.de_json({}, None)
         assert video_chat_started.api_kwargs == {}
@@ -62,12 +55,6 @@ class TestVideoChatStartedWithoutRequest:
 
 class TestVideoChatEndedWithoutRequest:
     duration = dtm.timedelta(seconds=100)
-
-    def test_slot_behaviour(self):
-        action = VideoChatEnded(8)
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
         json_dict = {"duration": int(self.duration.total_seconds())}
@@ -123,12 +110,6 @@ class TestVideoChatEndedWithoutRequest:
 
 
 class TestVideoChatParticipantsInvitedWithoutRequest:
-    def test_slot_behaviour(self, user1):
-        action = VideoChatParticipantsInvited([user1])
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json(self, user1, user2, offline_bot):
         json_data = {"users": [user1.to_dict(), user2.to_dict()]}
         video_chat_participants = VideoChatParticipantsInvited.de_json(json_data, offline_bot)
@@ -175,12 +156,6 @@ class TestVideoChatParticipantsInvitedWithoutRequest:
 
 class TestVideoChatScheduledWithoutRequest:
     start_date = dtm.datetime.now(dtm.timezone.utc)
-
-    def test_slot_behaviour(self):
-        inst = VideoChatScheduled(self.start_date)
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self):
         assert VideoChatScheduled(self.start_date).start_date == self.start_date

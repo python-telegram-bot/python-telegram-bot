@@ -33,17 +33,29 @@ TeleUserLikeOptional = TypeVar("TeleUserLikeOptional", bound="UserLikeOptional")
 if TYPE_CHECKING:
     from typing import type_check_only
 
+    # Below fields are defined as properties to satisfy frozeness of TelegramObjects
+    # disallowing writes
     @type_check_only
     class UserLike(Protocol):
-        first_name: str
-        last_name: str | None
-        username: str | None
+        @property
+        def first_name(self) -> str: ...
+
+        @property
+        def last_name(self) -> str | None: ...
+
+        @property
+        def username(self) -> str | None: ...
 
     @type_check_only
     class UserLikeOptional(Protocol):
-        first_name: str | None
-        last_name: str | None
-        username: str | None
+        @property
+        def first_name(self) -> str | None: ...
+
+        @property
+        def last_name(self) -> str | None: ...
+
+        @property
+        def username(self) -> str | None: ...
 
 
 @overload
@@ -52,7 +64,8 @@ def get_name(userlike: TeleUserLike) -> str: ...
 def get_name(userlike: TeleUserLikeOptional) -> str | None: ...
 
 
-def get_name(userlike: TeleUserLike | TeleUserLikeOptional) -> str | None:
+# The body handles the broadest supported input
+def get_name(userlike: TeleUserLikeOptional) -> str | None:
     """Returns ``username`` prefixed with "@". If  ``username`` is not available, calls
     :func:`get_full_name` below`.
     """
@@ -67,7 +80,8 @@ def get_full_name(userlike: TeleUserLike) -> str: ...
 def get_full_name(userlike: TeleUserLikeOptional) -> str | None: ...
 
 
-def get_full_name(userlike: TeleUserLike | TeleUserLikeOptional) -> str | None:
+# The body handles the broadest supported input
+def get_full_name(userlike: TeleUserLikeOptional) -> str | None:
     """
     If parameter ``first_name`` is not :obj:`None`, gives
     ``first_name`` followed by (if available) `UserLike.last_name`. Otherwise,
@@ -86,14 +100,17 @@ TeleLinkable = TypeVar("TeleLinkable", bound="Linkable")
 TeleLinkableOptional = TypeVar("TeleLinkableOptional", bound="LinkableOptional")
 
 if TYPE_CHECKING:
-
+    # Below fields are defined as properties to satisfy frozeness of TelegramObjects
+    # disallowing writes
     @type_check_only
     class Linkable(Protocol):
-        username: str
+        @property
+        def username(self) -> str: ...
 
     @type_check_only
     class LinkableOptional(Protocol):
-        username: str | None
+        @property
+        def username(self) -> str | None: ...
 
 
 @overload
@@ -102,7 +119,8 @@ def get_link(linkable: TeleLinkable) -> str: ...
 def get_link(linkable: TeleLinkableOptional) -> str | None: ...
 
 
-def get_link(linkable: TeleLinkable | TeleLinkableOptional) -> str | None:
+# The body handles the broadest supported input
+def get_link(linkable: TeleLinkableOptional) -> str | None:
     """If ``username`` is available, returns a t.me link of the user/chat."""
     if linkable.username:
         return f"https://t.me/{linkable.username}"

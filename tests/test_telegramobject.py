@@ -16,14 +16,15 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import dataclasses
 import datetime as dtm
 import inspect
 import pickle
-import re
 from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType
+from typing import Any
 
 import pytest
 
@@ -38,50 +39,45 @@ from telegram import (
     TelegramObject,
     User,
 )
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_FALSE, DEFAULT_NONE, DefaultValue
-from telegram._utils.types import JSONDict
+from telegram._utils.types import ODVInput
 from telegram.ext import PicklePersistence
-from telegram.warnings import PTBUserWarning
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 def all_subclasses(cls):
     # Gets all subclasses of the specified object, recursively. from
     # https://stackoverflow.com/a/3862957/9706202
     # also includes the class itself
-    return (
+    classes = (
         set(cls.__subclasses__())
         .union([s for c in cls.__subclasses__() for s in all_subclasses(c)])
         .union({cls})
     )
 
+    # dataclass(slots=True) creates a replacemnt class, both are present in __subclasses__()
+    # Keep the replacement and remove the original one
+    return [c for c in classes if "__slots__" in vars(c)]
+
 
 TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
 
 
+@tg_dataclass()
 class _DeJsonTestObject(TelegramObject):
     """Small subclass."""
 
-    __slots__ = ("value",)
-
-    def __init__(self, value: int, *, api_kwargs: JSONDict | None = None) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.value = value
-        self._freeze()
+    value: int = tg_field()
 
 
 class TestDeJsonWithoutRequest:
     def test_timestamp_is_converted_to_datetime(self):
+
+        @tg_dataclass()
         class TimestampedObject(TelegramObject):
-            def __init__(
-                self,
-                created_at: dtm.datetime,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.created_at = created_at
+            created_at: dtm.datetime = tg_field()
 
         telegram_object = TimestampedObject.de_json({"created_at": 1_700_000_000})
 
@@ -90,15 +86,10 @@ class TestDeJsonWithoutRequest:
         )
 
     def test_nested_object_is_deserialized_and_receives_bot(self, offline_bot):
+
+        @tg_dataclass()
         class Container(TelegramObject):
-            def __init__(
-                self,
-                child: _DeJsonTestObject,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.child = child
+            child: _DeJsonTestObject = tg_field()
 
         container = Container.de_json({"child": {"value": 1}}, bot=offline_bot)
 
@@ -107,15 +98,13 @@ class TestDeJsonWithoutRequest:
         assert container.child.get_bot() is offline_bot
 
     def test_sequence_of_objects_is_deserialized(self):
+
+        @tg_dataclass()
         class Container(TelegramObject):
-            def __init__(
-                self,
-                children: Sequence[_DeJsonTestObject],
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.children = tuple(children)
+            def to_tuple(v: Sequence[_DeJsonTestObject]):
+                return tuple(v)
+
+            children: tuple[_DeJsonTestObject, ...] = tg_field(converter=to_tuple)
 
         container = Container.de_json({"children": [{"value": 1}, {"value": 2}]})
 
@@ -123,58 +112,44 @@ class TestDeJsonWithoutRequest:
         assert all(isinstance(child, _DeJsonTestObject) for child in container.children)
 
     def test_nested_sequences_of_objects_are_deserialized(self):
+
+        @tg_dataclass()
         class Container(TelegramObject):
-            def __init__(
-                self,
-                rows: Sequence[Sequence[_DeJsonTestObject]],
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.rows = tuple(tuple(row) for row in rows)
+            def to_tuple(v: Sequence[Sequence[_DeJsonTestObject]]):
+                return tuple(tuple(v_i) for v_i in v)
+
+            rows: tuple[tuple[_DeJsonTestObject, ...], ...] = tg_field(converter=to_tuple)
 
         container = Container.de_json({"rows": [[{"value": 1}], [{"value": 2}, {"value": 3}]]})
 
         assert [[item.value for item in row] for row in container.rows] == [[1], [2, 3]]
 
     def test_unparameterized_sequence_is_left_unchanged(self):
+
+        @tg_dataclass()
         class Container(TelegramObject):
-            def __init__(
-                self,
-                values: Sequence,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.values = values
+            values: Sequence = tg_field()
 
         values = [1, 2]
 
         assert Container.de_json({"values": values}).values is values
 
     def test_none_is_not_deserialized_as_nested_object(self):
+
+        @tg_dataclass()
         class Container(TelegramObject):
-            def __init__(
-                self,
-                child: _DeJsonTestObject | None,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.child = child
+            child: _DeJsonTestObject | None = tg_field()
 
         assert Container.de_json({"child": None}).child is None
 
     def test_non_list_sequence_is_not_retransformed(self):
+
+        @tg_dataclass()
         class Container(TelegramObject):
-            def __init__(
-                self,
-                children: Sequence[_DeJsonTestObject],
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.children = tuple(children)
+            def to_tuple(v: Sequence[_DeJsonTestObject]):
+                return tuple(v)
+
+            children: tuple[_DeJsonTestObject, ...] = tg_field(converter=to_tuple)
 
         prepared_child = _DeJsonTestObject(value=1)
         container = Container.de_json({"children": (prepared_child,)})
@@ -182,15 +157,10 @@ class TestDeJsonWithoutRequest:
         assert container.children[0] is prepared_child
 
     def test_from_is_renamed_without_mutating_input(self):
+
+        @tg_dataclass()
         class Container(TelegramObject):
-            def __init__(
-                self,
-                from_user: _DeJsonTestObject,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.from_user = from_user
+            from_user: _DeJsonTestObject = tg_field()
 
         api_response = {"from": {"value": 1}}
 
@@ -200,19 +170,16 @@ class TestDeJsonWithoutRequest:
         assert api_response == {"from": {"value": 1}}
 
     def test_subclass_without_constructor_inherits_parent_plan(self):
-        class Parent(TelegramObject):
-            def __init__(
-                self,
-                child: _DeJsonTestObject,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.child = child
 
+        @tg_dataclass()
+        class Parent(TelegramObject):
+            child: _DeJsonTestObject = tg_field()
+
+        @tg_dataclass()
         class FirstChild(Parent):
             pass
 
+        @tg_dataclass()
         class SecondChild(Parent):
             pass
 
@@ -225,17 +192,11 @@ class TestDeJsonWithoutRequest:
         assert second_child.child.value == 2
 
     def test_removed_field_is_preserved_in_api_kwargs(self):
+
+        @tg_dataclass()
         class ObjectWithRemovedField(TelegramObject):
             __REMOVED_API_FIELDS__ = frozenset({"removed_field"})
-
-            def __init__(
-                self,
-                current_field: int,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.current_field = current_field
+            current_field: int = tg_field()
 
         telegram_object = ObjectWithRemovedField.de_json({"current_field": 1, "removed_field": 2})
 
@@ -255,17 +216,11 @@ class TestDeJsonWithoutRequest:
         assert user.api_kwargs == {"future_field": "future value"}
 
     def test_unknown_field_does_not_replace_constructor_default(self):
+
+        @tg_dataclass()
         class ObjectWithDefault(TelegramObject):
-            def __init__(
-                self,
-                required_field: int,
-                defaulted_field: str = "constructor default",
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.required_field = required_field
-                self.defaulted_field = defaulted_field
+            required_field: int = tg_field()
+            defaulted_field: str = tg_field(default="constructor default")
 
         telegram_object = ObjectWithDefault.de_json({"required_field": 1, "future_field": 2})
 
@@ -273,30 +228,23 @@ class TestDeJsonWithoutRequest:
         assert telegram_object.api_kwargs == {"future_field": 2}
 
     def test_missing_required_scalar_defaults_to_none(self):
+
+        @tg_dataclass()
         class ObjectWithRequiredField(TelegramObject):
-            def __init__(
-                self,
-                required_field: int,
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.required_field = required_field
+            required_field: int = tg_field()
 
         telegram_object = ObjectWithRequiredField.de_json({})
 
         assert telegram_object.required_field is None
 
     def test_missing_required_sequence_defaults_to_empty_tuple(self):
+
+        @tg_dataclass()
         class ObjectWithRequiredSequence(TelegramObject):
-            def __init__(
-                self,
-                required_values: Sequence[int],
-                *,
-                api_kwargs: JSONDict | None = None,
-            ) -> None:
-                super().__init__(api_kwargs=api_kwargs)
-                self.required_values = tuple(required_values)
+            def to_tuple(v: Sequence[int]):
+                return tuple(v)
+
+            required_values: tuple[int, ...] = tg_field(converter=to_tuple)
 
         telegram_object = ObjectWithRequiredSequence.de_json({})
 
@@ -331,26 +279,27 @@ class TestDeJsonWithoutRequest:
 
 
 class TestTelegramObject:
+    @tg_dataclass()
     class Sub(TelegramObject):
-        def __init__(self, private, normal, b):
-            super().__init__()
-            self._private = private
-            self.normal = normal
-            self._bot = b
+        _private: Any = tg_field(alias="private")
+        normal: Any = tg_field()
+        _bot: Any = tg_field(alias="b")
 
+    @dataclasses.dataclass(frozen=True, repr=False, eq=False)
     class ChangingTO(TelegramObject):
-        # Don't use in any tests, this is just for testing the pickle behaviour and the
-        # class is altered during the test procedure
+        # Don't use in any tests, this is just for testing the pickle behaviour and
+        # uses standard unsloted `@dataclass` so that its __dict__ can be altered during the
+        # test procedure
         pass
 
     def test_to_json(self, monkeypatch):
+
+        @tg_dataclass()
         class Subclass(TelegramObject):
-            def __init__(self):
-                super().__init__()
-                self.arg = "arg"
-                self.arg2 = ["arg2", "arg2"]
-                self.arg3 = {"arg3": "arg3"}
-                self.empty_tuple = ()
+            arg: str = tg_field(default="arg", init=False)
+            arg2: list[str] = tg_field(default_factory=lambda: ["arg2", "arg2"], init=False)
+            arg3: dict[str, str] = tg_field(default_factory=lambda: {"arg3": "arg3"}, init=False)
+            empty_tuple: tuple[Any, ...] = tg_field(default_factory=tuple, init=False)
 
         json = Subclass().to_json()
         # Order isn't guarantied
@@ -378,12 +327,10 @@ class TestTelegramObject:
             to.get_bot()
 
     def test_de_list(self, bot):
-        class SubClass(TelegramObject):
-            def __init__(self, arg: int, **kwargs):
-                super().__init__(**kwargs)
-                self.arg = arg
 
-                self._id_attrs = (self.arg,)
+        @tg_dataclass()
+        class SubClass(TelegramObject):
+            arg: int = tg_field(compare=True)
 
         assert SubClass.de_list([{"arg": 1}, {"arg": 2}], bot) == (
             SubClass(1),
@@ -392,13 +339,14 @@ class TestTelegramObject:
 
     def test_api_kwargs_read_only(self):
         tg_object = TelegramObject(api_kwargs={"foo": "bar"})
-        tg_object._freeze()
         assert isinstance(tg_object.api_kwargs, MappingProxyType)
         with pytest.raises(TypeError):
             tg_object.api_kwargs["foo"] = "baz"
-        with pytest.raises(AttributeError, match="can't be set"):
+        with pytest.raises(dataclasses.FrozenInstanceError):
             tg_object.api_kwargs = {"foo": "baz"}
 
+    # tags: deprecated next.version
+    # no subclasses other that bot will have their own init
     @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
     def test_subclasses_have_api_kwargs(self, cls):
         """Checks that all subclasses of TelegramObject have an api_kwargs argument that is
@@ -433,22 +381,21 @@ class TestTelegramObject:
         )
 
     def test_de_json_arbitrary_exceptions(self, bot):
+
+        @tg_dataclass()
         class SubClass(TelegramObject):
             def __init__(self, **kwargs):
-                super().__init__(**kwargs)
+                TelegramObject.__init__(self, **kwargs)
                 raise TypeError("This is a test")
 
         with pytest.raises(TypeError, match="This is a test"):
             SubClass.de_json({}, bot)
 
     def test_to_dict_private_attribute(self):
+        @tg_dataclass()
         class TelegramObjectSubclass(TelegramObject):
-            __slots__ = ("_b", "a")  # Added slots so that the attrs are converted to dict
-
-            def __init__(self):
-                super().__init__()
-                self.a = 1
-                self._b = 2
+            a: int = tg_field(default=1, init=False)
+            _b: int = tg_field(default=2, init=False)
 
         subclass_instance = TelegramObjectSubclass()
         assert subclass_instance.to_dict() == {"a": 1}
@@ -459,8 +406,8 @@ class TestTelegramObject:
 
     def test_to_dict_missing_attribute(self):
         message = Message(1, dtm.datetime.now(), Chat(1, "private"), from_user=User(1, "", False))
-        message._unfreeze()
-        del message.chat
+        with unfrozen(message):
+            del message.chat
 
         message_dict = message.to_dict()
         assert "chat" not in message_dict
@@ -469,19 +416,16 @@ class TestTelegramObject:
         assert message_dict["chat"] is None
 
     def test_to_dict_recursion(self):
+        @tg_dataclass()
         class Recursive(TelegramObject):
-            __slots__ = ("recursive",)
+            recursive: str = tg_field(default="recursive", init=False)
 
-            def __init__(self):
-                super().__init__()
-                self.recursive = "recursive"
-
+        @dataclasses.dataclass(frozen=True, slots=False, repr=False, eq=False)
         class SubClass(TelegramObject):
             """This class doesn't have `__slots__`, so has `__dict__` instead."""
 
-            def __init__(self):
-                super().__init__()
-                self.subclass = Recursive()
+            # default_factory to store the attribute in inst.__dict__, not on the class
+            subclass: Recursive = dataclasses.field(default_factory=Recursive, init=False)
 
         to = SubClass()
         to_dict_no_recurse = to.to_dict(recursive=False)
@@ -493,48 +437,88 @@ class TestTelegramObject:
         assert to_dict_recurse["subclass"]["recursive"] == "recursive"
 
     def test_to_dict_default_value(self):
+
+        @tg_dataclass()
         class SubClass(TelegramObject):
-            def __init__(self):
-                super().__init__()
-                self.default_none = DEFAULT_NONE
-                self.default_false = DEFAULT_FALSE
+            default_none: ODVInput[Any] = tg_field(default=DEFAULT_NONE, init=False)
+            default_false: ODVInput[bool] = tg_field(default=DEFAULT_FALSE, init=False)
 
         to = SubClass()
         to_dict = to.to_dict()
         assert "default_none" not in to_dict
         assert to_dict["default_false"] is False
 
-    def test_slot_behaviour(self):
-        inst = TelegramObject()
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    def test_meaningless_comparison(self, recwarn):
-        expected_warning = "Objects of type TGO can not be meaningfully tested for equivalence."
-
-        class TGO(TelegramObject):
+    def test_comparison(self):
+        @tg_dataclass()
+        class EmptyTGO(TelegramObject):
             pass
 
-        a = TGO()
-        b = TGO()
-        assert a == b
-        assert len(recwarn) == 1
-        assert str(recwarn[0].message) == expected_warning
-        assert recwarn[0].category is PTBUserWarning
-        assert recwarn[0].filename == __file__, "wrong stacklevel"
+        assert EmptyTGO() == EmptyTGO()
 
-    def test_meaningful_comparison(self, recwarn):
+        @tg_dataclass()
+        class ExcludedFieldTGO(TelegramObject):
+            attribute: str = tg_field(compare=False)
+
+        assert ExcludedFieldTGO("attr") == ExcludedFieldTGO("not attr")
+
+        @tg_dataclass()
+        class ComparedFieldTGO(TelegramObject):
+            attribute: str = tg_field(compare=True)
+
+        assert ComparedFieldTGO("foo") == ComparedFieldTGO("foo")
+        assert ComparedFieldTGO("foo") != ComparedFieldTGO("not foo")
+
+    def test_hash_without_comparison_fields_uses_identity(self, recwarn):
+        @tg_dataclass()
         class TGO(TelegramObject):
-            def __init__(self):
-                self._id_attrs = (1,)
+            arg: str = tg_field(compare=False)
 
-        a = TGO()
-        b = TGO()
+        a = TGO("test")
+        b = TGO("test")
         assert a == b
-        assert len(recwarn) == 0
-        assert b == a
-        assert len(recwarn) == 0
+
+        ab_set = {a, b}
+        assert len(ab_set) == 2
+
+        ab_dict = {
+            a: "a",
+            b: "b",
+        }
+        assert ab_dict[a] == "a"
+        assert ab_dict[b] == "b"
+
+    def test_hash_with_comparison_fields_uses_field_values(self, recwarn):
+        @tg_dataclass()
+        class TGO(TelegramObject):
+            arg: str = tg_field(compare=True)
+
+        a = TGO("test")
+        b = TGO("test")
+        assert a == b
+
+        ab_set = {a, b}
+        assert len(ab_set) == 1
+
+        ab_dict = {
+            a: 1,
+            b: 2,
+        }
+        assert ab_dict[a] == 2
+        assert ab_dict[b] == 2
+        assert len(ab_dict) == 1
+
+        c = TGO("not test")
+
+        ac_set = {a, c}
+        assert len(ac_set) == 2
+
+        ac_dict = {
+            a: 1,
+            c: 3,
+        }
+        assert ac_dict[a] == 1
+        assert ac_dict[c] == 3
+        assert len(ac_dict) == 2
 
     def test_bot_instance_none(self):
         tg_object = TelegramObject()
@@ -644,7 +628,7 @@ class TestTelegramObject:
 
         # Ensure that loading objects that were pickled before attributes were made immutable
         # are still mutable
-        chat.id = 7
+        object.__setattr__(chat, "id", 7)
         assert chat.id == 7
 
     def test_pickle_handle_properties(self):
@@ -654,13 +638,11 @@ class TestTelegramObject:
         # to test this.
         # Original class:
         v1 = """
+@tg_dataclass()
 class PicklePropertyTest(TelegramObject):
-    __slots__ = ("forward_from", "to_be_removed", "forward_date")
-    def __init__(self, forward_from=None, forward_date=None, api_kwargs=None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.forward_from = forward_from
-        self.forward_date = forward_date
-        self.to_be_removed = "to_be_removed"
+    forward_from: Any = tg_field(default=None)
+    forward_date: Any = tg_field(default=None)
+    to_be_removed: Any = tg_field(init=False, default="to_be_removed")
 """
         exec(v1, globals(), None)
         old = PicklePropertyTest("old_val", "date", api_kwargs={"new_attr": 1})  # noqa: F821
@@ -668,13 +650,11 @@ class PicklePropertyTest(TelegramObject):
 
         # After some API changes:
         v2 = """
+@tg_dataclass()
 class PicklePropertyTest(TelegramObject):
-    __slots__ = ("_forward_from", "_date", "_new_attr")
-    def __init__(self, forward_from=None, f_date=None, new_attr=None, api_kwargs=None):
-        super().__init__(api_kwargs=api_kwargs)
-        self._forward_from = forward_from
-        self.f_date = f_date
-        self._new_attr = new_attr
+    _forward_from: Any = tg_field(default=None, alias="forward_from")
+    _date: Any = tg_field(default=None, alias="f_date")
+    _new_attr: Any = tg_field(default=None, alias="new_attr")
     @property
     def forward_from(self):
         return self._forward_from
@@ -698,10 +678,9 @@ class PicklePropertyTest(TelegramObject):
 
         # After PTB removes the property and the attribute:
         v3 = """
+@tg_dataclass()
 class PicklePropertyTest(TelegramObject):
-    __slots__ = ()
-    def __init__(self, api_kwargs=None):
-        super().__init__(api_kwargs=api_kwargs)
+    pass
 """
         exec(v3, globals(), None)
         v3_unpickle = pickle.loads(pickled_v2)
@@ -740,19 +719,8 @@ class PicklePropertyTest(TelegramObject):
         assert new_msg.api_kwargs == {"foo": "bar"}
         assert new_msg.api_kwargs is not msg.api_kwargs
 
-        # check that deepcopy preserves the freezing status
-        with pytest.raises(
-            AttributeError, match="Attribute `text` of class `Message` can't be set!"
-        ):
-            new_msg.text = "new text"
-
-        msg._unfreeze()
-        new_message = deepcopy(msg)
-        new_message.text = "new text"
-        assert new_message.text == "new text"
-
     def test_deepcopy_subclass_telegram_obj(self, bot):
-        s = self.Sub("private", "normal", bot)
+        s = self.Sub(private="private", normal="normal", b=bot)
         d = deepcopy(s)
         assert d is not s
         assert d._private == s._private  # Can't test for identity since two equal strings is True
@@ -761,25 +729,29 @@ class PicklePropertyTest(TelegramObject):
         assert d.normal == s.normal
 
     def test_string_representation(self):
+
+        @tg_dataclass()
         class TGO(TelegramObject):
-            def __init__(self, api_kwargs=None):
-                super().__init__(api_kwargs=api_kwargs)
-                self.string_attr = "string"
-                self.int_attr = 42
-                self.to_attr = BotCommand("command", "description")
-                self.list_attr = [
+            string_attr: str = tg_field(default="string")
+            int_attr: int = tg_field(default=42)
+            to_attr: BotCommand = tg_field(default=BotCommand("command", "description"))
+            list_attr: list[BotCommand] = tg_field(
+                default_factory=lambda: [
                     BotCommand("command_1", "description_1"),
                     BotCommand("command_2", "description_2"),
                 ]
-                self.dict_attr = {
+            )
+            dict_attr: dict[BotCommand, BotCommand] = tg_field(
+                default_factory=lambda: {
                     BotCommand("command_1", "description_1"): BotCommand(
                         "command_2", "description_2"
                     )
                 }
-                self.empty_tuple_attrs = ()
-                self.empty_str_attribute = ""
-                # Should not be included in string representation
-                self.none_attr = None
+            )
+            empty_tuple_attrs: tuple[Any, ...] = tg_field(default_factory=tuple)
+            empty_str_attribute: str = tg_field(default="")
+            # Should not be included in string representation
+            none_attr: Any = tg_field(default=None)
 
         expected_without_api_kwargs = (
             "TGO(dict_attr={BotCommand(command='command_1', description='description_1'): "
@@ -806,12 +778,8 @@ class PicklePropertyTest(TelegramObject):
 
     @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
     def test_subclasses_are_frozen(self, cls):
-        if cls is TelegramObject or cls.__name__.startswith("_"):
-            # Protected classes don't need to be frozen and neither does the base class
-            return
-
         # instantiating each subclass would be tedious as some attributes require special init
-        # args. So we inspect the code instead.
+        # args. So we check the dataclass type `cls` instead.
 
         source_file = inspect.getsourcefile(cls.__init__)
         parents = Path(source_file).parents
@@ -821,51 +789,5 @@ class PicklePropertyTest(TelegramObject):
             # If the class is defined in a test file, we don't want to test it.
             return
 
-        if source_file.endswith("telegramobject.py"):
-            pytest.fail(
-                f"{cls.__name__} does not have its own `__init__` "
-                "and can therefore not be frozen correctly"
-            )
-
-        source_lines, _ = inspect.getsourcelines(cls.__init__)
-
-        # We use regex matching since a simple "if self._freeze() in source_lines[-1]" would also
-        # allo commented lines.
-        last_line_freezes = re.match(r"\s*self\.\_freeze\(\)", source_lines[-1])
-        uses_with_unfrozen = re.search(
-            r"\n\s*with self\.\_unfrozen\(\)\:", inspect.getsource(cls.__init__)
-        )
-
-        assert last_line_freezes or uses_with_unfrozen, f"{cls.__name__} is not frozen correctly"
-
-    def test_freeze_unfreeze(self):
-        class TestSub(TelegramObject):
-            def __init__(self):
-                super().__init__()
-                self._protected = True
-                self.public = True
-                self._freeze()
-
-        foo = TestSub()
-        foo._protected = False
-        assert foo._protected is False
-
-        with pytest.raises(
-            AttributeError, match="Attribute `public` of class `TestSub` can't be set!"
-        ):
-            foo.public = False
-
-        with pytest.raises(
-            AttributeError, match="Attribute `public` of class `TestSub` can't be deleted!"
-        ):
-            del foo.public
-
-        foo._unfreeze()
-        foo._protected = True
-        assert foo._protected is True
-        foo.public = False
-        assert foo.public is False
-        del foo.public
-        del foo._protected
-        assert not hasattr(foo, "public")
-        assert not hasattr(foo, "_protected")
+        assert dataclasses.is_dataclass(cls)
+        assert cls.__dataclass_params__.frozen

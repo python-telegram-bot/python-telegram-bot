@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import BotCommand, Dice
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module", params=Dice.ALL_EMOJI)
@@ -33,11 +32,6 @@ class DiceTestBase:
 
 
 class TestDiceWithoutRequest(DiceTestBase):
-    def test_slot_behaviour(self, dice):
-        for attr in dice.__slots__:
-            assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(dice)) == len(set(mro_slots(dice))), "duplicate slot"
-
     @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI)
     def test_de_json(self, offline_bot, emoji):
         json_dict = {"value": self.value, "emoji": emoji}

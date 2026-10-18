@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import StarAmount
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -37,12 +36,6 @@ class StarTransactionTestBase:
 
 
 class TestStarAmountWithoutRequest(StarTransactionTestBase):
-    def test_slot_behaviour(self, star_amount):
-        inst = star_amount
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "amount": self.amount,

@@ -37,7 +37,6 @@ from telegram._suggestedpost import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import SuggestedPostInfoState
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -54,15 +53,6 @@ class SuggestedPostParametersTestBase:
 
 
 class TestSuggestedPostParametersWithoutRequest(SuggestedPostParametersTestBase):
-    def test_slot_behaviour(self, suggested_post_parameters):
-        for attr in suggested_post_parameters.__slots__:
-            assert getattr(suggested_post_parameters, attr, "err") != "err", (
-                f"got extra slot '{attr}'"
-            )
-        assert len(mro_slots(suggested_post_parameters)) == len(
-            set(mro_slots(suggested_post_parameters))
-        ), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "price": self.price.to_dict(),
@@ -134,13 +124,6 @@ class SuggestedPostInfoTestBase:
 
 
 class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase):
-    def test_slot_behaviour(self, suggested_post_info):
-        for attr in suggested_post_info.__slots__:
-            assert getattr(suggested_post_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(suggested_post_info)) == len(set(mro_slots(suggested_post_info))), (
-            "duplicate slot"
-        )
-
     def test_type_enum_conversion(self):
         assert type(SuggestedPostInfo("pending").state) is SuggestedPostInfoState
         assert SuggestedPostInfo("unknown").state == "unknown"
@@ -216,13 +199,6 @@ class SuggestedPostPriceTestBase:
 
 
 class TestSuggestedPostPriceWithoutRequest(SuggestedPostPriceTestBase):
-    def test_slot_behaviour(self, suggested_post_price):
-        for attr in suggested_post_price.__slots__:
-            assert getattr(suggested_post_price, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(suggested_post_price)) == len(set(mro_slots(suggested_post_price))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "currency": self.currency,
@@ -270,15 +246,6 @@ class SuggestedPostDeclinedTestBase:
 
 
 class TestSuggestedPostDeclinedWithoutRequest(SuggestedPostDeclinedTestBase):
-    def test_slot_behaviour(self, suggested_post_declined):
-        for attr in suggested_post_declined.__slots__:
-            assert getattr(suggested_post_declined, attr, "err") != "err", (
-                f"got extra slot '{attr}'"
-            )
-        assert len(mro_slots(suggested_post_declined)) == len(
-            set(mro_slots(suggested_post_declined))
-        ), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "suggested_post_message": self.suggested_post_message.to_dict(),
@@ -332,13 +299,6 @@ class SuggestedPostPaidTestBase:
 
 
 class TestSuggestedPostPaidWithoutRequest(SuggestedPostPaidTestBase):
-    def test_slot_behaviour(self, suggested_post_paid):
-        for attr in suggested_post_paid.__slots__:
-            assert getattr(suggested_post_paid, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(suggested_post_paid)) == len(set(mro_slots(suggested_post_paid))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "suggested_post_message": self.suggested_post_message.to_dict(),
@@ -402,15 +362,6 @@ class SuggestedPostRefundedTestBase:
 
 
 class TestSuggestedPostRefundedWithoutRequest(SuggestedPostRefundedTestBase):
-    def test_slot_behaviour(self, suggested_post_refunded):
-        for attr in suggested_post_refunded.__slots__:
-            assert getattr(suggested_post_refunded, attr, "err") != "err", (
-                f"got extra slot '{attr}'"
-            )
-        assert len(mro_slots(suggested_post_refunded)) == len(
-            set(mro_slots(suggested_post_refunded))
-        ), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "suggested_post_message": self.suggested_post_message.to_dict(),
@@ -464,15 +415,6 @@ class SuggestedPostApprovedTestBase:
 
 
 class TestSuggestedPostApprovedWithoutRequest(SuggestedPostApprovedTestBase):
-    def test_slot_behaviour(self, suggested_post_approved):
-        for attr in suggested_post_approved.__slots__:
-            assert getattr(suggested_post_approved, attr, "err") != "err", (
-                f"got extra slot '{attr}'"
-            )
-        assert len(mro_slots(suggested_post_approved)) == len(
-            set(mro_slots(suggested_post_approved))
-        ), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "send_date": to_timestamp(self.send_date),
@@ -552,15 +494,6 @@ class SuggestedPostApprovalFailedTestBase:
 
 
 class TestSuggestedPostApprovalFailedWithoutRequest(SuggestedPostApprovalFailedTestBase):
-    def test_slot_behaviour(self, suggested_post_approval_failed):
-        for attr in suggested_post_approval_failed.__slots__:
-            assert getattr(suggested_post_approval_failed, attr, "err") != "err", (
-                f"got extra slot '{attr}'"
-            )
-        assert len(mro_slots(suggested_post_approval_failed)) == len(
-            set(mro_slots(suggested_post_approval_failed))
-        ), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "price": self.price.to_dict(),

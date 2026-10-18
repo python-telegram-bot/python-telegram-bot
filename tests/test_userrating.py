@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import BotCommand, UserRating
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -41,11 +40,6 @@ class UserRatingTestBase:
 
 
 class TestUserRatingWithoutRequest(UserRatingTestBase):
-    def test_slot_behaviour(self, user_rating):
-        for attr in user_rating.__slots__:
-            assert getattr(user_rating, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(user_rating)) == len(set(mro_slots(user_rating))), "duplicate slot"
-
     def test_de_json_with_next(self, offline_bot):
         json_dict = {
             "level": self.level,

@@ -28,7 +28,6 @@ from telegram import (
 )
 from telegram.constants import InputProfilePhotoType
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 class TestInputProfilePhotoWithoutRequest:
@@ -57,12 +56,6 @@ class InputProfilePhotoStaticTestBase:
 
 
 class TestInputProfilePhotoStaticWithoutRequest(InputProfilePhotoStaticTestBase):
-    def test_slot_behaviour(self, input_profile_photo_static):
-        inst = input_profile_photo_static
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_profile_photo_static):
         inst = input_profile_photo_static
         assert inst.type == self.type_
@@ -97,12 +90,6 @@ class InputProfilePhotoAnimatedTestBase:
 
 
 class TestInputProfilePhotoAnimatedWithoutRequest(InputProfilePhotoAnimatedTestBase):
-    def test_slot_behaviour(self, input_profile_photo_animated):
-        inst = input_profile_photo_animated
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_profile_photo_animated):
         inst = input_profile_photo_animated
         assert inst.type == self.type_

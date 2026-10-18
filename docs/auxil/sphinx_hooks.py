@@ -50,7 +50,6 @@ ADMONITION_INSERTER = AdmonitionInserter()
 PRIVATE_BASE_CLASSES = {
     "_ChatUserBaseFilter": "MessageFilter",
     "_Dice": "MessageFilter",
-    "_BaseThumbedMedium": "TelegramObject",
     "_BaseMedium": "TelegramObject",
     "_CredentialsBase": "TelegramObject",
     "_ChatBase": "TelegramObject",

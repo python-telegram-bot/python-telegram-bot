@@ -22,7 +22,6 @@ import pytest
 
 from telegram import OrderInfo, SuccessfulPayment
 from telegram._utils.datetime import UTC, to_timestamp
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -55,12 +54,6 @@ class SuccessfulPaymentTestBase:
 
 
 class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
-    def test_slot_behaviour(self, successful_payment):
-        inst = successful_payment
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "invoice_payload": self.invoice_payload,
