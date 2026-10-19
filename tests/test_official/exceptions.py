@@ -18,8 +18,6 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains exceptions to our API compared to the official API."""
 
-from collections.abc import Sequence
-
 from telegram import (
     Animation,
     Audio,
@@ -70,23 +68,31 @@ class ParamTypeCheckingExceptions:
         },
     }
 
-    # TODO: Look into merging this with COMPLEX_TYPES
-    # Exceptions to the "Array of" types, where we accept more types than the official API
-    # key: (parameter name, is_class), value: type which must be present in the annotation
-    ARRAY_OF_EXCEPTIONS = {
-        ("results", False): "InlineQueryResult",  # + Callable
-        ("commands", False): "BotCommand",  # + tuple[str, str]
-        ("keyboard", True): "KeyboardButton",  # + sequence[sequence[str]]
-        ("reaction", False): "ReactionType",  # + str
-        ("options", False): "InputPollOption",  # + str
-        ("correct_option_ids", False): "Sequence[typing.Literal[",
-    }
-
-    # Special cases for other parameters that accept more types than the official API, and are
+    # Special cases for parameters that accept more types than the official API, and are
     # too complex to compare/predict with official API
     # structure: class/method_name: {param_name: reduced form of annotation}
+    # For "Array of" types, the value is instead a string that must be present in the
+    # annotation (these were previously kept in the separate ARRAY_OF_EXCEPTIONS).
     COMPLEX_TYPES = {
-        "send_poll": {"correct_option_ids": Sequence[int]},
+        # Exceptions to the "Array of" types, where we accept more types than the official API
+        "answer_inline_query": {
+            "results": "InlineQueryResult",  # + Callable
+        },
+        "set_my_commands": {
+            "commands": "BotCommand",  # + tuple[str, str]
+        },
+        "ReplyKeyboardMarkup": {
+            "keyboard": "KeyboardButton",  # + sequence[sequence[str]]
+        },
+        "set_message_reaction": {
+            "reaction": "ReactionType",  # + str
+        },
+        "send_poll": {
+            "options": "InputPollOption",  # + str
+            # Note: the previous {"correct_option_ids": Sequence[int]} entry was unreachable:
+            # "Array of" parameters are handled before COMPLEX_TYPES is consulted.
+            "correct_option_ids": "Sequence[typing.Literal[",
+        },
         "get_file": {
             "file_id": str,  # actual: Union[str, objs_with_file_id_attr]
         },
