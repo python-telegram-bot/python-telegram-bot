@@ -12,6 +12,9 @@ repos:
     rev: v4.1.3
     hooks:
     -   id: pylint
+        # Run on the minimum supported Python; dill crashes on 3.15 in parallel mode.
+        # https://github.com/pylint-dev/pylint/issues/11528
+        language_version: python3.14
         files: ^(?!(tests|docs)).*\.py$
         language: python
         additional_dependencies:

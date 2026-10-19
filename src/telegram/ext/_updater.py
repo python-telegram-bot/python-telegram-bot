@@ -25,7 +25,7 @@ import ssl
 from collections.abc import Callable, Coroutine, Sequence
 from pathlib import Path
 from types import TracebackType
-from typing import TYPE_CHECKING, Any, TypeVar
+from typing import TYPE_CHECKING, Any, Self
 
 from telegram._utils.defaultvalue import DEFAULT_80, DEFAULT_IP, DefaultValue
 from telegram._utils.logging import get_logger
@@ -47,7 +47,6 @@ if TYPE_CHECKING:
     from telegram import Bot
 
 
-_UpdaterType = TypeVar("_UpdaterType", bound="Updater")  # pylint: disable=invalid-name
 _LOGGER = get_logger(__name__)
 
 
@@ -125,7 +124,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         self.__polling_task_stop_event: asyncio.Event = asyncio.Event()
         self.__polling_cleanup_cb: Callable[[], Coroutine[Any, Any, None]] | None = None
 
-    async def __aenter__(self: _UpdaterType) -> _UpdaterType:
+    async def __aenter__(self) -> Self:
         """
         |async_context_manager| :meth:`initializes <initialize>` the Updater.
 

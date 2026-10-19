@@ -48,7 +48,7 @@ class ChatBoostDefaults:
     is_unclaimed = False
     chat = Chat(1, "group")
     user = User(1, "user", False)
-    date = dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0)
+    date = dtm.datetime.now(dtm.UTC).replace(microsecond=0)
     default_source = ChatBoostSourcePremium(user)
     prize_star_count = 99
     boost = ChatBoost(

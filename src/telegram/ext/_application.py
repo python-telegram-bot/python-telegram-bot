@@ -31,7 +31,7 @@ from collections.abc import Awaitable, Callable, Coroutine, Generator, Mapping, 
 from copy import deepcopy
 from pathlib import Path
 from types import MappingProxyType, TracebackType
-from typing import TYPE_CHECKING, Any, Generic, NoReturn, TypeAlias, TypeVar
+from typing import TYPE_CHECKING, Any, Generic, NoReturn, Self, TypeAlias
 
 from telegram._update import Update
 from telegram._utils.defaultvalue import (
@@ -68,7 +68,6 @@ if TYPE_CHECKING:
 
 DEFAULT_GROUP: int = 0
 
-_AppType = TypeVar("_AppType", bound="Application")  # pylint: disable=invalid-name
 _STOP_SIGNAL = object()
 _DEFAULT_0 = DefaultValue(0)
 
@@ -356,7 +355,7 @@ class Application(
         self.__create_task_tasks: set[asyncio.Task] = set()  # Used for awaiting tasks upon exit
         self.__stop_running_marker = asyncio.Event()
 
-    async def __aenter__(self: _AppType) -> _AppType:
+    async def __aenter__(self) -> Self:
         """|async_context_manager| :meth:`initializes <initialize>` the App.
 
         Returns:
@@ -1643,19 +1642,15 @@ class Application(
             if not self.persistence:
                 return
 
-            # asyncio synchronization primitives don't accept a timeout argument, it is recommended
-            # to use wait_for instead
             try:
-                await asyncio.wait_for(
-                    self.__update_persistence_event.wait(),
-                    timeout=self.persistence.update_interval,
-                )
-            except asyncio.TimeoutError:
+                async with asyncio.timeout(self.persistence.update_interval):
+                    await self.__update_persistence_event.wait()
+            except TimeoutError:
                 pass
             else:
                 return
 
-            # putting this *after* the wait_for so we don't immediately update on startup as
+            # putting this *after* the timeout so we don't immediately update on startup as
             # that would make little sense
             await self.update_persistence()
 

@@ -38,7 +38,7 @@ class TestDefaults:
 
     def test_utc(self):
         defaults = Defaults()
-        assert defaults.tzinfo is dtm.timezone.utc
+        assert defaults.tzinfo is dtm.UTC
 
     @pytest.mark.skipif(not TEST_WITH_OPT_DEPS, reason="pytz not installed")
     def test_pytz_deprecation(self, recwarn):

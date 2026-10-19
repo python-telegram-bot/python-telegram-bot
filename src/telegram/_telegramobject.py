@@ -27,7 +27,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
-from typing import TYPE_CHECKING, Any, ClassVar, TypeVar, cast, get_args, get_origin
+from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, get_args, get_origin
 
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.de_json import (
@@ -43,8 +43,6 @@ from telegram._utils.warnings import warn
 if TYPE_CHECKING:
     from telegram import Bot
 
-Tele_co = TypeVar("Tele_co", bound="TelegramObject", covariant=True)
-Tele = TypeVar("Tele", bound="TelegramObject")
 _DATETIME_FIELD = object()  # Sentinel that marks datetime fields in the de_json plan.
 
 
@@ -352,7 +350,7 @@ class TelegramObject:
         if frozen:
             self._freeze()
 
-    def __deepcopy__(self: Tele_co, memodict: dict[int, object]) -> Tele_co:
+    def __deepcopy__(self, memodict: dict[int, object]) -> Self:
         """
         Customizes how :func:`copy.deepcopy` processes objects of this type.
         The only difference to the default implementation is that the :class:`telegram.Bot`
@@ -484,11 +482,11 @@ class TelegramObject:
 
     @classmethod
     def _de_json(
-        cls: type[Tele_co],
+        cls,
         data: JSONDict,
         bot: "Bot | None",
         api_kwargs: JSONDict | None = None,
-    ) -> Tele_co:
+    ) -> Self:
         # try-except is significantly faster in case we already have a correct argument set
         try:
             obj = cls(**data, api_kwargs=api_kwargs)
@@ -514,7 +512,7 @@ class TelegramObject:
         return obj
 
     @classmethod
-    def de_json(cls: type[Tele_co], data: JSONDict, bot: "Bot | None" = None) -> Tele_co:
+    def de_json(cls, data: JSONDict, bot: "Bot | None" = None) -> Self:
         """Converts JSON data to a Telegram object.
 
         Args:
@@ -544,7 +542,7 @@ class TelegramObject:
         # Dispatch to subclass for delegator classes (e.g. TransactionPartner, ChatMember).
         if cls.__DE_JSON_DISPATCH__:
             dispatch_key, dispatch_mapping = cls.__DE_JSON_DISPATCH__
-            target_cls: Tele_co = dispatch_mapping.get(  # type: ignore[assignment]
+            target_cls: Self = dispatch_mapping.get(  # type: ignore[assignment]
                 data.get(dispatch_key)  # type: ignore[arg-type]
             )
             if target_cls is not None:
@@ -580,9 +578,7 @@ class TelegramObject:
         return cls._de_json(data=data, bot=bot, api_kwargs=api_kwargs)
 
     @classmethod
-    def de_list(
-        cls: type[Tele_co], data: list[JSONDict], bot: "Bot | None" = None
-    ) -> tuple[Tele_co, ...]:
+    def de_list(cls, data: list[JSONDict], bot: "Bot | None" = None) -> tuple[Self, ...]:
         """Converts a list of JSON objects to a tuple of Telegram objects.
 
         .. versionchanged:: 20.0
@@ -605,7 +601,7 @@ class TelegramObject:
         return tuple(cls.de_json(d, bot) for d in data)
 
     @contextmanager
-    def _unfrozen(self: Tele) -> Iterator[Tele]:
+    def _unfrozen(self) -> Iterator[Self]:
         """Context manager to temporarily unfreeze the object. For internal use only.
 
         Note:

@@ -60,7 +60,7 @@ from tests.auxil.slots import mro_slots
 
 message = Message(
     1,
-    dtm.datetime.utcnow(),
+    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
     Chat(1, ""),
     from_user=User(1, "", False),
     text="Text",
@@ -68,7 +68,7 @@ message = Message(
 )
 channel_post = Message(
     1,
-    dtm.datetime.utcnow(),
+    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
     Chat(1, ""),
     text="Text",
     sender_chat=Chat(1, ""),
@@ -142,7 +142,7 @@ deleted_business_messages = BusinessMessagesDeleted(
 
 business_message = Message(
     1,
-    dtm.datetime.utcnow(),
+    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
     Chat(1, ""),
     User(1, "", False),
 )
@@ -158,7 +158,7 @@ managed_bot = ManagedBotUpdated(
 )
 guest_message = Message(
     1,
-    dtm.datetime.utcnow(),
+    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
     Chat(1, ""),
     User(1, "", False),
     sender_chat=Chat(1, ""),
@@ -430,7 +430,12 @@ class TestUpdateWithoutRequest(UpdateTestBase):
         # channel_post with signatures can have its from_user
         user = User(1, "", False)
         post = Message(
-            1, dtm.datetime.utcnow(), Chat(1, ""), author_signature="", from_user=user, text="Text"
+            1,
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+            Chat(1, ""),
+            author_signature="",
+            from_user=user,
+            text="Text",
         )
         update = Update(update_id=1, channel_post=post)
         assert update.effective_sender == update.effective_user == user

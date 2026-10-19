@@ -25,8 +25,7 @@ Warning:
 """
 
 import enum as _enum
-import sys
-from typing import TypeVar
+from typing import Self, TypeVar
 
 _A = TypeVar("_A")
 _B = TypeVar("_B")
@@ -43,25 +42,26 @@ def get_member(enum_cls: type[_Enum], value: _A, default: _B) -> _Enum | _A | _B
         return default
 
 
-# Python 3.11 and above has a different output for mixin classes for IntEnum, StrEnum and IntFlag
-# see https://docs.python.org/3.11/library/enum.html#notes. We want e.g. str(StrEnumTest.FOO) to
-# return "foo" instead of "StrEnumTest.FOO", which is not the case < py3.11
-class StringEnum(str, _enum.Enum):
+class StringEnum(_enum.StrEnum):
     """Helper class for string enums where ``str(member)`` prints the value, but ``repr(member)``
     gives ``EnumName.MEMBER_NAME``.
     """
 
     __slots__ = ()
 
+    def __new__(cls, value: str | int) -> Self:
+        # Preserve coercion of numeric definitions used by existing constants.
+        member = str.__new__(cls, value)
+        member._value_ = str(value)
+        return member
+
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}.{self.name}>"
 
-    def __str__(self) -> str:
-        return str.__str__(self)
 
-
-# Apply the __repr__ modification and __str__ fix to IntEnum
-class IntEnum(_enum.IntEnum):  # pylint: disable=invalid-slots
+# Apply the __repr__ modification to IntEnum
+# Astroid on Python 3.14 infers empty slots as an enum member instead of a tuple.
+class IntEnum(_enum.IntEnum):  # pylint: disable=invalid-slots,useless-suppression
     """Helper class for int enums where ``str(member)`` prints the value, but ``repr(member)``
     gives ``EnumName.MEMBER_NAME``.
     """
@@ -70,11 +70,6 @@ class IntEnum(_enum.IntEnum):  # pylint: disable=invalid-slots
 
     def __repr__(self) -> str:
         return f"<{self.__class__.__name__}.{self.name}>"
-
-    if sys.version_info < (3, 11):
-
-        def __str__(self) -> str:
-            return str(self.value)
 
 
 class FloatEnum(float, _enum.Enum):

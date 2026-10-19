@@ -18,6 +18,8 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class which represents a Telegram ChatAdministratorRights."""
 
+from typing import Self
+
 from telegram._telegramobject import TelegramObject
 from telegram._utils.types import JSONDict
 
@@ -260,7 +262,7 @@ class ChatAdministratorRights(TelegramObject):
         self._freeze()
 
     @classmethod
-    def all_rights(cls) -> "ChatAdministratorRights":
+    def all_rights(cls) -> Self:
         """
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`True`. This is e.g. useful when changing the bot's default administrator rights with
@@ -271,7 +273,7 @@ class ChatAdministratorRights(TelegramObject):
         return cls(*(True,) * len(cls.__slots__))
 
     @classmethod
-    def no_rights(cls) -> "ChatAdministratorRights":
+    def no_rights(cls) -> Self:
         """
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`False`.

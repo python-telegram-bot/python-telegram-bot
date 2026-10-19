@@ -53,7 +53,7 @@ class ChatInviteLinkTestBase:
     creates_join_request = False
     primary = True
     revoked = False
-    expire_date = dtm.datetime.now(dtm.timezone.utc)
+    expire_date = dtm.datetime.now(dtm.UTC)
     member_limit = 42
     name = "LinkName"
     pending_join_request_count = 42

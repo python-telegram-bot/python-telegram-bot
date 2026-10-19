@@ -57,14 +57,14 @@ def external_reply_info():
 
 class ExternalReplyInfoTestBase:
     origin = MessageOriginUser(
-        dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0), User(1, "user", False)
+        dtm.datetime.now(dtm.UTC).replace(microsecond=0), User(1, "user", False)
     )
     chat = Chat(1, Chat.SUPERGROUP)
     message_id = 123
     link_preview_options = LinkPreviewOptions(True)
     giveaway = Giveaway(
         (Chat(1, Chat.CHANNEL), Chat(2, Chat.SUPERGROUP)),
-        dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0),
+        dtm.datetime.now(dtm.UTC).replace(microsecond=0),
         1,
     )
     paid_media = PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])
@@ -136,7 +136,9 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         a = external_reply_info
         b = ExternalReplyInfo(origin=self.origin)
         c = ExternalReplyInfo(
-            origin=MessageOriginUser(dtm.datetime.utcnow(), User(2, "user", False))
+            origin=MessageOriginUser(
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None), User(2, "user", False)
+            )
         )
 
         d = BotCommand("start", "description")

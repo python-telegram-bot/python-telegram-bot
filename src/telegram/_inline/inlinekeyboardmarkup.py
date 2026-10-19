@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram InlineKeyboardMarkup."""
 
 from collections.abc import Sequence
+from typing import Self
 
 from telegram._inline.inlinekeyboardbutton import InlineKeyboardButton
 from telegram._telegramobject import TelegramObject
@@ -88,7 +89,7 @@ class InlineKeyboardMarkup(TelegramObject):
         self._freeze()
 
     @classmethod
-    def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> "InlineKeyboardMarkup":
+    def from_button(cls, button: InlineKeyboardButton, **kwargs: object) -> Self:
         """Shortcut for::
 
             InlineKeyboardMarkup([[button]], **kwargs)
@@ -102,9 +103,7 @@ class InlineKeyboardMarkup(TelegramObject):
         return cls([[button]], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
-    def from_row(
-        cls, button_row: Sequence[InlineKeyboardButton], **kwargs: object
-    ) -> "InlineKeyboardMarkup":
+    def from_row(cls, button_row: Sequence[InlineKeyboardButton], **kwargs: object) -> Self:
         """Shortcut for::
 
             InlineKeyboardMarkup([button_row], **kwargs)
@@ -122,9 +121,7 @@ class InlineKeyboardMarkup(TelegramObject):
         return cls([button_row], **kwargs)  # type: ignore[arg-type]
 
     @classmethod
-    def from_column(
-        cls, button_column: Sequence[InlineKeyboardButton], **kwargs: object
-    ) -> "InlineKeyboardMarkup":
+    def from_column(cls, button_column: Sequence[InlineKeyboardButton], **kwargs: object) -> Self:
         """Shortcut for::
 
             InlineKeyboardMarkup([[button] for button in button_column], **kwargs)

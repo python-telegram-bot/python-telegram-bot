@@ -118,6 +118,11 @@ class TestConstantsWithoutRequest:
 
         assert hash(StrEnumTest.FOO) == hash("foo")
 
+    def test_numeric_string_enum_values(self):
+        assert constants.InputStoryContentLimit.PHOTOSIZE_UPLOAD.value == "10000000"
+        assert constants.InputStoryContentLimit.PHOTO_WIDTH.value == "1080"
+        assert str(constants.InputStoryContentLimit.MAX_VIDEO_DURATION) == "60"
+
     def test_int_inheritance(self):
         assert isinstance(IntEnumTest.FOO, int)
         assert IntEnumTest.FOO + IntEnumTest.BAR == 3

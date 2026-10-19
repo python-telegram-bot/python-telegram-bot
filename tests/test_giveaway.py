@@ -54,7 +54,7 @@ def giveaway():
 
 class TestGiveawayWithoutRequest:
     chats = [Chat(1, Chat.CHANNEL), Chat(2, Chat.SUPERGROUP)]
-    winners_selection_date = dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0)
+    winners_selection_date = dtm.datetime.now(dtm.UTC).replace(microsecond=0)
     winner_count = 42
     only_new_members = True
     has_public_winners = True
@@ -224,7 +224,7 @@ def giveaway_winners():
 class TestGiveawayWinnersWithoutRequest:
     chat = Chat(1, Chat.CHANNEL)
     giveaway_message_id = 123456789
-    winners_selection_date = dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0)
+    winners_selection_date = dtm.datetime.now(dtm.UTC).replace(microsecond=0)
     winner_count = 42
     winners = [User(1, "user1", False), User(2, "user2", False)]
     additional_chat_count = 2
@@ -376,7 +376,7 @@ class TestGiveawayCompletedWithoutRequest:
     is_star_giveaway = True
     giveaway_message = Message(
         message_id=1,
-        date=dtm.datetime.now(dtm.timezone.utc),
+        date=dtm.datetime.now(dtm.UTC),
         text="giveaway_message",
         chat=Chat(1, Chat.CHANNEL),
         from_user=User(1, "user1", False),

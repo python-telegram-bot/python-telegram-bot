@@ -28,7 +28,7 @@ The repository follows a standard structure for Python projects. Here are some k
 ### Things to keep in mind while coding:
 
 - Ensure that your code is properly and fully typed. All your code should be compatible from
-  Python 3.9 to 3.14. Don't use the `typing_extensions` module.
+  Python 3.11 to 3.15. Don't use the `typing_extensions` module.
 - Read the stability guide mentioned at docs/source/stability_policy.rst to understand if your changes
   are breaking or incompatible.
 - Try to make sure your code is asyncio-friendly and thread-safe.
