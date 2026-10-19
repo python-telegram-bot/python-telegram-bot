@@ -45,7 +45,7 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         video_file_id (:obj:`str`): A valid file identifier for the video file.
         title (:obj:`str`): Title for the result.
         description (:obj:`str`, optional): Short description of the result.
@@ -58,36 +58,12 @@ class InlineQueryResultCachedVideo(InlineQueryResult):
             to the message.
         input_message_content (:class:`telegram.InputMessageContent`, optional): Content of the
             message to be sent instead of the video.
-        show_caption_above_media (:obj:`bool`, optional): Pass |show_cap_above_med|
+        show_caption_above_media (:obj:`bool`, optional): |show_cap_above_med|
 
             .. versionadded:: 21.3
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.VIDEO`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        video_file_id (:obj:`str`): A valid file identifier for the video file.
-        title (:obj:`str`): Title for the result.
-        description (:obj:`str`): Optional. Short description of the result.
-        caption (:obj:`str`): Optional. Caption of the video to be sent,
-            0-:tg-const:`telegram.constants.MessageLimit.CAPTION_LENGTH` characters after
-            entities parsing.
-        parse_mode (:obj:`str`): Optional. |parse_mode|
-        caption_entities (tuple[:class:`telegram.MessageEntity`]): Optional. |captionentitiesattr|
-
-            .. versionchanged:: 20.0
-
-                * |tupleclassattrs|
-                * |alwaystuple|
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the video.
-        show_caption_above_media (:obj:`bool`): Optional. |show_cap_above_med|
-
-            .. versionadded:: 21.3
-
     """
 
     __slots__ = (

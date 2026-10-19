@@ -1,0 +1,5 @@
+documentation = """Removed six ``Args`` entries that named a parameter the callable does not accept: ``type`` on the four ``PaidMedia`` subclasses, ``file`` on ``decrypt``, and ``proxy`` on ``ApplicationBuilder.get_updates_proxy``."""
+[[pull_requests]]
+uid = "5326"
+author_uids = ["darkdi"]
+closes_threads = []

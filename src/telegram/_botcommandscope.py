@@ -52,9 +52,6 @@ class BotCommandScope(TelegramObject):
 
     Args:
         type (:obj:`str`): Scope type.
-
-    Attributes:
-        type (:obj:`str`): Scope type.
     """
 
     __slots__ = ("type",)
@@ -172,7 +169,6 @@ class BotCommandScopeChat(BotCommandScope):
 
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT`.
-        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     """
 
     __slots__ = ("chat_id",)
@@ -199,7 +195,6 @@ class BotCommandScopeChatAdministrators(BotCommandScope):
         chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT_ADMINISTRATORS`.
-        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
     """
 
     __slots__ = ("chat_id",)
@@ -228,8 +223,6 @@ class BotCommandScopeChatMember(BotCommandScope):
 
     Attributes:
         type (:obj:`str`): Scope type :tg-const:`telegram.BotCommandScope.CHAT_MEMBER`.
-        chat_id (:obj:`str` | :obj:`int`): |chat_id_group|
-        user_id (:obj:`int`): Unique identifier of the target user.
     """
 
     __slots__ = ("chat_id", "user_id")
