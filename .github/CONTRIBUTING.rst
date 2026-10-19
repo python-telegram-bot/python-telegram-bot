@@ -108,6 +108,13 @@ Here's how to make a one-off code change.
 
         $ git add your-file-changed.py
 
+   - If your PR comes from a fork, create the chango fragment manually before pushing
+     (the chango workflow cannot auto-commit to fork branches):
+
+     .. code-block:: bash
+
+        $ uv run chango new --slug pr-1234-fix-telegram-api-error
+
    - Finally, push it to your GitHub fork, run:
 
      .. code-block:: bash
