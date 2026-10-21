@@ -60,6 +60,7 @@ __all__ = (
     "HAS_PROTECTED_CONTENT",
     "INVOICE",
     "IS_AUTOMATIC_FORWARD",
+    "IS_BOT",
     "IS_FROM_OFFLINE",
     "IS_TOPIC_MESSAGE",
     "LIVE_PHOTO",
@@ -1590,6 +1591,21 @@ IS_AUTOMATIC_FORWARD = _IsAutomaticForward(name="filters.IS_AUTOMATIC_FORWARD")
 """Messages that contain :attr:`telegram.Message.is_automatic_forward`.
 
     .. versionadded:: 13.9
+"""
+
+
+class _IsBot(UpdateFilter):
+    __slots__ = ()
+
+    def filter(self, update: Update) -> bool:
+        user = update.effective_user
+        return bool(user and user.is_bot)
+
+
+IS_BOT = _IsBot(name="filters.IS_BOT")
+"""This filter filters *any* message from a :attr:`bot <telegram.User.is_bot>`.
+
+.. versionadded:: NEXT.VERSION
 """
 
 

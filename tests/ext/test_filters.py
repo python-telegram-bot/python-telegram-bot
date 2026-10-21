@@ -2167,6 +2167,29 @@ class TestFilters:
         update.message.is_automatic_forward = True
         assert filters.IS_AUTOMATIC_FORWARD.check_update(update)
 
+    @pytest.mark.parametrize(
+        "message_type",
+        [
+            "message",
+            "edited_message",
+            "channel_post",
+            "edited_channel_post",
+            "business_message",
+            "edited_business_message",
+            "guest_message",
+        ],
+    )
+    @pytest.mark.parametrize("is_bot", [True, False, None])
+    def test_filters_is_bot(self, update, message_type, is_bot):
+        if is_bot is None:
+            update.message.from_user = None
+        else:
+            update.message.from_user.is_bot = is_bot
+        message_update = Update(0, **{message_type: update.message})
+
+        assert filters.IS_BOT.check_update(message_update) is (is_bot is True)
+        assert (~filters.IS_BOT).check_update(message_update) is (is_bot is not True)
+
     def test_filters_is_from_offline(self, update):
         assert not filters.IS_FROM_OFFLINE.check_update(update)
         update.message.is_from_offline = True
