@@ -2887,6 +2887,18 @@ class TestFilters:
             ["@test3", 123, user_no_username, user_wrong_username]
         ).check_update(update)
 
+    def test_filters_mention_type_text_mention_users_without_username(self, update):
+        user_1 = User(111, "first_name", False)
+        user_2 = User(222, "first_name", False)
+
+        update.message.text = "test1"
+        update.message.entities = [MessageEntity(MessageEntity.TEXT_MENTION, 0, 5, user=user_1)]
+
+        assert filters.Mention(user_1).check_update(update)
+        assert filters.Mention(111).check_update(update)
+        assert not filters.Mention(user_2).check_update(update)
+        assert not filters.Mention(222).check_update(update)
+
     def test_filters_giveaway(self, update):
         assert not filters.GIVEAWAY.check_update(update)
 
