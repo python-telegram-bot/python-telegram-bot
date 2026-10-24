@@ -27,7 +27,6 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._uniquegift import UniqueGift
 from telegram._user import User
-from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.entities import parse_message_entities, parse_message_entity
@@ -66,11 +65,7 @@ class OwnedGift(TelegramObject):
         },
     )
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.OwnedGiftType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.OwnedGiftType)
 
 
 @tg_dataclass()

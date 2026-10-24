@@ -24,7 +24,6 @@ from typing import ClassVar
 from telegram import constants
 from telegram._files.inputfile import InputFile
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.files import parse_file_input
@@ -53,16 +52,12 @@ class InputStoryContent(TelegramObject):
     """:const:`telegram.constants.InputStoryContentType.VIDEO`"""
 
     @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.InputStoryContentType, value, value)
-
-    @staticmethod
     def _parse_file_input(file_input: FileInput) -> str | InputFile:
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
         return parse_file_input(file_input, attach=True, local_mode=True)
 
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.InputStoryContentType)
 
 
 @tg_dataclass()

@@ -25,7 +25,6 @@ from telegram import constants
 from telegram._message import Message
 from telegram._payment.stars.staramount import StarAmount
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -159,12 +158,8 @@ class SuggestedPostInfo(TelegramObject):
     DECLINED: ClassVar[str] = constants.SuggestedPostInfoState.DECLINED
     """:const:`telegram.constants.SuggestedPostInfoState.DECLINED`"""
 
-    @staticmethod
-    def _state_converter(value: str) -> str:
-        return enum.get_member(constants.SuggestedPostInfoState, value, value)
-
     # Required
-    state: str = tg_field(compare=True, converter=_state_converter)
+    state: str = tg_field(compare=True, enum=constants.SuggestedPostInfoState)
     # Optional
     price: SuggestedPostPrice | None = tg_field(compare=True, default=None)
     send_date: dtm.datetime | None = tg_field(default=None)

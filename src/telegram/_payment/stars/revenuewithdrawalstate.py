@@ -23,7 +23,6 @@ from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -64,11 +63,7 @@ class RevenueWithdrawalState(TelegramObject):
     FAILED: ClassVar[str] = constants.RevenueWithdrawalStateType.FAILED
     """:const:`telegram.constants.RevenueWithdrawalStateType.FAILED`"""
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.RevenueWithdrawalStateType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.RevenueWithdrawalStateType)
 
 
 @tg_dataclass()

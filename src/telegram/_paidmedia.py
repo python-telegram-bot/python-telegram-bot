@@ -25,7 +25,6 @@ from telegram import constants
 from telegram._files.livephoto import LivePhoto
 from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import (
     parse_sequence_arg,
     to_timedelta,
@@ -77,11 +76,7 @@ class PaidMedia(TelegramObject):
     LIVE_PHOTO: ClassVar[str] = constants.PaidMediaType.LIVE_PHOTO
     """:const:`telegram.constants.PaidMediaType.LIVE_PHOTO`"""
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.PaidMediaType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.PaidMediaType)
 
 
 @tg_dataclass()

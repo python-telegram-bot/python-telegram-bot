@@ -25,7 +25,6 @@ from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
@@ -93,11 +92,7 @@ class ChatBoostSource(TelegramObject):
     GIVEAWAY: ClassVar[str] = constants.ChatBoostSources.GIVEAWAY
     """:const:`telegram.constants.ChatBoostSources.GIVEAWAY`"""
 
-    @staticmethod
-    def _source_converter(value: str) -> str:
-        return enum.get_member(constants.ChatBoostSources, value, value)
-
-    source: str = tg_field(compare=True, converter=_source_converter)
+    source: str = tg_field(compare=True, enum=constants.ChatBoostSources)
 
 
 @tg_dataclass()

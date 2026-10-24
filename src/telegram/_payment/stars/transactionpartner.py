@@ -25,7 +25,6 @@ from telegram._chat import Chat
 from telegram._gifts import Gift
 from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import (
     parse_sequence_arg,
     to_timedelta,
@@ -104,11 +103,7 @@ class TransactionPartner(TelegramObject):
     USER: ClassVar[str] = constants.TransactionPartnerType.USER
     """:const:`telegram.constants.TransactionPartnerType.USER`"""
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.TransactionPartnerType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.TransactionPartnerType)
 
 
 @tg_dataclass()

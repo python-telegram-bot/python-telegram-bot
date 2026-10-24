@@ -25,7 +25,6 @@ from telegram import constants
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -78,12 +77,8 @@ class MessageOrigin(TelegramObject):
     CHANNEL: ClassVar[str] = constants.MessageOriginType.CHANNEL
     """:const:`telegram.constants.MessageOriginType.CHANNEL`"""
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.MessageOriginType, value, value)
-
     # Required by all subclasses
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.MessageOriginType)
     date: dtm.datetime = tg_field(compare=True)
 
 

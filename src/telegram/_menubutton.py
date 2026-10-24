@@ -22,7 +22,6 @@ from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._webappinfo import WebAppInfo
 
@@ -61,11 +60,7 @@ class MenuButton(TelegramObject):
         },
     )
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.MenuButtonType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.MenuButtonType)
 
     COMMANDS: ClassVar[str] = constants.MenuButtonType.COMMANDS
     """:const:`telegram.constants.MenuButtonType.COMMANDS`"""

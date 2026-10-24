@@ -23,7 +23,6 @@ from typing import ClassVar
 from telegram import constants
 from telegram._files.document import Document
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
@@ -70,11 +69,7 @@ class BackgroundFill(TelegramObject):
     )
     """:const:`telegram.constants.BackgroundFillType.FREEFORM_GRADIENT`"""
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.BackgroundFillType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.BackgroundFillType)
 
 
 @tg_dataclass()
@@ -213,11 +208,7 @@ class BackgroundType(TelegramObject):
     CHAT_THEME: ClassVar[constants.BackgroundTypeType] = constants.BackgroundTypeType.CHAT_THEME
     """:const:`telegram.constants.BackgroundTypeType.CHAT_THEME`"""
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.BackgroundTypeType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.BackgroundTypeType)
 
 
 @tg_dataclass()

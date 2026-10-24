@@ -30,7 +30,6 @@ from telegram._forumtopic import ForumTopic
 from telegram._menubutton import MenuButton
 from telegram._reaction import ReactionType
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import (
@@ -93,12 +92,8 @@ class _ChatBase(TelegramObject):
     .. versionadded:: 21.3
     """
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.ChatType, value, value)
-
     id: int = tg_field(compare=True)
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.ChatType)
 
     if TYPE_CHECKING:
         # These fields are shared and should be be declared by each inheriting class.

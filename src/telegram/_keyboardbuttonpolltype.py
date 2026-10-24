@@ -19,7 +19,6 @@
 """This module contains an object that represents a type of a Telegram Poll."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.constants import PollType
 
@@ -47,8 +46,4 @@ class KeyboardButtonPollType(TelegramObject):
             Otherwise, the user will be allowed to create a poll of any type.
     """
 
-    @staticmethod
-    def _type_converter(value: str | None) -> str | None:
-        return enum.get_member(PollType, value, value)
-
-    type: str | None = tg_field(compare=True, default=None, converter=_type_converter)
+    type: str | None = tg_field(compare=True, default=None, enum=PollType)

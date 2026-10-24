@@ -23,7 +23,6 @@ from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.files import parse_file_input
@@ -56,10 +55,6 @@ class InputProfilePhoto(TelegramObject):
     """:obj:`str`: :tg-const:`telegram.constants.InputProfilePhotoType.ANIMATED`."""
 
     @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.InputProfilePhotoType, value, value)
-
-    @staticmethod
     def _parse_file_input(value: FileInput) -> "str | InputFile":
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
@@ -69,7 +64,7 @@ class InputProfilePhoto(TelegramObject):
             attach=True,
         )
 
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.InputProfilePhotoType)
 
 
 @tg_dataclass()

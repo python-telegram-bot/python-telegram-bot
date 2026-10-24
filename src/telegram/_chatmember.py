@@ -24,7 +24,6 @@ from typing import ClassVar
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -96,13 +95,9 @@ class ChatMember(TelegramObject):
     RESTRICTED: ClassVar[str] = constants.ChatMemberStatus.RESTRICTED
     """:const:`telegram.constants.ChatMemberStatus.RESTRICTED`"""
 
-    @staticmethod
-    def _status_converter(value: str) -> str:
-        return enum.get_member(constants.ChatMemberStatus, value, value)
-
     # Required by all subclasses
     user: User = tg_field(compare=True)
-    status: str = tg_field(compare=True, converter=_status_converter)
+    status: str = tg_field(compare=True, enum=constants.ChatMemberStatus)
 
 
 @tg_dataclass()

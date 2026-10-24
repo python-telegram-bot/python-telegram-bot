@@ -23,7 +23,6 @@ from typing import ClassVar
 from telegram import constants
 from telegram._reaction import ReactionType
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -140,11 +139,7 @@ class StoryAreaType(TelegramObject):
     UNIQUE_GIFT: ClassVar[str] = constants.StoryAreaTypeType.UNIQUE_GIFT
     """:const:`telegram.constants.StoryAreaTypeType.UNIQUE_GIFT`"""
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.StoryAreaTypeType, value, value)
-
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.StoryAreaTypeType)
 
 
 @tg_dataclass()

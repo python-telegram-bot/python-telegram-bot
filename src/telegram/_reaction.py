@@ -18,11 +18,10 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains objects that represents a Telegram ReactionType."""
 
-from typing import ClassVar, Literal
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -67,14 +66,8 @@ class ReactionType(TelegramObject):
     .. versionadded:: 21.5
     """
 
-    @staticmethod
-    def _type_converter(
-        value: Literal["emoji", "custom_emoji", "paid"] | constants.ReactionType,
-    ) -> str:
-        return enum.get_member(constants.ReactionType, value, value)
-
     # Required by all subclasses
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.ReactionType)
 
 
 @tg_dataclass()

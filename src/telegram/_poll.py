@@ -35,7 +35,6 @@ from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils import enum
 from telegram._utils.argumentparsing import (
     parse_sequence_arg,
     to_timedelta,
@@ -704,10 +703,6 @@ class Poll(TelegramObject):
 
     """
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.PollType, value, value)
-
     # Required
     id: str = tg_field(compare=True)
     question: str = tg_field()
@@ -715,7 +710,7 @@ class Poll(TelegramObject):
     total_voter_count: int = tg_field()
     is_closed: bool = tg_field()
     is_anonymous: bool = tg_field()
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.PollType)
     allows_multiple_answers: bool = tg_field()
     allows_revoting: bool = tg_field()
     members_only: bool = tg_field()

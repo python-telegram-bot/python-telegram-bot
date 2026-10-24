@@ -22,7 +22,6 @@ from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -87,14 +86,10 @@ class BotCommandScope(TelegramObject):
     """:const:`telegram.constants.BotCommandScopeType.CHAT_MEMBER`"""
 
     @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.BotCommandScopeType, value, value)
-
-    @staticmethod
     def _chat_id_converter(value: str | int) -> str | int:
         return value if isinstance(value, str) and value.startswith("@") else int(value)
 
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.BotCommandScopeType)
 
 
 @tg_dataclass()

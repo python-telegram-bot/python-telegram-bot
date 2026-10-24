@@ -27,7 +27,6 @@ from typing import ClassVar
 from telegram import constants
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.strings import TextEncoding
 
@@ -136,12 +135,8 @@ class MessageEntity(TelegramObject):
 
     """
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.MessageEntityType, value, value)
-
     # Required
-    type: str = tg_field(compare=True, converter=_type_converter)
+    type: str = tg_field(compare=True, enum=constants.MessageEntityType)
     offset: int = tg_field(compare=True)
     length: int = tg_field(compare=True)
     # Optionals

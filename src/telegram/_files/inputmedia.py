@@ -35,7 +35,6 @@ from telegram._files.sticker import Sticker
 from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
@@ -90,11 +89,7 @@ class _BaseInputMedia(TelegramObject):
         type (:obj:`str`): Type of media that the instance represents.
     """
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.BaseInputMediaType, value, value)
-
-    type: str = tg_field(converter=_type_converter, alias="media_type")
+    type: str = tg_field(enum=constants.BaseInputMediaType, alias="media_type")
 
 
 @dataclasses.dataclass(frozen=True, slots=False, repr=False, eq=False, match_args=False)
@@ -212,11 +207,7 @@ class InputPaidMedia(TelegramObject):
     .. versionadded:: 22.8
     """
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.InputPaidMediaType, value, value)
-
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.InputPaidMediaType)
     media: str | InputFile = tg_field()
 
 

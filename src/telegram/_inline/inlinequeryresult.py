@@ -22,7 +22,6 @@ from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -54,12 +53,8 @@ class InlineQueryResult(TelegramObject):
 
     """
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.InlineQueryResultType, value, value)
-
     # Required
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.InlineQueryResultType)
     id: str = tg_field(compare=True)
 
     MIN_ID_LENGTH: ClassVar[int] = constants.InlineQueryResultLimit.MIN_ID_LENGTH

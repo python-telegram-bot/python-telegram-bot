@@ -29,17 +29,21 @@ import functools
 import inspect
 from collections.abc import Callable, Sequence
 from dataclasses import MISSING, dataclass, field, is_dataclass
+from enum import Enum
 from typing import Any, TypeVar, get_args, get_origin
 
 from typing_extensions import dataclass_transform
 
+from telegram._utils import enum as _enum
 from telegram._utils.de_json import unwrap_optional
 
 _T = TypeVar("_T")
 CONVERTER_KEY = object()
-"""Special marker indicating that an entry was deleted."""
+"""Special marker for storing the `converter` function."""
 ALIAS_KEY = object()
-"""Special marker indicating that an entry was deleted."""
+"""Special marker for storing the field's alias (i.e. its desired `__init__` name)."""
+ENUM_KEY = object()
+"""Special marker indicating whether or not this field gets converted to an enum member."""
 
 
 def to_sequence_annotation(annotation: object) -> object:
@@ -128,9 +132,14 @@ def process_init(cls: type[_T]) -> type[_T]:
 
         alias = dataclass_field.metadata.get(ALIAS_KEY)
         converter = dataclass_field.metadata.get(CONVERTER_KEY)
+        is_enum_field = dataclass_field.metadata.get(ENUM_KEY, False)
         annotation = param.annotation
 
-        if converter is not None:
+        if is_enum_field:
+            # while enum fields still have a converter, we skip overwriting the annotation
+            # because the existing field annotation already is the right input type
+            pass
+        elif converter is not None:
             field_annotation = unwrap_optional(param.annotation)
 
             if get_origin(field_annotation) is tuple:
@@ -169,11 +178,23 @@ def tg_field(
     kw_only: Any = MISSING,
     converter: Callable[[Any], Any] | None = None,
     alias: str | None = None,
+    enum: type[Enum] | None = None,
 ) -> Any:
+    if enum is not None and converter is not None:
+        raise ValueError("`enum` and `converter` are mutually exclusive!")
+
     field_metadata: dict[Any, Any] = {}
 
     if converter is not None:
         field_metadata[CONVERTER_KEY] = converter
+
+    if enum is not None:
+        field_metadata[ENUM_KEY] = True
+        enum_converter = functools.partial(_enum.get_member, enum)
+
+        # Defining and setting `enum_converter` here as opposed to coming from :param:`converter`
+        # deliberately hides the converter from type checkers, see more in `process_init`
+        field_metadata[CONVERTER_KEY] = enum_converter
 
     if alias is not None:
         field_metadata[ALIAS_KEY] = alias

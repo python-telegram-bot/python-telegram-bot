@@ -26,7 +26,6 @@ from telegram import constants
 from telegram._chat import Chat
 from telegram._files.sticker import Sticker
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
@@ -110,16 +109,12 @@ class UniqueGiftModel(TelegramObject):
             .. versionadded:: 22.7
     """
 
-    @staticmethod
-    def _rarity_converter(value: str | None) -> str | None:
-        return enum.get_member(constants.UniqueGiftModelRarity, value, value)
-
     # Required
     name: str = tg_field(compare=True)
     sticker: Sticker = tg_field(compare=True)
     rarity_per_mille: int = tg_field(compare=True)
     # Optional
-    rarity: str | None = tg_field(default=None, converter=_rarity_converter)
+    rarity: str | None = tg_field(default=None, enum=constants.UniqueGiftModelRarity)
 
 
 @tg_dataclass()
@@ -403,13 +398,9 @@ class UniqueGiftInfo(TelegramObject):
     UPGRADE: ClassVar[str] = constants.UniqueGiftInfoOrigin.UPGRADE
     """:const:`telegram.constants.UniqueGiftInfoOrigin.UPGRADE`"""
 
-    @staticmethod
-    def _origin_converter(value: str) -> str:
-        return enum.get_member(constants.UniqueGiftInfoOrigin, value, value)
-
     # Required
     gift: UniqueGift = tg_field(compare=True)
-    origin: str = tg_field(compare=True, converter=_origin_converter)
+    origin: str = tg_field(compare=True, enum=constants.UniqueGiftInfoOrigin)
     # Optional
     owned_gift_id: str | None = tg_field(default=None)
     transfer_star_count: int | None = tg_field(default=None)

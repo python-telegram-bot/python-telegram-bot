@@ -24,7 +24,6 @@ from telegram import constants
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
-from telegram._utils import enum
 from telegram._utils.argumentparsing import parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
@@ -136,16 +135,12 @@ class Sticker(_BaseMedium):
         }
     )
 
-    @staticmethod
-    def _type_converter(value: str) -> str:
-        return enum.get_member(constants.StickerType, value, value)
-
     # Required
     width: int = tg_field()
     height: int = tg_field()
     is_animated: bool = tg_field()
     is_video: bool = tg_field()
-    type: str = tg_field(converter=_type_converter)
+    type: str = tg_field(enum=constants.StickerType)
     # Optional
     emoji: str | None = tg_field(default=None)
     file_size: int | None = tg_field(default=None)
