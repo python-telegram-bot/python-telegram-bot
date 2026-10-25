@@ -190,9 +190,9 @@ class MaybeInaccessibleMessage(TelegramObject):
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
-        object.__setattr__(self, "chat", chat)
-        object.__setattr__(self, "message_id", message_id)
-        object.__setattr__(self, "date", date)
+        self._set("chat", chat)
+        self._set("message_id", message_id)
+        self._set("date", date)
         TelegramObject.__init__(self, api_kwargs=api_kwargs)
 
     @property
@@ -1441,7 +1441,7 @@ class Message(MaybeInaccessibleMessage):
 
         for attachment_type in MessageAttachmentType:
             if self[attachment_type]:
-                object.__setattr__(self, "_effective_attachment", self[attachment_type])
+                self._set("_effective_attachment", self[attachment_type])
                 if attachment_type == MessageAttachmentType.SUCCESSFUL_PAYMENT:
                     warn(
                         PTBDeprecationWarning(
@@ -1453,7 +1453,7 @@ class Message(MaybeInaccessibleMessage):
                     )
                 break
         else:
-            object.__setattr__(self, "_effective_attachment", None)
+            self._set("_effective_attachment", None)
 
         return self._effective_attachment  # type: ignore[return-value]
 
@@ -1551,8 +1551,8 @@ class Message(MaybeInaccessibleMessage):
 
                 # create a new entity with the correct offset and length
                 new_entity = copy.copy(entity)
-                object.__setattr__(new_entity, "offset", offset)
-                object.__setattr__(new_entity, "length", e_length)
+                new_entity._set("offset", offset)
+                new_entity._set("length", e_length)
                 entities.append(new_entity)
 
         return position, tuple(entities) or None

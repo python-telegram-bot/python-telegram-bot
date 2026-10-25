@@ -264,9 +264,9 @@ class ExtBot(Bot, Generic[RLARGS]):
             private_key_password=private_key_password,
             local_mode=local_mode,
         )
-        object.__setattr__(self, "_defaults", defaults)
-        object.__setattr__(self, "_rate_limiter", rate_limiter)
-        object.__setattr__(self, "_callback_data_cache", None)
+        self._set("_defaults", defaults)
+        self._set("_rate_limiter", rate_limiter)
+        self._set("_callback_data_cache", None)
 
         # set up callback_data
         if arbitrary_callback_data is False:
@@ -277,9 +277,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         else:
             maxsize = 1024
 
-        object.__setattr__(
-            self, "_callback_data_cache", CallbackDataCache(bot=self, maxsize=maxsize)
-        )
+        self._set("_callback_data_cache", CallbackDataCache(bot=self, maxsize=maxsize))
 
     def __repr__(self) -> str:
         """Give a string representation of the bot in the form ``ExtBot[token=...]``.
@@ -483,7 +481,7 @@ class ExtBot(Bot, Generic[RLARGS]):
             elif isinstance(val, InputMedia) and val.parse_mode is DEFAULT_NONE:
                 # Copy object as not to edit it in-place
                 copied_val = copy(val)
-                object.__setattr__(copied_val, "parse_mode", self.defaults.parse_mode)
+                copied_val._set("parse_mode", self.defaults.parse_mode)
                 data[key] = copied_val
             elif (
                 key == "media"
@@ -494,7 +492,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 copy_list = [copy(media) for media in val]
                 for media in copy_list:
                     if media.parse_mode is DEFAULT_NONE:
-                        object.__setattr__(media, "parse_mode", self.defaults.parse_mode)
+                        media._set("parse_mode", self.defaults.parse_mode)
 
                 data[key] = copy_list
 
@@ -509,8 +507,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 or self.defaults.quote_parse_mode is not None
             ):
                 new_value = copy(val)
-                object.__setattr__(
-                    new_value,
+                new_value._set(
                     "allow_sending_without_reply",
                     (
                         defaults_aswr
@@ -518,8 +515,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                         else val.allow_sending_without_reply
                     ),
                 )
-                object.__setattr__(
-                    new_value,
+                new_value._set(
                     "quote_parse_mode",
                     (
                         self.defaults.quote_parse_mode
@@ -542,9 +538,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                         new_val.append(option)
                     else:
                         new_option = copy(option)
-                        object.__setattr__(
-                            new_option, "text_parse_mode", self.defaults.text_parse_mode
-                        )
+                        new_option._set("text_parse_mode", self.defaults.text_parse_mode)
                         new_val.append(new_option)
                 data[key] = new_val
 
@@ -737,7 +731,7 @@ class ExtBot(Bot, Generic[RLARGS]):
                 # different places
                 new_result = copy(result)
                 markup = self._replace_keyboard(result.reply_markup)
-                object.__setattr__(new_result, "reply_markup", markup)
+                new_result._set("reply_markup", markup)
 
                 results.append(new_result)
 
@@ -758,7 +752,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         if hasattr(res, "parse_mode") and res.parse_mode is DEFAULT_NONE:
             res = copy(res)
             copied = True
-            object.__setattr__(res, "parse_mode", self.defaults.parse_mode)
+            res._set("parse_mode", self.defaults.parse_mode)
         if hasattr(res, "input_message_content") and res.input_message_content:
             if (
                 hasattr(res.input_message_content, "parse_mode")
@@ -767,22 +761,17 @@ class ExtBot(Bot, Generic[RLARGS]):
                 if not copied:
                     res = copy(res)
                     copied = True
-                object.__setattr__(
-                    res.input_message_content, "parse_mode", self.defaults.parse_mode
-                )
+                res.input_message_content._set("parse_mode", self.defaults.parse_mode)
             if hasattr(res.input_message_content, "link_preview_options"):
                 if not copied:
                     res = copy(res)
                 if res.input_message_content.link_preview_options is DEFAULT_NONE:
-                    object.__setattr__(
-                        res.input_message_content,
-                        "link_preview_options",
-                        self.defaults.link_preview_options,
+                    res.input_message_content._set(
+                        "link_preview_options", self.defaults.link_preview_options
                     )
                 else:
                     # merge the existing options with the defaults
-                    object.__setattr__(
-                        res.input_message_content,
+                    res.input_message_content._set(
                         "link_preview_options",
                         self._merge_lpo_defaults(res.input_message_content.link_preview_options),
                     )

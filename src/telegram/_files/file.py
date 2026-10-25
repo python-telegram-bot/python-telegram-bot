@@ -348,4 +348,4 @@ class File(TelegramObject):
         Args:
             credentials (:class:`telegram.FileCredentials`): The credentials.
         """
-        object.__setattr__(self, "_credentials", credentials)
+        self._set("_credentials", credentials)

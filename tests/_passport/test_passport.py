@@ -447,9 +447,7 @@ class TestPassportWithoutRequest(PassportTestBase):
         )
         assert new.api_kwargs == {}
 
-        object.__setattr__(
-            new.credentials, "_decrypted_data", Credentials.de_json(credentials, offline_bot)
-        )
+        new.credentials._set("_decrypted_data", Credentials.de_json(credentials, offline_bot))
         assert new.credentials.api_kwargs == {}
 
         assert isinstance(new, PassportData)

@@ -2009,9 +2009,7 @@ class TestBotWithoutRequest:
             reply_markup=offline_bot.callback_data_cache.process_keyboard(reply_markup),
         )
         # We do to_dict -> de_json to make sure those aren't the same objects
-        object.__setattr__(
-            message, "pinned_message", Message.de_json(message.to_dict(), offline_bot)
-        )
+        message._set("pinned_message", Message.de_json(message.to_dict(), offline_bot))
 
         async def post(*args, **kwargs):
             update = Update(

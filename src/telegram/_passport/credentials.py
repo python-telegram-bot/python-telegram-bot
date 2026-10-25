@@ -165,7 +165,7 @@ class EncryptedCredentials(TelegramObject):
                     OAEP(mgf=MGF1(algorithm=SHA1()), algorithm=SHA1(), label=None),  # skipcq
                 )
 
-                object.__setattr__(self, "_decrypted_secret", secret)
+                self._set("_decrypted_secret", secret)
             except ValueError as exception:
                 # If decryption fails raise exception
                 raise PassportDecryptionError(exception) from exception
@@ -188,7 +188,7 @@ class EncryptedCredentials(TelegramObject):
                 decrypt_json(self.decrypted_secret, b64decode(self.hash), b64decode(self.data)),
                 self.get_bot(),
             )
-            object.__setattr__(self, "_decrypted_data", data)
+            self._set("_decrypted_data", data)
         return data
 
 
@@ -348,8 +348,8 @@ class _CredentialsBase(TelegramObject):
 
     def __post_init__(self) -> None:
         # Aliases just to be sure
-        object.__setattr__(self, "data_hash", self.hash)
-        object.__setattr__(self, "file_hash", self.hash)
+        self._set("data_hash", self.hash)
+        self._set("file_hash", self.hash)
         TelegramObject.__post_init__(self)
 
 

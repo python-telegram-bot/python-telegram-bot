@@ -320,7 +320,7 @@ def unfrozen(obj):
     def set_attribute(instance, name, value):
         # Identity check is needed so that only that only `obj` is affected
         if instance is obj:
-            object.__setattr__(instance, name, value)
+            instance._set(name, value)
         else:
             original_setattr(instance, name, value)
 

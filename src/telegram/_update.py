@@ -533,7 +533,7 @@ class Update(TelegramObject):
         elif self.managed_bot:
             user = self.managed_bot.user
 
-        object.__setattr__(self, "_effective_user", user)
+        self._set("_effective_user", user)
         return user
 
     @property
@@ -595,7 +595,7 @@ class Update(TelegramObject):
         if sender is None:
             sender = self.effective_user
 
-        object.__setattr__(self, "_effective_sender", sender)
+        self._set("_effective_sender", sender)
         return sender
 
     @property
@@ -662,7 +662,7 @@ class Update(TelegramObject):
         elif self.message_reaction_count:
             chat = self.message_reaction_count.chat
 
-        object.__setattr__(self, "_effective_chat", chat)
+        self._set("_effective_chat", chat)
         return chat
 
     @property
@@ -732,5 +732,5 @@ class Update(TelegramObject):
         elif self.guest_message:
             message = self.guest_message
 
-        object.__setattr__(self, "_effective_message", message)
+        self._set("_effective_message", message)
         return message

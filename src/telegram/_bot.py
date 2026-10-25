@@ -336,18 +336,18 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         super(Bot, self).__init__(api_kwargs=None)
         if not token:
             raise InvalidToken("You must pass the token you received from https://t.me/Botfather!")
-        object.__setattr__(self, "_token", token)
+        self._set("_token", token)
 
-        object.__setattr__(self, "_base_url", _parse_base_url(base_url, self._token))
-        object.__setattr__(self, "_base_file_url", _parse_base_url(base_file_url, self._token))
+        self._set("_base_url", _parse_base_url(base_url, self._token))
+        self._set("_base_file_url", _parse_base_url(base_file_url, self._token))
         self._LOGGER.debug("Set Bot API URL: %s", self._base_url)
         self._LOGGER.debug("Set Bot API File URL: %s", self._base_file_url)
 
-        object.__setattr__(self, "_local_mode", local_mode)
-        object.__setattr__(self, "_bot_user", None)
-        object.__setattr__(self, "_private_key", None)
-        object.__setattr__(self, "_requests_initialized", False)
-        object.__setattr__(self, "_bot_initialized", False)
+        self._set("_local_mode", local_mode)
+        self._set("_bot_user", None)
+        self._set("_private_key", None)
+        self._set("_requests_initialized", False)
+        self._set("_bot_initialized", False)
 
         _request: tuple[BaseRequest, BaseRequest] = (
             (
@@ -357,7 +357,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             ),
             HTTPXRequest() if request is None else request,
         )
-        object.__setattr__(self, "_request", _request)
+        self._set("_request", _request)
 
         # this section is about issuing a warning when using HTTP/2 and connect to a self-hosted
         # bot api instance, which currently only supports HTTP/1.1. Checking if a custom base url
@@ -400,7 +400,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             _private_key = serialization.load_pem_private_key(
                 private_key, password=private_key_password, backend=default_backend()
             )
-            object.__setattr__(self, "_private_key", _private_key)
+            self._set("_private_key", _private_key)
 
     async def __aenter__(self: BT) -> BT:
         """
@@ -666,7 +666,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             if isinstance(val, InputMedia):
                 # Copy object as not to edit it in-place
                 new = copy.copy(val)
-                object.__setattr__(new, "parse_mode", DefaultValue.get_value(new.parse_mode))
+                new._set("parse_mode", DefaultValue.get_value(new.parse_mode))
                 data[key] = new
             elif (
                 key == "media"
@@ -676,9 +676,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
                 # Copy objects as not to edit them in-place
                 copy_list = [copy.copy(media) for media in val]
                 for media in copy_list:
-                    object.__setattr__(
-                        media, "parse_mode", DefaultValue.get_value(media.parse_mode)
-                    )
+                    media._set("parse_mode", DefaultValue.get_value(media.parse_mode))
                 data[key] = copy_list
             # 2)
             else:
@@ -857,14 +855,14 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         # Initialize request objects if not already done
         if not self._requests_initialized:
             await asyncio.gather(self._request[0].initialize(), self._request[1].initialize())
-            object.__setattr__(self, "_requests_initialized", True)
+            self._set("_requests_initialized", True)
 
         # Initialize bot user
         # Since the bot is to be initialized only once, we can also use it for
         # verifying the token passed and raising an exception if it's invalid.
         try:
             await self.get_me()
-            object.__setattr__(self, "_bot_initialized", True)
+            self._set("_bot_initialized", True)
         except InvalidToken as exc:
             raise InvalidToken(f"The token `{self._token}` was rejected by the server.") from exc
 
@@ -881,8 +879,8 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             return
 
         await asyncio.gather(self._request[0].shutdown(), self._request[1].shutdown())
-        object.__setattr__(self, "_requests_initialized", False)
-        object.__setattr__(self, "_bot_initialized", False)
+        self._set("_requests_initialized", False)
+        self._set("_bot_initialized", False)
 
     async def do_api_request(
         self,
@@ -1012,7 +1010,7 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             api_kwargs=api_kwargs,
         )
         _bot_user = User.de_json(result, self)
-        object.__setattr__(self, "_bot_user", _bot_user)
+        self._set("_bot_user", _bot_user)
         return _bot_user
 
     async def send_message(
@@ -2939,12 +2937,10 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
             # Copy first item (to avoid mutation of original object), apply group caption to it.
             # This will lead to the group being shown with this caption.
             item_to_get_caption = copy.copy(media[0])
-            object.__setattr__(item_to_get_caption, "caption", caption)
+            item_to_get_caption._set("caption", caption)
             if parse_mode is not DEFAULT_NONE:
-                object.__setattr__(item_to_get_caption, "parse_mode", parse_mode)
-            object.__setattr__(
-                item_to_get_caption, "caption_entities", parse_sequence_arg(caption_entities)
-            )
+                item_to_get_caption._set("parse_mode", parse_mode)
+            item_to_get_caption._set("caption_entities", parse_sequence_arg(caption_entities))
 
             # copy the list (just the references) to avoid mutating the original list
             media = list(media)
@@ -3846,30 +3842,23 @@ class Bot(TelegramObject, contextlib.AbstractAsyncContextManager["Bot"]):
         if hasattr(res, "parse_mode"):
             res = copy.copy(res)
             copied = True
-            object.__setattr__(res, "parse_mode", DefaultValue.get_value(res.parse_mode))
+            res._set("parse_mode", DefaultValue.get_value(res.parse_mode))
         if hasattr(res, "input_message_content") and res.input_message_content:
             if hasattr(res.input_message_content, "parse_mode"):
                 if not copied:
                     res = copy.copy(res)
                     copied = True
 
-                object.__setattr__(
-                    res, "input_message_content", copy.copy(res.input_message_content)
-                )
-                object.__setattr__(
-                    res.input_message_content,
-                    "parse_mode",
-                    DefaultValue.get_value(res.input_message_content.parse_mode),
+                res._set("input_message_content", copy.copy(res.input_message_content))
+                res.input_message_content._set(
+                    "parse_mode", DefaultValue.get_value(res.input_message_content.parse_mode)
                 )
             if hasattr(res.input_message_content, "link_preview_options"):
                 if not copied:
                     res = copy.copy(res)
 
-                object.__setattr__(
-                    res, "input_message_content", copy.copy(res.input_message_content)
-                )
-                object.__setattr__(
-                    res.input_message_content,
+                res._set("input_message_content", copy.copy(res.input_message_content))
+                res.input_message_content._set(
                     "link_preview_options",
                     DefaultValue.get_value(res.input_message_content.link_preview_options),
                 )

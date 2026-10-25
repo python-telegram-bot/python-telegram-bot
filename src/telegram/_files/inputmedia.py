@@ -165,13 +165,13 @@ class InputMedia(_BaseInputMedia):
         super().__init__(media_type=media_type, api_kwargs=api_kwargs)
 
         self.media: str | InputFile
-        object.__setattr__(self, "media", media)
+        self._set("media", media)
         self.caption: str | None
-        object.__setattr__(self, "caption", caption)
+        self._set("caption", caption)
         self.caption_entities: tuple[MessageEntity, ...]
-        object.__setattr__(self, "caption_entities", parse_sequence_arg(caption_entities))
+        self._set("caption_entities", parse_sequence_arg(caption_entities))
         self.parse_mode: ODVInput[str]
-        object.__setattr__(self, "parse_mode", parse_mode)
+        self._set("parse_mode", parse_mode)
 
 
 @tg_dataclass()
@@ -317,15 +317,11 @@ class InputPaidMediaVideo(InputPaidMedia):
 
         if isinstance(media, Video):
             if self.width is None:
-                object.__setattr__(self, "width", media.width)
+                self._set("width", media.width)
             if self.height is None:
-                object.__setattr__(self, "height", media.height)
+                self._set("height", media.height)
             if self._duration is None:
-                object.__setattr__(
-                    self,
-                    "_duration",
-                    media._duration,  # pylint: disable=protected-access
-                )
+                self._set("_duration", media._duration)  # pylint: disable=protected-access
 
         InputPaidMedia.__post_init__(self)
 
@@ -515,22 +511,17 @@ class InputMediaAnimation(InputMedia):
 
         if isinstance(media, Animation):
             if self.width is None:
-                object.__setattr__(self, "width", media.width)
+                self._set("width", media.width)
             if self.height is None:
-                object.__setattr__(self, "height", media.height)
+                self._set("height", media.height)
             if self._duration is None:
-                object.__setattr__(
-                    self,
-                    "_duration",
-                    media._duration,  # pylint: disable=protected-access
-                )
+                self._set("_duration", media._duration)  # pylint: disable=protected-access
         else:
             effective_filename = filename_depr or filename
             if effective_filename is not None:
                 # We have to convert here because it requires both `media` and `filename`.
                 # It will harmlessly run again in the parent __post_init__
-                object.__setattr__(
-                    self,
+                self._set(
                     "media",
                     parse_file_input(
                         media, filename=effective_filename, attach=True, local_mode=True
@@ -651,8 +642,7 @@ class InputMediaPhoto(InputMedia):
             # We have to convert here because it requires both `media` and `filename`.
             # It will harmlessly run again in the parent __post_init__
             media = cast("FileInput | PhotoSize", self.media)
-            object.__setattr__(
-                self,
+            self._set(
                 "media",
                 parse_file_input(
                     media,
@@ -832,22 +822,17 @@ class InputMediaVideo(InputMedia):
 
         if isinstance(media, Video):
             if self.width is None:
-                object.__setattr__(self, "width", media.width)
+                self._set("width", media.width)
             if self.height is None:
-                object.__setattr__(self, "height", media.height)
+                self._set("height", media.height)
             if self._duration is None:
-                object.__setattr__(
-                    self,
-                    "_duration",
-                    media._duration,  # pylint: disable=protected-access
-                )
+                self._set("_duration", media._duration)  # pylint: disable=protected-access
         else:
             effective_filename = filename_depr or filename
             if effective_filename is not None:
                 # We have to convert here because it requires both `media` and `filename`.
                 # It will harmlessly run again in the parent __post_init__
-                object.__setattr__(
-                    self,
+                self._set(
                     "media",
                     parse_file_input(
                         media, filename=effective_filename, attach=True, local_mode=True
@@ -983,8 +968,7 @@ class InputMediaSticker(_BaseInputMedia):
         if filename is not None:
             # We have to convert here because it requires both `media` and `filename`.
             # It will harmlessly run again in the parent __post_init__
-            object.__setattr__(
-                self,
+            self._set(
                 "media",
                 parse_file_input(
                     self.media,
@@ -1129,22 +1113,17 @@ class InputMediaAudio(InputMedia):
 
         if isinstance(media, Audio):
             if self._duration is None:
-                object.__setattr__(
-                    self,
-                    "_duration",
-                    media._duration,  # pylint: disable=protected-access
-                )
+                self._set("_duration", media._duration)  # pylint: disable=protected-access
             if self.performer is None:
-                object.__setattr__(self, "performer", media.performer)
+                self._set("performer", media.performer)
             if self.title is None:
-                object.__setattr__(self, "title", media.title)
+                self._set("title", media.title)
         else:
             effective_filename = filename_depr or filename
             if effective_filename is not None:
                 # We have to convert here because it requires both `media` and `filename`.
                 # It will harmlessly run again in the parent __post_init__
-                object.__setattr__(
-                    self,
+                self._set(
                     "media",
                     parse_file_input(
                         media, filename=effective_filename, attach=True, local_mode=True
@@ -1270,8 +1249,7 @@ class InputMediaDocument(InputMedia):
             # We have to convert here because it requires both `media` and `filename`.
             # It will harmlessly run again in the parent __post_init__
             media = cast("FileInput | Document", self.media)
-            object.__setattr__(
-                self,
+            self._set(
                 "media",
                 parse_file_input(
                     media,

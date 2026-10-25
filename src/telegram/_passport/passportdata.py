@@ -73,11 +73,7 @@ class PassportData(TelegramObject):
     _comparison_key: tuple[str, ...] = tg_field(init=False, compare=True)
 
     def __post_init__(self) -> None:
-        object.__setattr__(
-            self,
-            "_comparison_key",
-            tuple([x.type for x in self.data] + [self.credentials.hash]),
-        )
+        self._set("_comparison_key", tuple([x.type for x in self.data] + [self.credentials.hash]))
         TelegramObject.__post_init__(self)
 
     @property
@@ -101,7 +97,7 @@ class PassportData(TelegramObject):
                 )
                 for element in self.data
             )
-            object.__setattr__(self, "_decrypted_data", data)
+            self._set("_decrypted_data", data)
         return data
 
     @property

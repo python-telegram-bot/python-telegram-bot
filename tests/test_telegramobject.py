@@ -628,7 +628,7 @@ class TestTelegramObject:
 
         # Ensure that loading objects that were pickled before attributes were made immutable
         # are still mutable
-        object.__setattr__(chat, "id", 7)
+        chat._set("id", 7)
         assert chat.id == 7
 
     def test_pickle_handle_properties(self):

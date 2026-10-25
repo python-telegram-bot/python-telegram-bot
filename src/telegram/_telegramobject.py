@@ -137,11 +137,7 @@ class TelegramObject:
         for dataclass_field in dataclasses.fields(self):
             converter = dataclass_field.metadata.get(CONVERTER_KEY)
             if converter is not None:
-                object.__setattr__(
-                    self,
-                    dataclass_field.name,
-                    converter(getattr(self, dataclass_field.name)),
-                )
+                self._set(dataclass_field.name, converter(getattr(self, dataclass_field.name)))
 
     def __repr__(self) -> str:
         """Gives a string representation of this object in the form
@@ -259,14 +255,14 @@ class TelegramObject:
 
         for key, val in state.items():
             try:
-                object.__setattr__(self, key, val)
+                self._set(key, val)
             except AttributeError:
                 # So an attribute was deprecated and removed from the class. Let's handle this:
                 # 1) Is the attribute now a property with no setter? Let's check that:
                 if isinstance(getattr(self.__class__, key, None), property):
                     # It is, so let's try to set the "private attribute" instead
                     try:
-                        object.__setattr__(self, f"_{key}", val)
+                        self._set(f"_{key}", val)
                     # If this fails as well, guess we've completely removed it. Let's add it to
                     # api_kwargs as fallback
                     except AttributeError:
@@ -281,7 +277,7 @@ class TelegramObject:
         # and then set the rest as MappingProxyType attribute. Converting to MappingProxyType
         # is necessary, since __getstate__ converts it to a dict as MPT is not pickable.
         self._apply_api_kwargs(api_kwargs)
-        object.__setattr__(self, "api_kwargs", MappingProxyType(api_kwargs))
+        self._set("api_kwargs", MappingProxyType(api_kwargs))
 
     def __deepcopy__(self: Tele_co, memodict: dict[int, object]) -> Tele_co:
         """
@@ -309,13 +305,11 @@ class TelegramObject:
             if k == "api_kwargs":
                 # Need to copy api_kwargs manually, since it's a MappingProxyType is not
                 # pickable and deepcopy uses the pickle interface
-                object.__setattr__(
-                    result, k, MappingProxyType(deepcopy(dict(self.api_kwargs), memodict))
-                )
+                result._set(k, MappingProxyType(deepcopy(dict(self.api_kwargs), memodict)))
                 continue
 
             try:
-                object.__setattr__(result, k, deepcopy(getattr(self, k), memodict))
+                result._set(k, deepcopy(getattr(self, k), memodict))
             except AttributeError:
                 # Skip missing attributes. This can happen if the object was loaded from a pickle
                 # file that was created with an older version of the library, where the class
@@ -549,9 +543,9 @@ class TelegramObject:
             if isinstance(getattr(self.__class__, key, None), property):
                 # if setattr fails, we'll just leave the value in api_kwargs:
                 with contextlib.suppress(AttributeError):
-                    object.__setattr__(self, f"_{key}", api_kwargs.pop(key))
+                    self._set(f"_{key}", api_kwargs.pop(key))
             elif getattr(self, key, True) is None:
-                object.__setattr__(self, key, api_kwargs.pop(key))
+                self._set(key, api_kwargs.pop(key))
 
     def _is_deprecated_attr(self, attr: str) -> bool:
         """Checks whether `attr` is in the list of deprecated time period attributes."""
@@ -741,12 +735,24 @@ class TelegramObject:
             )
         return bot
 
+    def _set(self, key: str, value: Any) -> None:
+        """Sets the attribute with name :paramref:`key` to :paramref:`value` bypassing dataclasses
+        frozen checks. The method does not check whether :paramref:`key` is an existing attribute.
+
+        .. versionadded:: NEXT.VERSION
+
+        Arguments:
+            key (:obj:`str`): Name of the attribute.
+            value (:obj:`Any`): Value to set the attribute to.
+        """
+        object.__setattr__(self, key, value)
+
     def set_bot(self, bot: "Bot | None") -> None:
         """Sets the :class:`telegram.Bot` instance associated with this object.
 
         .. seealso:: :meth:`get_bot`
 
-        .. versionadded: 20.0
+        .. versionadded:: 20.0
 
         Arguments:
             bot (:class:`telegram.Bot` | :obj:`None`): The bot instance.

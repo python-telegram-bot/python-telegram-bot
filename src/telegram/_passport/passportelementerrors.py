@@ -72,7 +72,7 @@ class PassportElementError(_BasePassportElementError):
     ) -> None:
         super().__init__(source, type, api_kwargs=api_kwargs)
 
-        object.__setattr__(self, "message", str(message))
+        self._set("message", str(message))
 
 
 @tg_dataclass()

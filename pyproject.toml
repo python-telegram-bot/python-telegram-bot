@@ -209,7 +209,7 @@ jobs = 0
 py-version = "3.10"
 
 [tool.pylint.classes]
-exclude-protected = ["_unfrozen"]
+exclude-protected = ["_set"]
 
 # PYTEST:
 [tool.pytest.ini_options]

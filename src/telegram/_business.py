@@ -320,7 +320,7 @@ class BusinessOpeningHoursInterval(TelegramObject):
         opening_time = self._opening_time
         if opening_time is None:
             opening_time = self._parse_minute(self.opening_minute)
-            object.__setattr__(self, "_opening_time", opening_time)
+            self._set("_opening_time", opening_time)
         return opening_time
 
     @property
@@ -335,7 +335,7 @@ class BusinessOpeningHoursInterval(TelegramObject):
         closing_time = self._closing_time
         if closing_time is None:
             closing_time = self._parse_minute(self.closing_minute)
-            object.__setattr__(self, "_closing_time", closing_time)
+            self._set("_closing_time", closing_time)
         return closing_time
 
 
@@ -375,7 +375,7 @@ class BusinessOpeningHours(TelegramObject):
         cached_zone_info = self._cached_zone_info
         if cached_zone_info is None:
             cached_zone_info = get_zone_info(self.time_zone_name)
-            object.__setattr__(self, "_cached_zone_info", cached_zone_info)
+            self._set("_cached_zone_info", cached_zone_info)
         return cached_zone_info
 
     def get_opening_hours_for_day(

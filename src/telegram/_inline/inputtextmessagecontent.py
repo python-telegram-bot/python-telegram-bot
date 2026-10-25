@@ -106,13 +106,9 @@ class InputTextMessageContent(InputMessageContent):
         disable_web_page_preview: bool | None = None,
         /,
     ) -> None:
-        object.__setattr__(
-            self,
+        self._set(
             "link_preview_options",
-            parse_lpo_and_dwpp(
-                disable_web_page_preview,
-                self.link_preview_options,
-            ),
+            parse_lpo_and_dwpp(disable_web_page_preview, self.link_preview_options),
         )
 
         InputMessageContent.__post_init__(self)
