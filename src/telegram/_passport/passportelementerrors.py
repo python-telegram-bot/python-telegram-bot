@@ -27,6 +27,8 @@ from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.types import JSONDict
 
 
+# tags: deprecated NEXT.VERSION
+# merge into public base
 @tg_dataclass()
 class _BasePassportElementError(TelegramObject):
     source: str = tg_field(compare=True)
@@ -42,6 +44,10 @@ class PassportElementError(_BasePassportElementError):
 
     Objects of this class are comparable in terms of equality. Two objects of this class are
     considered equal, if their :attr:`source` and :attr:`type` are equal.
+
+    .. deprecated:: NEXT.VERSION
+        :paramref:`message` will be added to equality comparisons of direct base instances in
+        a future release.
 
     Args:
         source (:obj:`str`): Error source.
