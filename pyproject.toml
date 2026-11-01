@@ -119,7 +119,7 @@ tests = [
 ]
 docs = [
     "chango~=0.6.0; python_version >= '3.12'",
-    "sphinx==9.1.0; python_version >= '3.12'",
+    "sphinx==9.2.0; python_version >= '3.12'",
     "furo==2025.12.19",
     "sphinx-paramlinks==0.6.0",
     "sphinxcontrib-mermaid==2.1.1",
