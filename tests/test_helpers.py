@@ -108,6 +108,14 @@ class TestHelpers:
         with pytest.raises(ValueError, match="Only the following characters"):
             helpers.create_deep_linked_url(username, "text with spaces")
 
+        # ``$`` also matches just before a trailing newline, so a full-string match is
+        # required to reject every payload outside the documented character set.
+        for invalid_payload in ("hello\n", "hello\r", "hello\nworld"):
+            with pytest.raises(ValueError, match="Only the following characters"):
+                helpers.create_deep_linked_url(username, invalid_payload)
+            with pytest.raises(ValueError, match="Only the following characters"):
+                helpers.create_deep_linked_url(username, invalid_payload, group=True)
+
         with pytest.raises(ValueError, match="must not exceed 64"):
             helpers.create_deep_linked_url(username, "0" * 65)
 

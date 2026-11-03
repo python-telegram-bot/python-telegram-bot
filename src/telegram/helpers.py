@@ -193,7 +193,7 @@ def create_deep_linked_url(
             f"The deep-linking payload must not exceed {MessageLimit.DEEP_LINK_LENGTH} characters."
         )
 
-    if not re.match(r"^[A-Za-z0-9_-]+$", payload):
+    if not re.fullmatch(r"[A-Za-z0-9_-]+", payload):
         raise ValueError(
             "Only the following characters are allowed for deep-linked "
             "URLs: A-Z, a-z, 0-9, _ and -"
