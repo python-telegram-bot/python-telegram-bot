@@ -1729,7 +1729,8 @@ class Mention(MessageFilter):
         if isinstance(mention, TGUser):
             return any(
                 mention.id == entity.user.id
-                or mention.username == entity.user.username
+                # users without a username must not match other users without one
+                or (mention.username is not None and mention.username == entity.user.username)
                 or mention.username == cls._fix_mention_username(entity_texts[entity])
                 for entity in message.entities
                 if entity.user
