@@ -49,15 +49,6 @@ class InlineQueryResultCachedSticker(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.STICKER`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        sticker_file_id (:obj:`str`): A valid file identifier of the sticker.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the sticker.
-
     """
 
     __slots__ = ("input_message_content", "reply_markup", "sticker_file_id")

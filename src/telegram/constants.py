@@ -788,12 +788,12 @@ class BusinessLimit(IntEnum):
       :meth:`telegram.Bot.get_user_gifts`.
     """
     MIN_STAR_COUNT = 1
-    """:obj:`int`: Minimum number of Telegram Stars to be transfered. Relevant for
+    """:obj:`int`: Minimum number of Telegram Stars to be transferred. Relevant for
     :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
     :meth:`telegram.Bot.transfer_business_account_stars`.
     """
     MAX_STAR_COUNT = 10000
-    """:obj:`int`: Maximum number of Telegram Stars to be transfered. Relevant for
+    """:obj:`int`: Maximum number of Telegram Stars to be transferred. Relevant for
     :paramref:`~telegram.Bot.transfer_business_account_stars.star_count` of
     :meth:`telegram.Bot.transfer_business_account_stars`.
     """
@@ -3610,7 +3610,7 @@ class UniqueGiftInfoOrigin(StringEnum):
     .. versionadded:: 22.3
     """
     TRANSFER = "transfer"
-    """:obj:`str` gift transfered"""
+    """:obj:`str` gift transferred"""
     UPGRADE = "upgrade"
     """:obj:`str` gift upgraded"""
 
@@ -3834,7 +3834,7 @@ class InvoiceLimit(IntEnum):
     .. versionadded:: 21.8
     """
     SUBSCRIPTION_MAX_PRICE = 10000
-    """:obj:`int`: The maximum price of a subscription created wtih
+    """:obj:`int`: The maximum price of a subscription created with
     :meth:`telegram.Bot.create_invoice_link`.
 
     .. versionadded:: 21.9

@@ -87,11 +87,6 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
     Args:
         bot (:class:`telegram.Bot`): The bot used with this Updater.
         update_queue (:class:`asyncio.Queue`): Queue for the updates.
-
-    Attributes:
-        bot (:class:`telegram.Bot`): The bot used with this Updater.
-        update_queue (:class:`asyncio.Queue`): Queue for the updates.
-
     """
 
     __slots__ = (

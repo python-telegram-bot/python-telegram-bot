@@ -45,13 +45,6 @@ class InlineQueryResult(TelegramObject):
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
             :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-
-    Attributes:
-        type (:obj:`str`): Type of the result.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-
     """
 
     __slots__ = ("id", "type")

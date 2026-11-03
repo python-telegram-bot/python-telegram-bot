@@ -36,31 +36,15 @@ class PassportData(TelegramObject):
 
     Note:
         To be able to decrypt this object, you must pass your ``private_key`` to either
-        :class:`telegram.ext.Updater` or :class:`telegram.Bot`. Decrypted data is then found in
-        :attr:`decrypted_data` and the payload can be found in :attr:`decrypted_credentials`'s
-        attribute :attr:`telegram.Credentials.nonce`.
+        :class:`telegram.ext.ApplicationBuilder` or :class:`telegram.Bot`. Decrypted data is
+        then found in :attr:`decrypted_data` and the payload can be found in
+        :attr:`decrypted_credentials`'s attribute :attr:`telegram.Credentials.nonce`.
 
     Args:
         data (Sequence[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
             information about documents and other Telegram Passport elements that was shared with
             the bot.
-
-            .. versionchanged:: 20.0
-                |sequenceclassargs|
-
-        credentials (:class:`telegram.EncryptedCredentials`)): Encrypted credentials.
-
-    Attributes:
-        data (tuple[:class:`telegram.EncryptedPassportElement`]): Array with encrypted
-            information about documents and other Telegram Passport elements that was shared with
-            the bot.
-
-            .. versionchanged:: 20.0
-                |tupleclassattrs|
-
         credentials (:class:`telegram.EncryptedCredentials`): Encrypted credentials.
-
-
     """
 
     __slots__ = ("_decrypted_data", "credentials", "data")
