@@ -126,6 +126,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
 - `Sam Mosleh <https://github.com/sam-mosleh>`_
 - `Sascha <https://github.com/saschalalala>`_
+- `Shahadat Islam Koyel <https://github.com/ShahadatTest>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
 - `Shivam <https://github.com/Starry69>`_
 - `Shivam Saini <https://github.com/shivamsn97>`_
