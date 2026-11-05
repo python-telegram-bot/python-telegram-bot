@@ -181,8 +181,20 @@ class TestCommandHandler(BaseTest):
 
     @pytest.mark.parametrize(
         "cmd",
-        ["way_too_longcommand1234567yes_way_toooooooLong", "ïñválídletters", "invalid #&* chars"],
-        ids=["too long", "invalid letter", "invalid characters"],
+        [
+            "way_too_longcommand1234567yes_way_toooooooLong",
+            "ïñválídletters",
+            "invalid #&* chars",
+            "trailing_newline\n",
+            "a" * 32 + "\n",
+        ],
+        ids=[
+            "too long",
+            "invalid letter",
+            "invalid characters",
+            "trailing newline",
+            "max length plus trailing newline",
+        ],
     )
     def test_invalid_commands(self, cmd):
         with pytest.raises(

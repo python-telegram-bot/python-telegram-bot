@@ -124,6 +124,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Sneh <https://github.com/xsneh>`_
 - Snehashish Biswas
 - `Sahil Sharma <https://github.com/sahilsharma811>`_
+- `Sai Sanjay Gawali <https://github.com/SAIGAWALI>`_
 - `Sam Mosleh <https://github.com/sam-mosleh>`_
 - `Sascha <https://github.com/saschalalala>`_
 - `Shelomentsev D <https://github.com/shelomentsevd>`_
