@@ -21,6 +21,7 @@
 import asyncio
 import contextlib
 import datetime as dtm
+import inspect
 import ssl
 from collections.abc import Callable, Coroutine, Sequence
 from pathlib import Path
@@ -274,7 +275,7 @@ class Updater(contextlib.AbstractAsyncContextManager["Updater"]):
         # already issue them in `Application`. This means that there are no warnings when using
         # `Updater` without `Application`, but this is a rather special use case.
 
-        if error_callback and asyncio.iscoroutinefunction(error_callback):
+        if error_callback and inspect.iscoroutinefunction(error_callback):
             raise TypeError(
                 "The `error_callback` must not be a coroutine function! Use an ordinary function "
                 "instead. "
