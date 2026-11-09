@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import BotCommand, Dice
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -32,20 +33,24 @@ class DiceTestBase:
     value = 4
 
 
-class TestDiceWithoutRequest(DiceTestBase):
+class TestDiceWithoutRequest(DiceTestBase, DeserializationTestBase):
+    de_json_class = Dice
+
+    @pytest.fixture(params=Dice.ALL_EMOJI)
+    def de_json_dict(self, request):
+        return {"value": self.value, "emoji": request.param}
+
     def test_slot_behaviour(self, dice):
         for attr in dice.__slots__:
             assert getattr(dice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(dice)) == len(set(mro_slots(dice))), "duplicate slot"
 
-    @pytest.mark.parametrize("emoji", Dice.ALL_EMOJI)
-    def test_de_json(self, offline_bot, emoji):
-        json_dict = {"value": self.value, "emoji": emoji}
-        dice = Dice.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        dice = Dice.de_json(de_json_dict, offline_bot)
         assert dice.api_kwargs == {}
 
         assert dice.value == self.value
-        assert dice.emoji == emoji
+        assert dice.emoji == de_json_dict["emoji"]
 
     def test_to_dict(self, dice):
         dice_dict = dice.to_dict()
