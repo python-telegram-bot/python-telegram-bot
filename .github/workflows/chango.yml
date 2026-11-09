@@ -54,9 +54,17 @@ jobs:
 
       - name: Do Release
         if: steps.check_title.outputs.IS_RELEASE_PR == 'true'
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           cd ./target-repo
-          git add changes/unreleased/*
+          # chango only checks `unreleased` for existing fragments - drop duplicates of this PR
+          # if it was already released, otherwise every push re-triggers a new release commit
+          if find changes -mindepth 2 -maxdepth 2 -name "${PR_NUMBER}.*.toml" -not -path "changes/unreleased/*" | grep -q .; then
+            echo "PR #${PR_NUMBER} already has a released fragment. Dropping new unreleased ones."
+            find changes/unreleased -maxdepth 1 -name "${PR_NUMBER}.*.toml" -exec git rm -f --quiet -- {} +
+          fi
+          git add --all changes/
           pip install . --group docs
           VERSION_TAG=$(python -c "from telegram import __version__; print(f'{__version__}')")
           chango release --uid $VERSION_TAG
