@@ -23,12 +23,13 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Abubakar Alaya <https://github.com/Ecode2>`_
 - `Alateas <https://github.com/alateas>`_
 - `Ales Dokshanin <https://github.com/alesdokshanin>`_
+- `Alessandro Lanteri <https://github.com/2ale2>`_
 - `Alexandre <https://github.com/xTudoS>`_
 - `Alizia <https://github.com/thefunkycat>`_
 - `Ambro17 <https://github.com/Ambro17>`_
 - `Andrej Zhilenkov <https://github.com/Andrej730>`_
 - `Anton Tagunov <https://github.com/anton-tagunov>`_
-- `Anya Marcano <https://github.com/AnyaMarcanito>`
+- `Anya Marcano <https://github.com/AnyaMarcanito>`_
 - `Avanatiker <https://github.com/Avanatiker>`_
 - `Balduro <https://github.com/Balduro>`_
 - `Bibo-Joshi <https://github.com/Bibo-Joshi>`_
@@ -57,15 +58,15 @@ The following wonderful people contributed directly or indirectly to this projec
 - `gamgi <https://github.com/gamgi>`_
 - `Gauthamram Ravichandran <https://github.com/GauthamramRavichandran>`_
 - `Harshil <https://github.com/harshil21>`_
-- `Henok Tesfamikael <https://github.com/hethon>`
-- `Henry Galue <https://github.com/henryg311>`
+- `Henok Tesfamikael <https://github.com/hethon>`_
+- `Henry Galue <https://github.com/henryg311>`_
 - `Hugo Damer <https://github.com/HakimusGIT>`_
 - `ihoru <https://github.com/ihoru>`_
 - `Iulian Onofrei <https://github.com/revolter>`_
 - `Jainam Oswal <https://github.com/jainamoswal>`_
 - `Jasmin Bom <https://github.com/jsmnbom>`_
 - `JASON0916 <https://github.com/JASON0916>`_
-- `Jeamhowards Montiel <https://github.com/Jeam-zx>`
+- `Jeamhowards Montiel <https://github.com/Jeam-zx>`_
 - `jeffffc <https://github.com/jeffffc>`_
 - `Jelle Besseling <https://github.com/pingiun>`_
 - `jh0ker <https://github.com/jh0ker>`_
@@ -74,7 +75,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Joscha Götzer <https://github.com/Rostgnom>`_
 - `jossalgon <https://github.com/jossalgon>`_
 - `JRoot3D <https://github.com/JRoot3D>`_
-- `Juan Cuevas <https://github.com/cuevasrja>`
+- `Juan Cuevas <https://github.com/cuevasrja>`_
 - `karin0 <https://github.com/karin0>`_
 - `kenjitagawa <https://github.com/kenjitagawa>`_
 - `kennethcheo <https://github.com/kennethcheo>`_
@@ -94,7 +95,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Michael Dix <https://github.com/Eisberge>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
 - `Miguel C. R. <https://github.com/MiguelX413>`_
-- `Miguel Salomon <https://github.com/Migueldsc12>`
+- `Miguel Salomon <https://github.com/Migueldsc12>`_
 - `miles <https://github.com/miles170>`_
 - `Mischa Krüger <https://github.com/Makman2>`_
 - `Mohd Yusuf <https://github.com/mohdyusuf2312>`_
