@@ -21,8 +21,9 @@
 import functools
 import re
 from collections.abc import Sequence
-from typing import TYPE_CHECKING, Any, TypeVar, _eval_type, get_type_hints
+from typing import TYPE_CHECKING, Any, TypeVar, evaluate_forward_ref, get_type_hints
 
+from annotationlib import ForwardRef
 from bs4 import PageElement, Tag
 
 import telegram
@@ -108,9 +109,11 @@ def cached_type_hints(obj: Any, is_class: bool) -> dict[str, Any]:
 
 @functools.cache
 def resolve_forward_refs_in_type(obj: type) -> type:
-    """Resolves forward references in a type hint."""
-    # TODO: Refactor test_official to properly use annotationlib
-    return _eval_type(obj, localns=tg_objects, globalns=None)
+    """Resolves forward references in a type hint, including nested ones such as the
+    ``"InputFile"`` in :obj:`telegram._utils.types.FileLike`."""
+    # `evaluate_forward_ref` only accepts a `ForwardRef`, so we wrap `obj` in one which simply
+    # points to it. The evaluation then recursively resolves all forward refs nested in `obj`.
+    return evaluate_forward_ref(ForwardRef("_obj"), globals=tg_objects, locals={"_obj": obj})
 
 
 T = TypeVar("T")
