@@ -138,6 +138,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Timur Kushukov <https://github.com/timqsh>`_
 - `Trainer Jono <https://github.com/Tr-Jono>`_
 - `Valentijn <https://github.com/Faalentijn>`_
+- `Visvesh Khanna <https://github.com/visveshkhanna>`_
 - `voider1 <https://github.com/voider1>`_
 - `Vorobjev Simon <https://github.com/simonvorobjev>`_
 - `Wagner Macedo <https://github.com/wagnerluis1982>`_
