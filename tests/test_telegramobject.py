@@ -20,6 +20,7 @@ import dataclasses
 import datetime as dtm
 import inspect
 import pickle
+import sys
 from collections.abc import Sequence
 from copy import deepcopy
 from pathlib import Path
@@ -58,8 +59,8 @@ def all_subclasses(cls):
     )
 
     # dataclass(slots=True) creates a replacemnt class, both are present in __subclasses__()
-    # Keep the replacement and remove the original one
-    return [c for c in classes if "__slots__" in vars(c)]
+    # We keep the replacement, i.e. the one its module exposes
+    return [c for c in classes if getattr(sys.modules[c.__module__], c.__name__, None) is c]
 
 
 TO_SUBCLASSES = sorted(all_subclasses(TelegramObject), key=lambda cls: cls.__name__)
@@ -781,7 +782,7 @@ class PicklePropertyTest(TelegramObject):
         # instantiating each subclass would be tedious as some attributes require special init
         # args. So we check the dataclass type `cls` instead.
 
-        source_file = inspect.getsourcefile(cls.__init__)
+        source_file = inspect.getsourcefile(cls)
         parents = Path(source_file).parents
         is_test_file = Path(__file__).parent.resolve() in parents
 
@@ -789,5 +790,29 @@ class PicklePropertyTest(TelegramObject):
             # If the class is defined in a test file, we don't want to test it.
             return
 
-        assert dataclasses.is_dataclass(cls)
-        assert cls.__dataclass_params__.frozen
+        # We get param with `vars()` so that no parent lookup is performed
+        params = vars(cls).get("__dataclass_params__")
+
+        assert params is not None
+        assert params.frozen, f"{cls.__name__} is not frozen"
+
+    @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
+    def test_subclasses_are_dataclass(self, cls):
+        # We do not guarantee that subclasses are decorated with `tg_dataclass` specificaly
+        # but that they're *at least* decorated as a dataclass (@dataclasses.dataclass)
+
+        source_file = inspect.getsourcefile(cls)
+        parents = Path(source_file).parents
+        is_test_file = Path(__file__).parent.resolve() in parents
+
+        if is_test_file:
+            # If the class is defined in a test file, we don't want to test it.
+            return
+
+        # We check __dataclass_fields__ from `vars()` so that no parent lookup is performed
+        # A dataclass with no fields still has `__dataclass_fields__ == {}`.
+        # Hence this check can be relied upon
+        assert "__dataclass_fields__" in vars(cls), (
+            f"{cls.__name__} is not decorated as a dataclass, make sure to decorate it"
+            " with `@tg_dataclass`"
+        )

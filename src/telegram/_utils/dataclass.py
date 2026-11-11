@@ -140,13 +140,11 @@ def process_init(cls: type[_T]) -> type[_T]:
             # because the existing field annotation already is the right input type
             pass
         elif converter is not None:
-            field_annotation = unwrap_optional(param.annotation)
-
-            if get_origin(field_annotation) is tuple:
+            if get_origin(param.annotation) is tuple:
                 # Special case for tupel fields passing through parse_sequence_arg converter, we
                 # *do not* rely on its first param for the correct annotation b/c (1) it uses a
                 # TypeVar and (2) covers all possible argument types (required and optional)
-                annotation = to_sequence_annotation(field_annotation)
+                annotation = to_sequence_annotation(param.annotation)
                 if dataclass_field.default is not MISSING:
                     annotation |= None
             else:

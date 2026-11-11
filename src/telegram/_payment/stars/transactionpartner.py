@@ -318,7 +318,7 @@ class TransactionPartnerUser(TransactionPartner):
     user: "User" = tg_field(compare=True)
     # Optional
     invoice_payload: str | None = tg_field(default=None)
-    paid_media: tuple[PaidMedia, ...] | None = tg_field(default=None, converter=parse_sequence_arg)
+    paid_media: tuple[PaidMedia, ...] = tg_field(default=None, converter=parse_sequence_arg)
     paid_media_payload: str | None = tg_field(default=None)
     subscription_period: "dtm.timedelta | None" = tg_field(
         default=None, converter=int_to_timedelta
