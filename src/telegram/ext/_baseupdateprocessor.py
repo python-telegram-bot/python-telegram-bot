@@ -20,6 +20,7 @@
 
 from abc import ABC, abstractmethod
 from contextlib import AbstractAsyncContextManager
+from inspect import iscoroutine
 from types import TracebackType
 from typing import TYPE_CHECKING, Any, Self, final
 
@@ -165,8 +166,15 @@ class BaseUpdateProcessor(AbstractAsyncContextManager["BaseUpdateProcessor"], AB
             coroutine (:term:`Awaitable`): The coroutine that will be awaited to process the
                 update.
         """
-        async with self._semaphore:
-            await self.do_process_update(update, coroutine)
+        entered = False
+        try:
+            async with self._semaphore:
+                entered = True
+                await self.do_process_update(update, coroutine)
+        finally:
+            # Before admission, no subclass has taken ownership of the coroutine.
+            if not entered and iscoroutine(coroutine):
+                coroutine.close()
 
 
 class SimpleUpdateProcessor(BaseUpdateProcessor):
