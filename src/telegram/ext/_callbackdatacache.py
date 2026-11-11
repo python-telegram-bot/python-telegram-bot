@@ -451,7 +451,7 @@ class CallbackDataCache:
     def __clear(
         self, mapping: MutableMapping, time_cutoff: float | dtm.datetime | None = None
     ) -> None:
-        if not time_cutoff:
+        if time_cutoff is None:
             mapping.clear()
             return
 

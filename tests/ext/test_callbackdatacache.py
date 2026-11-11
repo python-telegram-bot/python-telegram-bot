@@ -366,6 +366,36 @@ class TestCallbackDataCache:
             assert len(callback_data_cache.persistence_data[0]) == 100
             assert len(callback_data_cache.persistence_data[1]) == 0
 
+    @pytest.mark.parametrize(
+        ("time_cutoff", "remaining"),
+        [
+            (0, ["at", "after"]),
+            (0.0, ["at", "after"]),
+            (dtm.datetime(1970, 1, 1, tzinfo=UTC), ["at", "after"]),
+            (None, []),
+            ("future", []),
+        ],
+    )
+    def test_clear_cutoff_boundary(self, callback_data_cache, time_cutoff, remaining):
+        keyboard_data = [
+            ("before", -1.0, {"button": "old data"}),
+            ("at", 0.0, {"button": "epoch data"}),
+            ("after", 1.0, {"button": "new data"}),
+        ]
+        callback_queries = {"query": "after"}
+        callback_data_cache.load_persistence_data((keyboard_data, callback_queries))
+        # Set the exact boundary explicitly: loading a zero access time uses the current time.
+        callback_data_cache._keyboard_data["at"].access_time = 0.0
+
+        if time_cutoff == "future":
+            time_cutoff = time.time() + 1
+        callback_data_cache.clear_callback_data(time_cutoff=time_cutoff)
+
+        assert callback_data_cache.persistence_data == (
+            [data for data in keyboard_data if data[0] in remaining],
+            callback_queries,
+        )
+
     @pytest.mark.parametrize("time_method", ["time", "datetime", "defaults"])
     def test_clear_cutoff(self, callback_data_cache, time_method, tz_bot):
         # Fill the cache with some fake data
