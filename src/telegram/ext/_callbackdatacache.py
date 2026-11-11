@@ -26,7 +26,7 @@ from typing import TYPE_CHECKING, Any, cast
 from uuid import uuid4
 
 try:
-    from cachetools import LRUCache
+    from cachetools import Cache, LRUCache
 
     CACHE_TOOLS_AVAILABLE = True
 except ImportError:
@@ -192,7 +192,9 @@ class CallbackDataCache:
         keyboard_data, callback_queries = persistent_data
         for key, value in callback_queries.items():
             self._callback_queries[key] = value
-        for uuid, access_time, data in keyboard_data:
+        # Insert the keyboards from least to most recently used, so that the LRU order of the
+        # cache matches the one from before the data was persisted
+        for uuid, access_time, data in sorted(keyboard_data, key=lambda item: item[1]):
             self._keyboard_data[uuid] = _KeyboardData(
                 keyboard_uuid=uuid, access_time=access_time, button_data=data
             )
@@ -215,9 +217,16 @@ class CallbackDataCache:
         # While building a list/dict from the LRUCaches has linear runtime (in the number of
         # entries), the runtime is bounded by maxsize and it has the big upside of not throwing a
         # highly customized data structure at users trying to implement a custom persistence class
-        return [data.to_tuple() for data in self._keyboard_data.values()], dict(
-            self._callback_queries.items()
+        # Reading the values with `self._keyboard_data[key]` (which is also what `.values()` does)
+        # would mark every keyboard as just used, in insertion order. Since this runs on every
+        # `Application.update_persistence`, the most used keyboards could then be evicted first.
+        # So read them without updating the LRU order.
+        keyboards = cast("LRUCache[str, _KeyboardData]", self._keyboard_data)
+        keyboard_data: list[_KeyboardData] = sorted(
+            (Cache.__getitem__(keyboards, key) for key in keyboards),
+            key=lambda data: data.access_time,
         )
+        return [data.to_tuple() for data in keyboard_data], dict(self._callback_queries.items())
 
     def process_keyboard(self, reply_markup: InlineKeyboardMarkup) -> InlineKeyboardMarkup:
         """Registers the reply markup to the cache. If any of the buttons have

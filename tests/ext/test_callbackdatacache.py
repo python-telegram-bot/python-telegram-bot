@@ -175,6 +175,39 @@ class TestCallbackDataCache:
         assert cdc.persistence_data[0][0][0] != keyboard_1
         assert cdc.persistence_data[0][0][0] == keyboard_2
 
+    @pytest.mark.parametrize("reload", [False, True])
+    def test_persistence_data_keeps_lru_order(self, bot, reload):
+        cdc = CallbackDataCache(bot, maxsize=2)
+
+        def make_keyboard(data):
+            reply_markup = InlineKeyboardMarkup.from_button(
+                InlineKeyboardButton("button", callback_data=data)
+            )
+            return cdc.process_keyboard(reply_markup).inline_keyboard[0][0].callback_data
+
+        def press(cache, callback_data):
+            callback_query = CallbackQuery(
+                "1", from_user=None, chat_instance="chat_instance", data=callback_data
+            )
+            cache.process_callback_query(callback_query)
+            return callback_query.data
+
+        menu = make_keyboard("menu")
+        time.sleep(0.001)
+        old = make_keyboard("old")
+        time.sleep(0.001)
+        # "menu" is now the most recently used keyboard
+        assert press(cdc, menu) == "menu"
+
+        # Neither persisting nor reloading the data must change which keyboard is evicted next
+        persistent_data = deepcopy(cdc.persistence_data)
+        if reload:
+            cdc = CallbackDataCache(bot, maxsize=2, persistent_data=persistent_data)
+        make_keyboard("new")
+
+        assert press(cdc, menu) == "menu"
+        assert isinstance(press(cdc, old), InvalidCallbackData)
+
     @pytest.mark.parametrize("data", [True, False])
     @pytest.mark.parametrize("message", [True, False])
     @pytest.mark.parametrize("invalid", [True, False])
