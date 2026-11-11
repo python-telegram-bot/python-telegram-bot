@@ -32,10 +32,6 @@ class BotDescription(TelegramObject):
 
     Args:
         description (:obj:`str`): The bot's description.
-
-    Attributes:
-        description (:obj:`str`): The bot's description.
-
     """
 
     __slots__ = ("description",)
@@ -59,10 +55,6 @@ class BotShortDescription(TelegramObject):
 
     Args:
         short_description (:obj:`str`): The bot's short description.
-
-    Attributes:
-        short_description (:obj:`str`): The bot's short description.
-
     """
 
     __slots__ = ("short_description",)

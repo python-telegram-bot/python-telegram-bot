@@ -1267,15 +1267,15 @@ class Document:
               i.e. without a dot in the filename.
         """
 
-        __slots__ = ("_file_extension", "is_case_sensitive")
+        __slots__ = ("_file_extension", "_is_case_sensitive")
 
         def __init__(self, file_extension: str | None, case_sensitive: bool = False):
             super().__init__()
-            self.is_case_sensitive: bool = case_sensitive
+            self._is_case_sensitive: bool = case_sensitive
             if file_extension is None:
                 self._file_extension = None
                 self.name = "filters.Document.FileExtension(None)"
-            elif self.is_case_sensitive:
+            elif self._is_case_sensitive:
                 self._file_extension = f".{file_extension}"
                 self.name = (
                     f"filters.Document.FileExtension({file_extension!r}, case_sensitive=True)"
@@ -1289,7 +1289,7 @@ class Document:
                 return False
             if self._file_extension is None:
                 return "." not in message.document.file_name
-            if self.is_case_sensitive:
+            if self._is_case_sensitive:
                 filename = message.document.file_name
             else:
                 filename = message.document.file_name.lower()

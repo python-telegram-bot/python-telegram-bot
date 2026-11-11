@@ -44,7 +44,7 @@ class InlineQueryResultLocation(InlineQueryResult):
     Args:
         id (:obj:`str`): Unique identifier for this result,
             :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
+            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` bytes.
         latitude (:obj:`float`): Location latitude in degrees.
         longitude (:obj:`float`): Location longitude in degrees.
         title (:obj:`str`): Location title.
@@ -83,15 +83,6 @@ class InlineQueryResultLocation(InlineQueryResult):
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.InlineQueryResultType.LOCATION`.
-        id (:obj:`str`): Unique identifier for this result,
-            :tg-const:`telegram.InlineQueryResult.MIN_ID_LENGTH`-
-            :tg-const:`telegram.InlineQueryResult.MAX_ID_LENGTH` Bytes.
-        latitude (:obj:`float`): Location latitude in degrees.
-        longitude (:obj:`float`): Location longitude in degrees.
-        title (:obj:`str`): Location title.
-        horizontal_accuracy (:obj:`float`): Optional. The radius of uncertainty for the location,
-            measured in meters; 0-
-            :tg-const:`telegram.InlineQueryResultLocation.HORIZONTAL_ACCURACY`.
         live_period (:obj:`int` | :class:`datetime.timedelta`): Optional. Period in seconds for
             which the location will be updated, should be between
             :tg-const:`telegram.InlineQueryResultLocation.MIN_LIVE_PERIOD` and
@@ -101,29 +92,6 @@ class InlineQueryResultLocation(InlineQueryResult):
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        heading (:obj:`int`): Optional. For live locations, a direction in which the user is
-            moving, in degrees. Must be between
-            :tg-const:`telegram.InlineQueryResultLocation.MIN_HEADING` and
-            :tg-const:`telegram.InlineQueryResultLocation.MAX_HEADING` if specified.
-        proximity_alert_radius (:obj:`int`): Optional. For live locations, a maximum distance
-            for proximity alerts about approaching another chat member, in meters. Must be
-            between :tg-const:`telegram.InlineQueryResultLocation.MIN_PROXIMITY_ALERT_RADIUS`
-            and :tg-const:`telegram.InlineQueryResultLocation.MAX_PROXIMITY_ALERT_RADIUS`
-            if specified.
-        reply_markup (:class:`telegram.InlineKeyboardMarkup`): Optional. Inline keyboard attached
-            to the message.
-        input_message_content (:class:`telegram.InputMessageContent`): Optional. Content of the
-            message to be sent instead of the location.
-        thumbnail_url (:obj:`str`): Optional. Url of the thumbnail for the result.
-
-            .. versionadded:: 20.2
-        thumbnail_width (:obj:`int`): Optional. Thumbnail width.
-
-            .. versionadded:: 20.2
-        thumbnail_height (:obj:`int`): Optional. Thumbnail height.
-
-            .. versionadded:: 20.2
-
     """
 
     __slots__ = (
