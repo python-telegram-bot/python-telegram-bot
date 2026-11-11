@@ -143,13 +143,21 @@ def process_init(cls: type[_T]) -> type[_T]:
             field_annotation = unwrap_optional(param.annotation)
 
             if get_origin(field_annotation) is tuple:
+                # Special case for tupel fields passing through parse_sequence_arg converter, we
+                # *do not* rely on its first param for the correct annotation b/c (1) it uses a
+                # TypeVar and (2) covers all possible argument types (required and optional)
                 annotation = to_sequence_annotation(field_annotation)
-
                 if dataclass_field.default is not MISSING:
                     annotation |= None
             else:
-                converter_param = next(iter(inspect.signature(converter).parameters.values()))
-                annotation = converter_param.annotation
+                converter_1st_param = next(iter(inspect.signature(converter).parameters.values()))
+                annotation = converter_1st_param.annotation
+
+                if dataclass_field.default is MISSING:
+                    # Similar to (2) above, some converters (e.g int_to_timedelta) signatures cover
+                    # *all* arg types (required and optional), so we judge requiredness
+                    # from `field.default`
+                    annotation = unwrap_optional(annotation)
 
         parameters.append(
             param.replace(

@@ -22,7 +22,7 @@ import datetime as dtm
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 
@@ -84,7 +84,7 @@ class Animation(_BaseMedium):
     # Required
     width: int = tg_field()
     height: int = tg_field()
-    _duration: dtm.timedelta = tg_field(alias="duration", converter=to_timedelta)
+    _duration: dtm.timedelta = tg_field(alias="duration", converter=int_to_timedelta)
     # Optional
     file_name: str | None = tg_field(default=None)
     mime_type: str | None = tg_field(default=None)

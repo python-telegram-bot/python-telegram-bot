@@ -26,8 +26,8 @@ from telegram._gifts import Gift
 from telegram._paidmedia import PaidMedia
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import (
+    int_to_timedelta,
     parse_sequence_arg,
-    to_timedelta,
 )
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
@@ -320,7 +320,9 @@ class TransactionPartnerUser(TransactionPartner):
     invoice_payload: str | None = tg_field(default=None)
     paid_media: tuple[PaidMedia, ...] | None = tg_field(default=None, converter=parse_sequence_arg)
     paid_media_payload: str | None = tg_field(default=None)
-    subscription_period: "dtm.timedelta | None" = tg_field(default=None, converter=to_timedelta)
+    subscription_period: "dtm.timedelta | None" = tg_field(
+        default=None, converter=int_to_timedelta
+    )
     gift: Gift | None = tg_field(default=None)
     affiliate: AffiliateInfo | None = tg_field(default=None)
     premium_subscription_duration: int | None = tg_field(default=None)

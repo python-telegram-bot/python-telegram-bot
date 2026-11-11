@@ -26,8 +26,8 @@ from telegram._files.livephoto import LivePhoto
 from telegram._files.video import Video
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import (
+    int_to_timedelta,
     parse_sequence_arg,
-    to_timedelta,
 )
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
@@ -120,7 +120,7 @@ class PaidMediaPreview(PaidMedia):
     width: int | None = tg_field(compare=True, default=None)
     height: int | None = tg_field(compare=True, default=None)
     _duration: dtm.timedelta | None = tg_field(
-        compare=True, alias="duration", default=None, converter=to_timedelta
+        compare=True, alias="duration", default=None, converter=int_to_timedelta
     )
 
     @property

@@ -29,7 +29,7 @@ from collections.abc import Sequence
 from typing import TypeVar, overload
 
 from telegram._linkpreviewoptions import LinkPreviewOptions
-from telegram._utils.types import ODVInput
+from telegram._utils.types import ODVInput, TimePeriod
 
 T = TypeVar("T")
 
@@ -47,18 +47,12 @@ def parse_sequence_arg(arg: Sequence[T] | None) -> tuple[T, ...]:
 
 
 @overload
-def to_timedelta(arg: None) -> None: ...
-
-
+def int_to_timedelta(arg: None) -> None: ...
 @overload
-def to_timedelta(
-    arg: (
-        int | float | dtm.timedelta  # noqa: PYI041 (be more explicit about `int` and `float` args)
-    ),
-) -> dtm.timedelta: ...
+def int_to_timedelta(arg: TimePeriod) -> dtm.timedelta: ...
 
 
-def to_timedelta(arg: int | float | dtm.timedelta | None) -> dtm.timedelta | None:  # noqa: PYI041
+def int_to_timedelta(arg: TimePeriod | None) -> dtm.timedelta | None:
     """Parses an optional time period in seconds into a timedelta
 
     Args:
@@ -67,11 +61,14 @@ def to_timedelta(arg: int | float | dtm.timedelta | None) -> dtm.timedelta | Non
     Returns:
         :obj:`timedelta`: The time period converted to a timedelta object or :obj:`None`.
     """
-    if arg is None:
-        return None
-    if isinstance(arg, int | float):
-        return dtm.timedelta(seconds=arg)
-    return arg
+    return float_to_timedelta(arg)
+
+
+def float_to_timedelta(arg: float | dtm.timedelta | None) -> dtm.timedelta | None:
+    """See :func:`int_to_timedelta`."""
+    if arg is None or isinstance(arg, dtm.timedelta):
+        return arg
+    return dtm.timedelta(seconds=arg)
 
 
 def parse_lpo_and_dwpp(

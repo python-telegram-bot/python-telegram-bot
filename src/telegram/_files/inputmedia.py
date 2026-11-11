@@ -35,7 +35,7 @@ from telegram._files.sticker import Sticker
 from telegram._files.video import Video
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta, parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -306,7 +306,7 @@ class InputPaidMediaVideo(InputPaidMedia):
     width: int | None = tg_field(default=None)
     height: int | None = tg_field(default=None)
     _duration: dtm.timedelta | None = tg_field(
-        default=None, alias="duration", converter=to_timedelta
+        default=None, alias="duration", converter=int_to_timedelta
     )
     supports_streaming: bool | None = tg_field(default=None)
     cover: str | InputFile | None = tg_field(default=None, converter=_parse_optional_file_input)
@@ -473,7 +473,7 @@ class InputMediaAnimation(InputMedia):
     width: int | None = tg_field(default=None)
     height: int | None = tg_field(default=None)
     _duration: dtm.timedelta | None = tg_field(
-        default=None, alias="duration", converter=to_timedelta
+        default=None, alias="duration", converter=int_to_timedelta
     )
     caption_entities: tuple[MessageEntity, ...] = tg_field(
         default=None, converter=parse_sequence_arg
@@ -780,7 +780,7 @@ class InputMediaVideo(InputMedia):
     width: int | None = tg_field(default=None)
     height: int | None = tg_field(default=None)
     _duration: dtm.timedelta | None = tg_field(
-        default=None, alias="duration", converter=to_timedelta
+        default=None, alias="duration", converter=int_to_timedelta
     )
     supports_streaming: bool | None = tg_field(default=None)
     parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
@@ -1075,7 +1075,7 @@ class InputMediaAudio(InputMedia):
     caption: str | None = tg_field(default=None)
     parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
     _duration: dtm.timedelta | None = tg_field(
-        default=None, alias="duration", converter=to_timedelta
+        default=None, alias="duration", converter=int_to_timedelta
     )
     performer: str | None = tg_field(default=None)
     title: str | None = tg_field(default=None)

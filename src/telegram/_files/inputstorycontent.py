@@ -24,7 +24,7 @@ from typing import ClassVar
 from telegram import constants
 from telegram._files.inputfile import InputFile
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import float_to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput
@@ -105,10 +105,10 @@ class InputStoryContentVideo(InputStoryContent):
             each second in the ``MPEG4`` format, and must not exceed
             :tg-const:`telegram.constants.InputStoryContentLimit.VIDEOSIZE_UPLOAD` MB.
             |uploadinputnopath|.
-        duration (:class:`datetime.timedelta` | :obj:`int` | :obj:`float`, optional): Precise
+        duration (:class:`datetime.timedelta` | :obj:`float`, optional): Precise
             duration of the video in seconds;
             0-:tg-const:`telegram.constants.InputStoryContentLimit.MAX_VIDEO_DURATION`
-        cover_frame_timestamp (:class:`datetime.timedelta` | :obj:`int` | :obj:`float`, optional):
+        cover_frame_timestamp (:class:`datetime.timedelta` | :obj:`float`, optional):
             Timestamp in seconds of the frame that will be used as the static cover for the story.
             Defaults to ``0.0``.
         is_animation (:obj:`bool`, optional): Pass :obj:`True` if the video has no sound
@@ -133,6 +133,8 @@ class InputStoryContentVideo(InputStoryContent):
     # Required
     video: str | InputFile = tg_field(converter=InputStoryContent._parse_file_input)
     # Optional
-    duration: dtm.timedelta | None = tg_field(default=None, converter=to_timedelta)
-    cover_frame_timestamp: dtm.timedelta | None = tg_field(default=None, converter=to_timedelta)
+    duration: dtm.timedelta | None = tg_field(default=None, converter=float_to_timedelta)
+    cover_frame_timestamp: dtm.timedelta | None = tg_field(
+        default=None, converter=float_to_timedelta
+    )
     is_animation: bool | None = tg_field(default=None)

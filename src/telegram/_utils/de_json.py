@@ -65,16 +65,22 @@ def resolve_annotation(
 
 
 def unwrap_optional(annotation: object) -> object:
-    """Return the sole non-None member of an optional union, if it has one."""
+    """Return a Union without its ``None`` member.
+
+    Note: if only one memeber is left after removing the ``None``, the return value is equivalnt to
+        that of the member direclty.
+        >>> Union[int] is int # True
+    """
     if get_origin(annotation) not in (Union, UnionType):
         return annotation
 
-    non_none_annotations = tuple(
-        member
-        for member in get_args(annotation)
-        if member is not type(None)  # pylint: disable=unidiomatic-typecheck
-    )
-    return non_none_annotations[0] if len(non_none_annotations) == 1 else annotation
+    return Union[  # noqa: UP007
+        tuple(
+            member
+            for member in get_args(annotation)
+            if member is not type(None)  # pylint: disable=unidiomatic-typecheck
+        )
+    ]
 
 
 def build_sequence_transformer(

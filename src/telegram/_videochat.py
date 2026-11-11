@@ -22,7 +22,7 @@ import datetime as dtm
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta, parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 
@@ -72,7 +72,7 @@ class VideoChatEnded(TelegramObject):
 
     """
 
-    _duration: dtm.timedelta = tg_field(compare=True, alias="duration", converter=to_timedelta)
+    _duration: dtm.timedelta = tg_field(compare=True, alias="duration", converter=int_to_timedelta)
 
     @property
     def duration(self) -> int | dtm.timedelta:

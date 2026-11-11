@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
-from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta, parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -106,7 +106,7 @@ class InlineQueryResultVoice(InlineQueryResult):
     title: str = tg_field()
     # Optional
     _voice_duration: dtm.timedelta | None = tg_field(
-        default=None, alias="voice_duration", converter=to_timedelta
+        default=None, alias="voice_duration", converter=int_to_timedelta
     )
     caption: str | None = tg_field(default=None)
     reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)

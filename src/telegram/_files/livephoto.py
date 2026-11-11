@@ -22,7 +22,7 @@ import datetime as dtm
 
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
-from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta, parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
@@ -71,7 +71,7 @@ class LivePhoto(_BaseMedium):
     # Required
     width: int = tg_field()
     height: int = tg_field()
-    duration: dtm.timedelta = tg_field(converter=to_timedelta)
+    duration: dtm.timedelta = tg_field(converter=int_to_timedelta)
     # Optional
     photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
     mime_type: str | None = tg_field(default=None)

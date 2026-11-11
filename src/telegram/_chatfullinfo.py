@@ -32,8 +32,8 @@ from telegram._reaction import ReactionType
 from telegram._uniquegift import UniqueGiftColors
 from telegram._userrating import UserRating
 from telegram._utils.argumentparsing import (
+    int_to_timedelta,
     parse_sequence_arg,
-    to_timedelta,
 )
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import (
@@ -482,14 +482,14 @@ class ChatFullInfo(_ChatBase):
         compare=True,
         default=None,
         alias="slow_mode_delay",
-        converter=to_timedelta,
+        converter=int_to_timedelta,
     )
     unrestrict_boost_count: int | None = tg_field(compare=True, default=None)
     _message_auto_delete_time: dtm.timedelta | None = tg_field(
         compare=True,
         default=None,
         alias="message_auto_delete_time",
-        converter=to_timedelta,
+        converter=int_to_timedelta,
     )
     has_aggressive_anti_spam_enabled: bool | None = tg_field(compare=True, default=None)
     has_hidden_members: bool | None = tg_field(compare=True, default=None)

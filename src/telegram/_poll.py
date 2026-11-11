@@ -36,8 +36,8 @@ from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import (
+    int_to_timedelta,
     parse_sequence_arg,
-    to_timedelta,
 )
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
@@ -720,7 +720,7 @@ class Poll(TelegramObject):
         default=None, converter=parse_sequence_arg
     )
     _open_period: dtm.timedelta | None = tg_field(
-        default=None, alias="open_period", converter=to_timedelta
+        default=None, alias="open_period", converter=int_to_timedelta
     )
     close_date: dtm.datetime | None = tg_field(default=None)
     question_entities: tuple[MessageEntity, ...] = tg_field(

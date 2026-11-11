@@ -23,7 +23,7 @@ from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import float_to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.files import parse_file_input
 from telegram._utils.types import FileInput
@@ -98,7 +98,7 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
     Args:
         animation (:term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` | \
             :class:`pathlib.Path`): The animated profile photo. |uploadinputnopath|
-        main_frame_timestamp (:class:`datetime.timedelta` | :obj:`int` | :obj:`float`, optional):
+        main_frame_timestamp (:class:`datetime.timedelta` | :obj:`float`, optional):
             Timestamp in seconds of the frame that will be used as the static profile photo.
             Defaults to ``0.0``.
 
@@ -114,4 +114,6 @@ class InputProfilePhotoAnimated(InputProfilePhoto):
     # Required
     animation: "str | InputFile" = tg_field(converter=InputProfilePhoto._parse_file_input)
     # Optional
-    main_frame_timestamp: dtm.timedelta | None = tg_field(default=None, converter=to_timedelta)
+    main_frame_timestamp: dtm.timedelta | None = tg_field(
+        default=None, converter=float_to_timedelta
+    )

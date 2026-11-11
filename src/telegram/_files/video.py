@@ -23,7 +23,7 @@ import datetime as dtm
 from telegram._files._basemedium import _BaseMedium
 from telegram._files.photosize import PhotoSize
 from telegram._files.videoquality import VideoQuality
-from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta, parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 
@@ -110,7 +110,7 @@ class Video(_BaseMedium):
     # Required
     width: int = tg_field()
     height: int = tg_field()
-    _duration: dtm.timedelta = tg_field(alias="duration", converter=to_timedelta)
+    _duration: dtm.timedelta = tg_field(alias="duration", converter=int_to_timedelta)
     # Optional
     mime_type: str | None = tg_field(default=None)
     file_size: int | None = tg_field(default=None)
@@ -118,7 +118,7 @@ class Video(_BaseMedium):
     thumbnail: PhotoSize | None = tg_field(default=None)
     cover: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
     _start_timestamp: dtm.timedelta | None = tg_field(
-        default=None, alias="start_timestamp", converter=to_timedelta
+        default=None, alias="start_timestamp", converter=int_to_timedelta
     )
     qualities: tuple[VideoQuality, ...] = tg_field(default=None, converter=parse_sequence_arg)
 

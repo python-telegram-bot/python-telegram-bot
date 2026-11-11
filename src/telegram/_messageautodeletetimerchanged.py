@@ -23,7 +23,7 @@ deletion.
 import datetime as dtm
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 
@@ -54,7 +54,7 @@ class MessageAutoDeleteTimerChanged(TelegramObject):
     """
 
     _message_auto_delete_time: dtm.timedelta = tg_field(
-        compare=True, alias="message_auto_delete_time", converter=to_timedelta
+        compare=True, alias="message_auto_delete_time", converter=int_to_timedelta
     )
 
     @property

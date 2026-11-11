@@ -23,7 +23,7 @@ from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 
@@ -77,7 +77,7 @@ class Location(TelegramObject):
     # Optional
     horizontal_accuracy: float | None = tg_field(default=None)
     _live_period: dtm.timedelta | None = tg_field(
-        default=None, alias="live_period", converter=to_timedelta
+        default=None, alias="live_period", converter=int_to_timedelta
     )
     heading: int | None = tg_field(default=None)
     proximity_alert_radius: int | None = tg_field(default=None)

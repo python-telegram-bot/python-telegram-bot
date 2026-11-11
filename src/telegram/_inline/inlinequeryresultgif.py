@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
-from telegram._utils.argumentparsing import parse_sequence_arg, to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta, parse_sequence_arg
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.defaultvalue import DEFAULT_NONE
@@ -144,7 +144,7 @@ class InlineQueryResultGif(InlineQueryResult):
     reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
     input_message_content: "InputMessageContent | None" = tg_field(default=None)
     _gif_duration: dtm.timedelta | None = tg_field(
-        default=None, alias="gif_duration", converter=to_timedelta
+        default=None, alias="gif_duration", converter=int_to_timedelta
     )
     parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
     caption_entities: tuple[MessageEntity, ...] = tg_field(

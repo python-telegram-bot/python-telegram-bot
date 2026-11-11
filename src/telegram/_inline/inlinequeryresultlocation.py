@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, ClassVar
 from telegram import constants
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 
@@ -135,7 +135,7 @@ class InlineQueryResultLocation(InlineQueryResult):
     title: str = tg_field()
     # Optional
     _live_period: dtm.timedelta | None = tg_field(
-        default=None, alias="live_period", converter=to_timedelta
+        default=None, alias="live_period", converter=int_to_timedelta
     )
     reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
     input_message_content: "InputMessageContent | None" = tg_field(default=None)

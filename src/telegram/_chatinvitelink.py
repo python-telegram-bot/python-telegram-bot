@@ -22,7 +22,7 @@ import datetime as dtm
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta
 from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import get_timedelta_value
 
@@ -136,7 +136,7 @@ class ChatInviteLink(TelegramObject):
     name: str | None = tg_field(default=None)
     pending_join_request_count: int | None = tg_field(default=None)
     _subscription_period: dtm.timedelta | None = tg_field(
-        default=None, alias="subscription_period", converter=to_timedelta
+        default=None, alias="subscription_period", converter=int_to_timedelta
     )
     subscription_price: int | None = tg_field(default=None)
 
