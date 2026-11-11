@@ -61,19 +61,20 @@ def process_init(cls: type[_T]) -> type[_T]:
     Args:
         cls (:obj:`type`): A class transformed with :func:`dataclasses.dataclass`.
 
-    The function updates the exposed signature of the provided class' ``__init__``:
+    The function updates the exposed signature and annotation of the provided class' ``__init__``.
+    It:
 
     1) Replaces field names with their aliases.
 
-    2) Replaces the annotations of fields with converters with the input annotations accepted by
-       those converters.
+    2) Replaces type annotations of fields with converters with the annotation of the first
+        converter parameter. With these special cases:
 
-           - Fields stored as tuples expose the corresponding :class:`collections.abc.Sequence`
+            - Fields stored as tuples expose the corresponding :class:`collections.abc.Sequence`
              annotation.
+            - Parameter required/optional status is calculated based on :param:`tg_field.default`
 
-           - Parameter required/optional status is calculated based on :param:`tg_field.default`
-
-    It also provides runtime support for :param:`tg_field.alias`
+    If aliases are present in the dataclass, a wrapper for __init__ is created to provide the
+    necessary runtime support.
 
     Note:
         The aliased name and converter function are assumed to exist under the field metadata with
@@ -166,11 +167,19 @@ def process_init(cls: type[_T]) -> type[_T]:
 
     signature = generated_signature.replace(parameters=parameters)
 
+    # Lastly, we overwrite __annotations__, which is important for test_official
+    # to perfrom its types tests (it uses `typing.get_type_hints` which reads from __annotations)
+    annotations = {param.name: param.annotation for param in parameters if param.name != "self"}
+    annotations["return"] = None
+
     if not has_aliases:
         generated_init.__signature__ = signature  # type: ignore[attr-defined]
+        generated_init.__annotations__ = annotations
         return cls
 
     aliased_init.__signature__ = signature  # type: ignore[attr-defined]
+    aliased_init.__annotations__ = annotations
+
     cls.__init__ = aliased_init  # type: ignore[method-assign]
     return cls
 
