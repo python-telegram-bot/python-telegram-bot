@@ -155,7 +155,7 @@ class TestVideoChatParticipantsInvitedWithoutRequest:
 
 
 class TestVideoChatScheduledWithoutRequest:
-    start_date = dtm.datetime.now(dtm.timezone.utc)
+    start_date = dtm.datetime.now(dtm.UTC)
 
     def test_expected_values(self):
         assert VideoChatScheduled(self.start_date).start_date == self.start_date
@@ -194,7 +194,9 @@ class TestVideoChatScheduledWithoutRequest:
     def test_equality(self):
         a = VideoChatScheduled(self.start_date)
         b = VideoChatScheduled(self.start_date)
-        c = VideoChatScheduled(dtm.datetime.utcnow() + dtm.timedelta(seconds=5))
+        c = VideoChatScheduled(
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None) + dtm.timedelta(seconds=5)
+        )
         d = VideoChatStarted()
 
         assert a == b

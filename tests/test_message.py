@@ -145,10 +145,13 @@ def message(bot):
     params=[
         {
             "reply_to_message": Message(
-                50, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                50,
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                Chat(13, "channel"),
+                User(9, "i", False),
             )
         },
-        {"edit_date": dtm.datetime.utcnow()},
+        {"edit_date": dtm.datetime.now(dtm.UTC).replace(tzinfo=None)},
         {
             "text": "a text message",
             "entities": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
@@ -194,7 +197,10 @@ def message(bot):
         {"migrate_from_chat_id": -54321},
         {
             "pinned_message": Message(
-                7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                7,
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                Chat(13, "channel"),
+                User(9, "i", False),
             )
         },
         {"invoice": Invoice("my invoice", "invoice", "start", "EUR", 243)},
@@ -248,7 +254,11 @@ def message(bot):
                 User(1, "John", False), User(2, "Doe", False), 42
             )
         },
-        {"video_chat_scheduled": VideoChatScheduled(dtm.datetime.utcnow())},
+        {
+            "video_chat_scheduled": VideoChatScheduled(
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None)
+            )
+        },
         {"video_chat_started": VideoChatStarted()},
         {"video_chat_ended": VideoChatEnded(100)},
         {
@@ -309,7 +319,9 @@ def message(bot):
         {
             "giveaway": Giveaway(
                 chats=[Chat(1, Chat.SUPERGROUP)],
-                winners_selection_date=dtm.datetime.utcnow().replace(microsecond=0),
+                winners_selection_date=dtm.datetime.now(dtm.UTC)
+                .replace(tzinfo=None)
+                .replace(microsecond=0),
                 winner_count=5,
             )
         },
@@ -318,7 +330,9 @@ def message(bot):
             "giveaway_winners": GiveawayWinners(
                 chat=Chat(1, Chat.CHANNEL),
                 giveaway_message_id=123456789,
-                winners_selection_date=dtm.datetime.utcnow().replace(microsecond=0),
+                winners_selection_date=dtm.datetime.now(dtm.UTC)
+                .replace(tzinfo=None)
+                .replace(microsecond=0),
                 winner_count=42,
                 winners=[User(1, "user1", False), User(2, "user2", False)],
             )
@@ -341,11 +355,17 @@ def message(bot):
         },
         {
             "external_reply": ExternalReplyInfo(
-                MessageOriginChat(dtm.datetime.utcnow(), Chat(1, Chat.PRIVATE))
+                MessageOriginChat(
+                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None), Chat(1, Chat.PRIVATE)
+                )
             )
         },
         {"quote": TextQuote("a text quote", 1)},
-        {"forward_origin": MessageOriginChat(dtm.datetime.utcnow(), Chat(1, Chat.PRIVATE))},
+        {
+            "forward_origin": MessageOriginChat(
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None), Chat(1, Chat.PRIVATE)
+            )
+        },
         {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
         {"boost_added": ChatBoostAdded(100)},
         {"sender_boost_count": 1},
@@ -388,7 +408,10 @@ def message(bot):
         {
             "suggested_post_declined": SuggestedPostDeclined(
                 suggested_post_message=Message(
-                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                    7,
+                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                    Chat(13, "channel"),
+                    User(9, "i", False),
                 ),
                 comment="comment",
             )
@@ -397,7 +420,10 @@ def message(bot):
             "suggested_post_paid": SuggestedPostPaid(
                 currency="XTR",
                 suggested_post_message=Message(
-                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                    7,
+                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                    Chat(13, "channel"),
+                    User(9, "i", False),
                 ),
                 amount=100,
             )
@@ -406,16 +432,22 @@ def message(bot):
             "suggested_post_refunded": SuggestedPostRefunded(
                 reason="post_deleted",
                 suggested_post_message=Message(
-                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                    7,
+                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                    Chat(13, "channel"),
+                    User(9, "i", False),
                 ),
             )
         },
         {
             "suggested_post_approved": SuggestedPostApproved(
-                send_date=dtm.datetime.utcnow(),
+                send_date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
                 price=SuggestedPostPrice(currency="XTR", amount=100),
                 suggested_post_message=Message(
-                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                    7,
+                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                    Chat(13, "channel"),
+                    User(9, "i", False),
                 ),
             )
         },
@@ -423,7 +455,10 @@ def message(bot):
             "suggested_post_approval_failed": SuggestedPostApprovalFailed(
                 price=SuggestedPostPrice(currency="XTR", amount=100),
                 suggested_post_message=Message(
-                    7, dtm.datetime.utcnow(), Chat(13, "channel"), User(9, "i", False)
+                    7,
+                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                    Chat(13, "channel"),
+                    User(9, "i", False),
                 ),
             )
         },
@@ -431,7 +466,7 @@ def message(bot):
             "suggested_post_info": SuggestedPostInfo(
                 state="pending",
                 price=SuggestedPostPrice(currency="XTR", amount=100),
-                send_date=dtm.datetime.utcnow(),
+                send_date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
             )
         },
         {
@@ -573,7 +608,7 @@ def message_params(bot, request):
 class MessageTestBase:
     id_ = 1
     from_user = User(2, "testuser", False)
-    date = dtm.datetime.utcnow()
+    date = dtm.datetime.now(dtm.UTC).replace(tzinfo=None)
     chat = Chat(3, "private")
     test_entities = [
         {"length": 4, "offset": 10, "type": "bold"},

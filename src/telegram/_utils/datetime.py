@@ -41,7 +41,7 @@ from telegram.warnings import PTBDeprecationWarning
 if TYPE_CHECKING:
     from telegram import Bot
 
-UTC = dtm.timezone.utc
+UTC = dtm.UTC
 try:
     import pytz
 except ImportError:
@@ -228,7 +228,7 @@ def _datetime_to_float_timestamp(dt_obj: dtm.datetime) -> float:
     If the datetime object is timezone-naive, it is assumed to be in UTC.
     """
     if dt_obj.tzinfo is None:
-        dt_obj = dt_obj.replace(tzinfo=dtm.timezone.utc)
+        dt_obj = dt_obj.replace(tzinfo=dtm.UTC)
     return dt_obj.timestamp()
 
 

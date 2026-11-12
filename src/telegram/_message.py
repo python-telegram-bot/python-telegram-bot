@@ -24,7 +24,7 @@ import datetime as dtm
 import re
 from collections.abc import Sequence
 from html import escape
-from typing import TYPE_CHECKING, Any, ClassVar, TypedDict
+from typing import TYPE_CHECKING, Any, ClassVar, Self, TypedDict, cast
 
 from telegram._chat import Chat
 from telegram._chatbackground import ChatBackground
@@ -208,15 +208,15 @@ class MaybeInaccessibleMessage(TelegramObject):
         cls,
         data: JSONDict,
         bot: "Bot | None" = None,
-    ) -> "MaybeInaccessibleMessage":
+    ) -> Self:
         """See :meth:`telegram.TelegramObject.de_json`."""
         # Dispatch *before* the plan runs so that the raw ``date`` value is still
         # an integer and can be compared to 0.
         if cls is MaybeInaccessibleMessage:
             data = cls._parse_data(data)
             if data.get("date") == 0:
-                return InaccessibleMessage.de_json(data=data, bot=bot)
-            return Message.de_json(data=data, bot=bot)
+                return cast("Self", InaccessibleMessage.de_json(data=data, bot=bot))
+            return cast("Self", Message.de_json(data=data, bot=bot))
         return super(MaybeInaccessibleMessage, cls).de_json(data=data, bot=bot)  # noqa: UP008
 
 

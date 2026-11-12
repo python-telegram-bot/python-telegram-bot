@@ -44,7 +44,7 @@ if TEST_WITH_OPT_DEPS:
 
     UTC = pytz.utc
 else:
-    UTC = dtm.timezone.utc
+    UTC = dtm.UTC
 
 
 class CustomContext(CallbackContext):
@@ -98,7 +98,7 @@ class TestJobQueue:
         jq.set_application(app)
         assert repr(jq) == f"JobQueue[application={app!r}]"
 
-        when = dtm.datetime.utcnow() + dtm.timedelta(days=1)
+        when = dtm.datetime.now(dtm.UTC).replace(tzinfo=None) + dtm.timedelta(days=1)
         callback = self.job_run_once
         job = jq.run_once(callback, when, name="name2")
         assert repr(job) == (
@@ -118,7 +118,7 @@ class TestJobQueue:
         # Unfortunately, we can't really test the executor setting explicitly without relying
         # on protected attributes. However, this should be tested enough implicitly via all the
         # other tests in here
-        assert job_queue.scheduler_configuration["timezone"] is dtm.timezone.utc
+        assert job_queue.scheduler_configuration["timezone"] is dtm.UTC
 
         tz_app = ApplicationBuilder().defaults(Defaults(tzinfo=timezone)).token(bot.token).build()
         assert tz_app.job_queue.scheduler_configuration["timezone"] is timezone

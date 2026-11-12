@@ -1,0 +1,5 @@
+internal = "Update dependency pytest-socket to v0.8.1"
+[[pull_requests]]
+uid = "5369"
+author_uids = ["renovate[bot]"]
+closes_threads = []

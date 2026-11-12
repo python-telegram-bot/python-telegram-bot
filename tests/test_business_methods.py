@@ -56,7 +56,7 @@ class TestBusinessMethodsWithoutRequest(BusinessMethodsTestBase):
     async def test_get_business_connection(self, offline_bot, monkeypatch):
         user = User(1, "first", False)
         user_chat_id = 1
-        date = dtm.datetime.utcnow()
+        date = dtm.datetime.now(dtm.UTC).replace(tzinfo=None)
         rights = BusinessBotRights(can_reply=True)
         is_enabled = True
         bc = BusinessConnection(

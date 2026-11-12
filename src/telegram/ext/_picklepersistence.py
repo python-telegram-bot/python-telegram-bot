@@ -298,7 +298,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Returns:
             dict[:obj:`int`, :obj:`dict`]: The restored user data.
         """
-        if self.user_data:
+        if self.user_data is not None:
             pass
         elif not self.single_file:
             data = self._load_file(Path(f"{self.filepath}_user_data"))
@@ -315,7 +315,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Returns:
             dict[:obj:`int`, :obj:`dict`]: The restored chat data.
         """
-        if self.chat_data:
+        if self.chat_data is not None:
             pass
         elif not self.single_file:
             data = self._load_file(Path(f"{self.filepath}_chat_data"))
@@ -333,7 +333,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Returns:
             :obj:`dict` | :attr:`telegram.ext.ContextTypes.bot_data`: The restored bot data.
         """
-        if self.bot_data:
+        if self.bot_data is not None:
             pass
         elif not self.single_file:
             data = self._load_file(Path(f"{self.filepath}_bot_data"))
@@ -376,7 +376,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
         Returns:
             :obj:`dict`: The restored conversations for the handler.
         """
-        if self.conversations:
+        if self.conversations is not None:
             pass
         elif not self.single_file:
             data = self._load_file(Path(f"{self.filepath}_conversations"))
@@ -398,7 +398,7 @@ class PicklePersistence(BasePersistence[UD, CD, BD]):
             key (:obj:`tuple`): The key the state is changed for.
             new_state (:class:`object`): The new state for the given key.
         """
-        if not self.conversations:
+        if self.conversations is None:
             self.conversations = {}
         if self.conversations.setdefault(name, {}).get(key) == new_state:
             return

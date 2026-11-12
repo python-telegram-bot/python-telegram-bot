@@ -19,6 +19,7 @@
 """This module contains the class which represents a Telegram ChatAdministratorRights."""
 
 import dataclasses
+from typing import Self
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.dataclass import tg_dataclass, tg_field
@@ -198,7 +199,7 @@ class ChatAdministratorRights(TelegramObject):
     can_manage_tags: bool | None = tg_field(compare=True, default=None)
 
     @classmethod
-    def all_rights(cls) -> "ChatAdministratorRights":
+    def all_rights(cls) -> Self:
         """
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`True`. This is e.g. useful when changing the bot's default administrator rights with
@@ -211,7 +212,7 @@ class ChatAdministratorRights(TelegramObject):
         )
 
     @classmethod
-    def no_rights(cls) -> "ChatAdministratorRights":
+    def no_rights(cls) -> Self:
         """
         This method returns the :class:`ChatAdministratorRights` object with all attributes set to
         :obj:`False`.

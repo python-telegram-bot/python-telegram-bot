@@ -19,6 +19,7 @@
 """This module contains an object that represents a Telegram ChatPermission."""
 
 import dataclasses
+from typing import Self
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.dataclass import tg_dataclass, tg_field
@@ -182,7 +183,7 @@ class ChatPermissions(TelegramObject):
     can_react_to_messages: bool | None = tg_field(compare=True, default=None)
 
     @classmethod
-    def all_permissions(cls) -> "ChatPermissions":
+    def all_permissions(cls) -> Self:
         """
         This method returns an :class:`ChatPermissions` instance with all attributes
         set to :obj:`True`. This is e.g. useful when unrestricting a chat member with
@@ -196,7 +197,7 @@ class ChatPermissions(TelegramObject):
         )
 
     @classmethod
-    def no_permissions(cls) -> "ChatPermissions":
+    def no_permissions(cls) -> Self:
         """
         This method returns an :class:`ChatPermissions` instance
         with all attributes set to :obj:`False`.

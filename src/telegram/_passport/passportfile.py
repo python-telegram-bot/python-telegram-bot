@@ -19,7 +19,7 @@
 """This module contains an object that represents a Encrypted PassportFile."""
 
 import datetime as dtm
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Self
 
 from telegram._telegramobject import TelegramObject
 from telegram._utils.dataclass import tg_dataclass, tg_field
@@ -91,7 +91,7 @@ class PassportFile(TelegramObject):
     @classmethod
     def de_json_decrypted(
         cls, data: JSONDict, bot: "Bot | None", credentials: "FileCredentials"
-    ) -> "PassportFile":
+    ) -> Self:
         """Variant of :meth:`telegram.TelegramObject.de_json` that also takes into account
         passport credentials.
 
@@ -121,7 +121,7 @@ class PassportFile(TelegramObject):
         data: list[JSONDict],
         bot: "Bot | None",
         credentials: list["FileCredentials"],
-    ) -> tuple["PassportFile", ...]:
+    ) -> tuple[Self, ...]:
         """Variant of :meth:`telegram.TelegramObject.de_list` that also takes into account
         passport credentials.
 

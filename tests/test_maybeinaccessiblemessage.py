@@ -38,7 +38,7 @@ def maybe_inaccessible_message():
 class MaybeInaccessibleMessageTestBase:
     chat = Chat(1, "title")
     message_id = 123
-    date = dtm.datetime.now(dtm.timezone.utc).replace(microsecond=0)
+    date = dtm.datetime.now(dtm.UTC).replace(microsecond=0)
 
 
 class TestMaybeInaccessibleMessageWithoutRequest(MaybeInaccessibleMessageTestBase):

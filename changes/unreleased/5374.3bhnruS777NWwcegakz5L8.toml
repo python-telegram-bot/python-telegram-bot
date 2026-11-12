@@ -1,0 +1,5 @@
+breaking = "Drop support for Python 3.10, and officially support Python 3.15 and 3.15t"
+[[pull_requests]]
+uid = "5374"
+author_uids = ["harshil21"]
+closes_threads = []

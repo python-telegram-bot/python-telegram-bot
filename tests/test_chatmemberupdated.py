@@ -257,7 +257,11 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         old_chat_member = ChatMember(user, "old_status")
         new_chat_member = ChatMember(user, "new_status")
         chat_member_updated = ChatMemberUpdated(
-            chat, user, dtm.datetime.utcnow(), old_chat_member, new_chat_member
+            chat,
+            user,
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+            old_chat_member,
+            new_chat_member,
         )
         assert chat_member_updated.difference() == {"status": ("old_status", "new_status")}
 
@@ -266,7 +270,11 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         new_user = User(1, "First name", False, last_name="last name")
         new_chat_member = ChatMember(new_user, "new_status")
         chat_member_updated = ChatMemberUpdated(
-            chat, user, dtm.datetime.utcnow(), old_chat_member, new_chat_member
+            chat,
+            user,
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+            old_chat_member,
+            new_chat_member,
         )
         assert chat_member_updated.difference() == {
             "status": ("old_status", "new_status"),
@@ -314,7 +322,11 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
             can_post_stories=True,
         )
         chat_member_updated = ChatMemberUpdated(
-            chat, user, dtm.datetime.utcnow(), old_chat_member, new_chat_member
+            chat,
+            user,
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+            old_chat_member,
+            new_chat_member,
         )
         assert chat_member_updated.difference() == {optional_attribute: (old_value, new_value)}
 
@@ -324,7 +336,7 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         chat_member_updated = ChatMemberUpdated(
             chat=chat,
             from_user=user,
-            date=dtm.datetime.utcnow(),
+            date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
             old_chat_member=old_chat_member,
             new_chat_member=new_chat_member,
         )

@@ -41,7 +41,7 @@ RELATIVE_TIME_SPECS = DELTA_TIME_SPECS + TIME_OF_DAY_TIME_SPECS
 
 ABSOLUTE_TIME_SPECS = [
     dtm.datetime.now(tz=dtm.timezone(dtm.timedelta(hours=-7))),
-    dtm.datetime.utcnow(),
+    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
 ]
 TIME_SPECS = ABSOLUTE_TIME_SPECS + RELATIVE_TIME_SPECS
 
@@ -83,7 +83,7 @@ class TestDatetime:
         assert tzinfo.utcoffset(dt) is not None
 
     def test_localize_zoneinfo_aware(self):
-        dt = dtm.datetime(2023, 1, 1, 12, 0, 0, tzinfo=dtm.timezone.utc)
+        dt = dtm.datetime(2023, 1, 1, 12, 0, 0, tzinfo=dtm.UTC)
         tzinfo = zoneinfo.ZoneInfo("Europe/Berlin")
         localized_dt = tg_dtm.localize(dt, tzinfo)
         assert localized_dt.hour == dt.hour + 1
@@ -179,7 +179,7 @@ class TestDatetime:
         assert tg_dtm.from_timestamp(None) is None
 
     def test_from_timestamp_naive(self):
-        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=dtm.timezone.utc)
+        datetime = dtm.datetime(2019, 11, 11, 0, 26, 16, tzinfo=dtm.UTC)
         assert tg_dtm.from_timestamp(1573431976, tzinfo=None) == datetime
 
     def test_from_timestamp_aware(self, timezone):

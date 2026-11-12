@@ -1,0 +1,5 @@
+internal = "Update dependency sphinxcontrib-mermaid to v2.1.1"
+[[pull_requests]]
+uid = "5370"
+author_uids = ["renovate[bot]"]
+closes_threads = []

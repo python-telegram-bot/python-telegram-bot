@@ -23,7 +23,7 @@ import json
 from contextlib import AbstractAsyncContextManager
 from http import HTTPStatus
 from types import TracebackType
-from typing import Final, TypeVar, final
+from typing import Final, Self, final
 
 from telegram._utils.defaultvalue import DEFAULT_NONE as _DEFAULT_NONE
 from telegram._utils.defaultvalue import DefaultValue
@@ -42,8 +42,6 @@ from telegram.error import (
     TelegramError,
 )
 from telegram.request._requestdata import RequestData
-
-RT = TypeVar("RT", bound="BaseRequest")
 
 _LOGGER = get_logger(__name__, class_name="BaseRequest")
 
@@ -103,7 +101,7 @@ class BaseRequest(
         Use ``if parameter is (not) BaseRequest.DEFAULT_NONE:`` to check if the parameter was set.
     """
 
-    async def __aenter__(self: RT) -> RT:
+    async def __aenter__(self) -> Self:
         """|async_context_manager| :meth:`initializes <initialize>` the Request.
 
         Returns:

@@ -18,7 +18,7 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the CallbackQueryHandler class."""
 
-import asyncio
+import inspect
 import re
 from collections.abc import Callable
 from re import Match, Pattern
@@ -136,7 +136,7 @@ class CallbackQueryHandler(BaseHandler[Update, CCT, RT]):
     ):
         super().__init__(callback, block=block)
 
-        if callable(pattern) and asyncio.iscoroutinefunction(pattern):
+        if callable(pattern) and inspect.iscoroutinefunction(pattern):
             raise TypeError(
                 "The `pattern` must not be a coroutine function! Use an ordinary function instead."
             )
