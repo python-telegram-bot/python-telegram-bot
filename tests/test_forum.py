@@ -33,7 +33,6 @@ from telegram import (
 )
 from telegram.error import BadRequest
 from tests.auxil.constants import TEST_MSG_TEXT, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -65,12 +64,6 @@ class ForumTopicTestBase:
 
 
 class TestForumTopicWithoutRequest(ForumTopicTestBase):
-    def test_slot_behaviour(self, offline_forum_topic_object):
-        inst = offline_forum_topic_object
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     async def test_expected_values(
         self, offline_emoji_id, forum_group_id, offline_forum_topic_object
     ):
@@ -327,13 +320,6 @@ class ForumTopicCreatedTestBase:
 
 
 class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
-    def test_slot_behaviour(self, topic_created):
-        for attr in topic_created.__slots__:
-            assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(topic_created)) == len(set(mro_slots(topic_created))), (
-            "duplicate slot"
-        )
-
     def test_expected_values(self, topic_created):
         assert topic_created.icon_color == self.TEST_TOPIC_ICON_COLOR
         assert topic_created.name == self.TEST_TOPIC_NAME
@@ -381,12 +367,6 @@ class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
 
 
 class TestForumTopicClosedWithoutRequest:
-    def test_slot_behaviour(self):
-        action = ForumTopicClosed()
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json(self):
         action = ForumTopicClosed.de_json({}, None)
         assert action.api_kwargs == {}
@@ -399,12 +379,6 @@ class TestForumTopicClosedWithoutRequest:
 
 
 class TestForumTopicReopenedWithoutRequest:
-    def test_slot_behaviour(self):
-        action = ForumTopicReopened()
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json(self):
         action = ForumTopicReopened.de_json({}, None)
         assert action.api_kwargs == {}
@@ -422,11 +396,6 @@ def topic_edited(emoji_id):
 
 
 class TestForumTopicEdited:
-    def test_slot_behaviour(self, topic_edited):
-        for attr in topic_edited.__slots__:
-            assert getattr(topic_edited, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(topic_edited)) == len(set(mro_slots(topic_edited))), "duplicate slot"
-
     def test_expected_values(self, topic_edited, emoji_id):
         assert topic_edited.name == TEST_TOPIC_NAME
         assert topic_edited.icon_custom_emoji_id == emoji_id
@@ -471,12 +440,6 @@ class TestForumTopicEdited:
 
 
 class TestGeneralForumTopicHidden:
-    def test_slot_behaviour(self):
-        action = GeneralForumTopicHidden()
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json(self):
         action = GeneralForumTopicHidden.de_json({}, None)
         assert action.api_kwargs == {}
@@ -489,12 +452,6 @@ class TestGeneralForumTopicHidden:
 
 
 class TestGeneralForumTopicUnhidden:
-    def test_slot_behaviour(self):
-        action = GeneralForumTopicUnhidden()
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
-
     def test_de_json(self):
         action = GeneralForumTopicUnhidden.de_json({}, None)
         assert action.api_kwargs == {}

@@ -38,7 +38,6 @@ from telegram import (
 )
 from telegram.constants import PaidMediaType
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -77,12 +76,6 @@ class PaidMediaTestBase:
 
 
 class TestPaidMediaWithoutRequest(PaidMediaTestBase):
-    def test_slot_behaviour(self, paid_media):
-        inst = paid_media
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self, paid_media):
         assert type(PaidMedia("photo").type) is PaidMediaType
         assert PaidMedia("unknown").type == "unknown"
@@ -152,12 +145,6 @@ def paid_media_photo():
 class TestPaidMediaPhotoWithoutRequest(PaidMediaTestBase):
     type = PaidMediaType.PHOTO
 
-    def test_slot_behaviour(self, paid_media_photo):
-        inst = paid_media_photo
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "photo": [p.to_dict() for p in self.photo],
@@ -197,12 +184,6 @@ def paid_media_video():
 
 class TestPaidMediaVideoWithoutRequest(PaidMediaTestBase):
     type = PaidMediaType.VIDEO
-
-    def test_slot_behaviour(self, paid_media_video):
-        inst = paid_media_video
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -247,12 +228,6 @@ def paid_media_live_photo():
 
 class TestPaidMediaLivePhotoWithoutRequest(PaidMediaTestBase):
     type = PaidMediaType.LIVE_PHOTO
-
-    def test_slot_behaviour(self, paid_media_live_photo):
-        inst = paid_media_live_photo
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -299,12 +274,6 @@ def paid_media_preview():
 
 class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
     type = PaidMediaType.PREVIEW
-
-    def test_slot_behaviour(self, paid_media_preview):
-        inst = paid_media_preview
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -433,12 +402,6 @@ class PaidMediaInfoTestBase:
 
 
 class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase):
-    def test_slot_behaviour(self, paid_media_info):
-        inst = paid_media_info
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "star_count": self.star_count,
@@ -472,12 +435,6 @@ class PaidMediaPurchasedTestBase:
 
 
 class TestPaidMediaPurchasedWithoutRequest(PaidMediaPurchasedTestBase):
-    def test_slot_behaviour(self, paid_media_purchased):
-        inst = paid_media_purchased
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, bot):
         json_dict = {
             "from": self.from_user.to_dict(),

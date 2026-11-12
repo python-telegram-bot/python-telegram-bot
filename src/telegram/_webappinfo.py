@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram Web App Info."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class WebAppInfo(TelegramObject):
     """
     This object contains information about a `Web App <https://core.telegram.org/bots/webapps>`_.
@@ -45,13 +46,5 @@ class WebAppInfo(TelegramObject):
             <https://core.telegram.org/bots/webapps#initializing-mini-apps>`_.
     """
 
-    __slots__ = ("url",)
-
-    def __init__(self, url: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.url: str = url
-
-        self._id_attrs = (self.url,)
-
-        self._freeze()
+    # Required
+    url: str = tg_field(compare=True)

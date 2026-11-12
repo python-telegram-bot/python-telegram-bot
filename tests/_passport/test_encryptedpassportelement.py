@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import EncryptedPassportElement, PassportElementError, PassportFile
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -51,12 +50,6 @@ class EncryptedPassportElementTestBase:
 
 
 class TestEncryptedPassportElementWithoutRequest(EncryptedPassportElementTestBase):
-    def test_slot_behaviour(self, encrypted_passport_element):
-        inst = encrypted_passport_element
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, encrypted_passport_element):
         assert encrypted_passport_element.type == self.type_
         assert encrypted_passport_element.hash == self.hash

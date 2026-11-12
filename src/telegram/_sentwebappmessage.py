@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram Sent Web App Message."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class SentWebAppMessage(TelegramObject):
     """Contains information about an inline message sent by a Web App on behalf of a user.
 
@@ -41,15 +42,5 @@ class SentWebAppMessage(TelegramObject):
             the message.
     """
 
-    __slots__ = ("inline_message_id",)
-
-    def __init__(
-        self, inline_message_id: str | None = None, *, api_kwargs: JSONDict | None = None
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Optionals
-        self.inline_message_id: str | None = inline_message_id
-
-        self._id_attrs = (self.inline_message_id,)
-
-        self._freeze()
+    # Optionals
+    inline_message_id: str | None = tg_field(compare=True, default=None)

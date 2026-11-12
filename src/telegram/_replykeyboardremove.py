@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram ReplyKeyboardRemove."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ReplyKeyboardRemove(TelegramObject):
     """
     Upon receiving a message with this object, Telegram clients will remove the current custom
@@ -60,13 +61,7 @@ class ReplyKeyboardRemove(TelegramObject):
 
     """
 
-    __slots__ = ("remove_keyboard", "selective")
+    # Attribute only (init=False)
+    remove_keyboard: bool = tg_field(compare=True, init=False, default=True)
 
-    def __init__(self, selective: bool | None = None, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.remove_keyboard: bool = True
-        # Optionals
-        self.selective: bool | None = selective
-
-        self._freeze()
+    selective: bool | None = tg_field(default=None)

@@ -18,19 +18,20 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram InputSticker."""
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._files.sticker import MaskPosition
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.files import parse_file_input
-from telegram._utils.types import FileInput, JSONDict
+from telegram._utils.types import FileInput
 
 if TYPE_CHECKING:
     from telegram._files.inputfile import InputFile
 
 
+@tg_dataclass()
 class InputSticker(TelegramObject):
     """
     This object describes a sticker to be added to a sticker set.
@@ -90,30 +91,20 @@ class InputSticker(TelegramObject):
             .. versionadded:: 21.1
     """
 
-    __slots__ = ("emoji_list", "format", "keywords", "mask_position", "sticker")
-
-    def __init__(
-        self,
-        sticker: FileInput,
-        emoji_list: Sequence[str],
-        format: str,  # pylint: disable=redefined-builtin
-        mask_position: MaskPosition | None = None,
-        keywords: Sequence[str] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
+    @staticmethod
+    def _sticker_converter(value: FileInput) -> "str | InputFile":
         # We use local_mode=True because we don't have access to the actual setting and want
         # things to work in local mode.
-        self.sticker: str | InputFile = parse_file_input(
-            sticker,
+        return parse_file_input(
+            value,
             local_mode=True,
             attach=True,
         )
-        self.emoji_list: tuple[str, ...] = parse_sequence_arg(emoji_list)
-        self.format: str = format
-        self.mask_position: MaskPosition | None = mask_position
-        self.keywords: tuple[str, ...] = parse_sequence_arg(keywords)
 
-        self._freeze()
+    # Required
+    sticker: "str | InputFile" = tg_field(converter=_sticker_converter)
+    emoji_list: tuple[str, ...] = tg_field(converter=parse_sequence_arg)
+    format: str = tg_field()
+    # Optional
+    mask_position: MaskPosition | None = tg_field(default=None)
+    keywords: tuple[str, ...] = tg_field(default=None, converter=parse_sequence_arg)

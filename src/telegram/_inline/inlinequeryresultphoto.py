@@ -18,21 +18,22 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the classes that represent Telegram InlineQueryResultPhoto."""
 
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
 from telegram._messageentity import MessageEntity
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import ODVInput
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultPhoto(InlineQueryResult):
     """
     Represents a link to a photo. By default, this photo will be sent by the user with optional
@@ -110,53 +111,21 @@ class InlineQueryResultPhoto(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "caption",
-        "caption_entities",
-        "description",
-        "input_message_content",
-        "parse_mode",
-        "photo_height",
-        "photo_url",
-        "photo_width",
-        "reply_markup",
-        "show_caption_above_media",
-        "thumbnail_url",
-        "title",
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.PHOTO)
+    # Required
+    photo_url: str = tg_field()
+    thumbnail_url: str = tg_field()
+    # Optional
+    photo_width: int | None = tg_field(default=None)
+    photo_height: int | None = tg_field(default=None)
+    title: str | None = tg_field(default=None)
+    description: str | None = tg_field(default=None)
+    caption: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    caption_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        photo_url: str,
-        thumbnail_url: str,
-        photo_width: int | None = None,
-        photo_height: int | None = None,
-        title: str | None = None,
-        description: str | None = None,
-        caption: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        caption_entities: Sequence[MessageEntity] | None = None,
-        show_caption_above_media: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.PHOTO, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.photo_url: str = photo_url
-            self.thumbnail_url: str = thumbnail_url
-
-            # Optionals
-            self.photo_width: int | None = photo_width
-            self.photo_height: int | None = photo_height
-            self.title: str | None = title
-            self.description: str | None = description
-            self.caption: str | None = caption
-            self.parse_mode: ODVInput[str] = parse_mode
-            self.caption_entities: tuple[MessageEntity, ...] = parse_sequence_arg(caption_entities)
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
-            self.show_caption_above_media: bool | None = show_caption_above_media
+    show_caption_above_media: bool | None = tg_field(default=None)

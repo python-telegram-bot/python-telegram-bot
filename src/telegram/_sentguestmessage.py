@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram Sent Guest Message."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class SentGuestMessage(TelegramObject):
     """Describes an inline message sent by a guest bot.
 
@@ -37,18 +38,5 @@ class SentGuestMessage(TelegramObject):
         inline_message_id (:obj:`str`): Identifier of the sent inline message.
     """
 
-    __slots__ = ("inline_message_id",)
-
-    def __init__(
-        self,
-        inline_message_id: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.inline_message_id: str = inline_message_id
-
-        self._id_attrs = (self.inline_message_id,)
-
-        self._freeze()
+    # Required
+    inline_message_id: str = tg_field(compare=True)

@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import LabeledPrice, Location
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -33,12 +32,6 @@ class LabeledPriceTestBase:
 
 
 class TestLabeledPriceWithoutRequest(LabeledPriceTestBase):
-    def test_slot_behaviour(self, labeled_price):
-        inst = labeled_price
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, labeled_price):
         assert labeled_price.label == self.label
         assert labeled_price.amount == self.amount

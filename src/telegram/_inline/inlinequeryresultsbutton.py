@@ -18,14 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains the class that represent a Telegram InlineQueryResultsButton."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._webappinfo import WebAppInfo
 
 
+@tg_dataclass()
 class InlineQueryResultsButton(TelegramObject):
     """This object represents a button to be shown above inline query results. You **must** use
     exactly one of the optional fields.
@@ -71,34 +72,17 @@ class InlineQueryResultsButton(TelegramObject):
 
     """
 
-    __slots__ = ("start_parameter", "text", "web_app")
+    # Required
+    text: str = tg_field(compare=True)
+    # Optional
+    web_app: WebAppInfo | None = tg_field(compare=True, default=None)
+    start_parameter: str | None = tg_field(compare=True, default=None)
 
-    def __init__(
-        self,
-        text: str,
-        web_app: WebAppInfo | None = None,
-        start_parameter: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.text: str = text
-
-        # Optional
-        self.web_app: WebAppInfo | None = web_app
-        self.start_parameter: str | None = start_parameter
-
-        self._id_attrs = (self.text, self.web_app, self.start_parameter)
-
-        self._freeze()
-
-    MIN_START_PARAMETER_LENGTH: Final[int] = (
+    MIN_START_PARAMETER_LENGTH: ClassVar[int] = (
         constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH
     )
     """:const:`telegram.constants.InlineQueryResultsButtonLimit.MIN_START_PARAMETER_LENGTH`"""
-    MAX_START_PARAMETER_LENGTH: Final[int] = (
+    MAX_START_PARAMETER_LENGTH: ClassVar[int] = (
         constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH
     )
     """:const:`telegram.constants.InlineQueryResultsButtonLimit.MAX_START_PARAMETER_LENGTH`"""

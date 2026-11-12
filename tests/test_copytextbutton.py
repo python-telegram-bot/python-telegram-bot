@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import BotCommand, CopyTextButton
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -33,13 +32,6 @@ class CopyTextButtonTestBase:
 
 
 class TestCopyTextButtonWithoutRequest(CopyTextButtonTestBase):
-    def test_slot_behaviour(self, copy_text_button):
-        for attr in copy_text_button.__slots__:
-            assert getattr(copy_text_button, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(copy_text_button)) == len(set(mro_slots(copy_text_button))), (
-            "duplicate slot"
-        )
-
     def test_de_json(self, offline_bot):
         json_dict = {"text": self.text}
         copy_text_button = CopyTextButton.de_json(json_dict, offline_bot)

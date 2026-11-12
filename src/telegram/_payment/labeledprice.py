@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram LabeledPrice."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class LabeledPrice(TelegramObject):
     """This object represents a portion of the price for goods or services.
 
@@ -51,13 +52,5 @@ class LabeledPrice(TelegramObject):
 
     """
 
-    __slots__ = ("amount", "label")
-
-    def __init__(self, label: str, amount: int, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.label: str = label
-        self.amount: int = amount
-
-        self._id_attrs = (self.label, self.amount)
-
-        self._freeze()
+    label: str = tg_field(compare=True)
+    amount: int = tg_field(compare=True)

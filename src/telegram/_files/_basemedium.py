@@ -21,6 +21,7 @@
 from typing import TYPE_CHECKING
 
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -28,6 +29,7 @@ if TYPE_CHECKING:
     from telegram import File
 
 
+@tg_dataclass()
 class _BaseMedium(TelegramObject):
     """Base class for objects representing the various media file types.
     Objects of this class are comparable in terms of equality. Two objects of this class are
@@ -39,36 +41,18 @@ class _BaseMedium(TelegramObject):
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`int`, optional): File size.
 
     Attributes:
         file_id (:obj:`str`): File identifier.
         file_unique_id (:obj:`str`): Unique identifier for this file, which
             is supposed to be the same over time and for different bots.
             Can't be used to download or reuse the file.
-        file_size (:obj:`int`): Optional. File size.
 
     """
 
-    __slots__ = ("file_id", "file_size", "file_unique_id")
-
-    def __init__(
-        self,
-        file_id: str,
-        file_unique_id: str,
-        file_size: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.file_id: str = str(file_id)
-        self.file_unique_id: str = str(file_unique_id)
-        # Optionals
-        self.file_size: int | None = file_size
-
-        self._id_attrs = (self.file_unique_id,)
+    # Required
+    file_id: str = tg_field()
+    file_unique_id: str = tg_field(compare=True)
 
     async def get_file(
         self,

@@ -19,9 +19,10 @@
 # pylint: disable=missing-module-docstring
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class PersonalDetails(TelegramObject):
     """
     This object represents personal details.
@@ -59,50 +60,21 @@ class PersonalDetails(TelegramObject):
             residence.
     """
 
-    __slots__ = (
-        "birth_date",
-        "country_code",
-        "first_name",
-        "first_name_native",
-        "gender",
-        "last_name",
-        "last_name_native",
-        "middle_name",
-        "middle_name_native",
-        "residence_country_code",
-    )
-
-    def __init__(
-        self,
-        first_name: str,
-        last_name: str,
-        birth_date: str,
-        gender: str,
-        country_code: str,
-        residence_country_code: str,
-        first_name_native: str | None = None,
-        last_name_native: str | None = None,
-        middle_name: str | None = None,
-        middle_name_native: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.first_name: str = first_name
-        self.last_name: str = last_name
-        self.middle_name: str | None = middle_name
-        self.birth_date: str = birth_date
-        self.gender: str = gender
-        self.country_code: str = country_code
-        self.residence_country_code: str = residence_country_code
-        self.first_name_native: str | None = first_name_native
-        self.last_name_native: str | None = last_name_native
-        self.middle_name_native: str | None = middle_name_native
-
-        self._freeze()
+    # Required
+    first_name: str = tg_field()
+    last_name: str = tg_field()
+    birth_date: str = tg_field()
+    gender: str = tg_field()
+    country_code: str = tg_field()
+    residence_country_code: str = tg_field()
+    # Optional
+    first_name_native: str | None = tg_field(default=None)
+    last_name_native: str | None = tg_field(default=None)
+    middle_name: str | None = tg_field(default=None)
+    middle_name_native: str | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class ResidentialAddress(TelegramObject):
     """
     This object represents a residential address.
@@ -124,38 +96,16 @@ class ResidentialAddress(TelegramObject):
         post_code (:obj:`str`): Address post code.
     """
 
-    __slots__ = (
-        "city",
-        "country_code",
-        "post_code",
-        "state",
-        "street_line1",
-        "street_line2",
-    )
-
-    def __init__(
-        self,
-        street_line1: str,
-        street_line2: str,
-        city: str,
-        state: str,
-        country_code: str,
-        post_code: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.street_line1: str = street_line1
-        self.street_line2: str = street_line2
-        self.city: str = city
-        self.state: str = state
-        self.country_code: str = country_code
-        self.post_code: str = post_code
-
-        self._freeze()
+    # Required
+    street_line1: str = tg_field()
+    street_line2: str = tg_field()
+    city: str = tg_field()
+    state: str = tg_field()
+    country_code: str = tg_field()
+    post_code: str = tg_field()
 
 
+@tg_dataclass()
 class IdDocumentData(TelegramObject):
     """
     This object represents the data of an identity document.
@@ -169,17 +119,5 @@ class IdDocumentData(TelegramObject):
         expiry_date (:obj:`str`): Optional. Date of expiry, in DD.MM.YYYY format.
     """
 
-    __slots__ = ("document_no", "expiry_date")
-
-    def __init__(
-        self,
-        document_no: str,
-        expiry_date: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.document_no: str = document_no
-        self.expiry_date: str = expiry_date
-
-        self._freeze()
+    document_no: str = tg_field()
+    expiry_date: str = tg_field()

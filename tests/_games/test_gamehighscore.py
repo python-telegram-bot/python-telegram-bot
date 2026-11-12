@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import GameHighScore, User
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -37,11 +36,6 @@ class GameHighScoreTestBase:
 
 
 class TestGameHighScoreWithoutRequest(GameHighScoreTestBase):
-    def test_slot_behaviour(self, game_highscore):
-        for attr in game_highscore.__slots__:
-            assert getattr(game_highscore, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(game_highscore)) == len(set(mro_slots(game_highscore))), "same slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "position": self.position,

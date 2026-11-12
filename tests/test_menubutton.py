@@ -27,7 +27,6 @@ from telegram import (
     WebAppInfo,
 )
 from telegram.constants import MenuButtonType
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -42,12 +41,6 @@ class MenuButtonTestBase:
 
 
 class TestMenuButtonWithoutRequest(MenuButtonTestBase):
-    def test_slot_behaviour(self, menu_button):
-        inst = menu_button
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self, menu_button):
         assert type(MenuButton("default").type) is MenuButtonType
         assert MenuButton("unknown").type == "unknown"
@@ -107,12 +100,6 @@ def menu_button_commands():
 class TestMenuButtonCommandsWithoutRequest(MenuButtonTestBase):
     type = MenuButtonType.COMMANDS
 
-    def test_slot_behaviour(self, menu_button_commands):
-        inst = menu_button_commands
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         transaction_partner = MenuButtonCommands.de_json({}, offline_bot)
         assert transaction_partner.api_kwargs == {}
@@ -144,12 +131,6 @@ def menu_button_default():
 
 class TestMenuButtonDefaultWithoutRequest(MenuButtonTestBase):
     type = MenuButtonType.DEFAULT
-
-    def test_slot_behaviour(self, menu_button_default):
-        inst = menu_button_default
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         transaction_partner = MenuButtonDefault.de_json({}, offline_bot)
@@ -185,12 +166,6 @@ def menu_button_web_app():
 
 class TestMenuButtonWebAppWithoutRequest(MenuButtonTestBase):
     type = MenuButtonType.WEB_APP
-
-    def test_slot_behaviour(self, menu_button_web_app):
-        inst = menu_button_web_app
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {"web_app": self.web_app.to_dict(), "text": self.text}

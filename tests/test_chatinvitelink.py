@@ -23,7 +23,6 @@ import pytest
 from telegram import ChatInviteLink, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -62,11 +61,6 @@ class ChatInviteLinkTestBase:
 
 
 class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
-    def test_slot_behaviour(self, invite_link):
-        for attr in invite_link.__slots__:
-            assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"
-
     def test_de_json_required_args(self, offline_bot, creator):
         json_dict = {
             "invite_link": self.link,
@@ -95,7 +89,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "expire_date": to_timestamp(self.expire_date),
             "member_limit": self.member_limit,
             "name": self.name,
-            "pending_join_request_count": str(self.pending_join_request_count),
+            "pending_join_request_count": self.pending_join_request_count,
             "subscription_period": int(self.subscription_period.total_seconds()),
             "subscription_price": self.subscription_price,
         }
@@ -126,7 +120,7 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "expire_date": to_timestamp(self.expire_date),
             "member_limit": self.member_limit,
             "name": self.name,
-            "pending_join_request_count": str(self.pending_join_request_count),
+            "pending_join_request_count": self.pending_join_request_count,
         }
 
         invite_link_raw = ChatInviteLink.de_json(json_dict, raw_bot)

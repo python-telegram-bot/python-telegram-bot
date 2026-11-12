@@ -39,7 +39,6 @@ from telegram.helpers import escape_markdown
 from telegram.request import RequestData
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -69,11 +68,6 @@ class LivePhotoTestBase:
 
 
 class TestLivePhotoWithoutRequest(LivePhotoTestBase):
-    def test_slot_behaviour(self, live_photo):
-        for attr in live_photo.__slots__:
-            assert getattr(live_photo, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(live_photo)) == len(set(mro_slots(live_photo))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "file_id": self.file_id,

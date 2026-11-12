@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram RefundedPayment."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class RefundedPayment(TelegramObject):
     """This object contains basic information about a refunded payment.
 
@@ -60,32 +61,10 @@ class RefundedPayment(TelegramObject):
 
     """
 
-    __slots__ = (
-        "currency",
-        "invoice_payload",
-        "provider_payment_charge_id",
-        "telegram_payment_charge_id",
-        "total_amount",
-    )
-
-    def __init__(
-        self,
-        currency: str,
-        total_amount: int,
-        invoice_payload: str,
-        telegram_payment_charge_id: str,
-        provider_payment_charge_id: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.currency: str = currency
-        self.total_amount: int = total_amount
-        self.invoice_payload: str = invoice_payload
-        self.telegram_payment_charge_id: str = telegram_payment_charge_id
-        # Optional
-        self.provider_payment_charge_id: str | None = provider_payment_charge_id
-
-        self._id_attrs = (self.telegram_payment_charge_id,)
-
-        self._freeze()
+    # Required
+    currency: str = tg_field()
+    total_amount: int = tg_field()
+    invoice_payload: str = tg_field()
+    telegram_payment_charge_id: str = tg_field(compare=True)
+    # Optional
+    provider_payment_charge_id: str | None = tg_field(default=None)

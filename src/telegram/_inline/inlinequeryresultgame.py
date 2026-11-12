@@ -20,10 +20,11 @@
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.constants import InlineQueryResultType
 
 
+@tg_dataclass()
 class InlineQueryResultGame(InlineQueryResult):
     """Represents a :class:`telegram.Game`.
 
@@ -46,20 +47,9 @@ class InlineQueryResultGame(InlineQueryResult):
 
     """
 
-    __slots__ = ("game_short_name", "reply_markup")
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        game_short_name: str,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.GAME, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.id: str = id
-            self.game_short_name: str = game_short_name
-
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.GAME)
+    # Required
+    game_short_name: str = tg_field()
+    # Optional
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)

@@ -24,10 +24,12 @@ from telegram._chat import Chat
 from telegram._chatinvitelink import ChatInviteLink
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
 
+@tg_dataclass()
 class ChatJoinRequest(TelegramObject):
     """This object represents a join request sent to a chat.
 
@@ -96,33 +98,15 @@ class ChatJoinRequest(TelegramObject):
 
     """
 
-    __slots__ = ("bio", "chat", "date", "from_user", "invite_link", "user_chat_id")
+    # Required
+    chat: Chat = tg_field(compare=True)
+    from_user: User = tg_field(compare=True)
+    date: dtm.datetime = tg_field(compare=True)
+    user_chat_id: int = tg_field()
 
-    def __init__(
-        self,
-        chat: Chat,
-        from_user: User,
-        date: dtm.datetime,
-        user_chat_id: int,
-        bio: str | None = None,
-        invite_link: ChatInviteLink | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.chat: Chat = chat
-        self.from_user: User = from_user
-        self.date: dtm.datetime = date
-        self.user_chat_id: int = user_chat_id
-
-        # Optionals
-        self.bio: str | None = bio
-        self.invite_link: ChatInviteLink | None = invite_link
-
-        self._id_attrs = (self.chat, self.from_user, self.date)
-
-        self._freeze()
+    # Optionals
+    bio: str | None = tg_field(default=None)
+    invite_link: ChatInviteLink | None = tg_field(default=None)
 
     async def approve(
         self,

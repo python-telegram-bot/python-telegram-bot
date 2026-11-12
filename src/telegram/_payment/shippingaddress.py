@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram ShippingAddress."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ShippingAddress(TelegramObject):
     """This object represents a Telegram ShippingAddress.
 
@@ -47,41 +48,9 @@ class ShippingAddress(TelegramObject):
 
     """
 
-    __slots__ = (
-        "city",
-        "country_code",
-        "post_code",
-        "state",
-        "street_line1",
-        "street_line2",
-    )
-
-    def __init__(
-        self,
-        country_code: str,
-        state: str,
-        city: str,
-        street_line1: str,
-        street_line2: str,
-        post_code: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.country_code: str = country_code
-        self.state: str = state
-        self.city: str = city
-        self.street_line1: str = street_line1
-        self.street_line2: str = street_line2
-        self.post_code: str = post_code
-
-        self._id_attrs = (
-            self.country_code,
-            self.state,
-            self.city,
-            self.street_line1,
-            self.street_line2,
-            self.post_code,
-        )
-
-        self._freeze()
+    country_code: str = tg_field(compare=True)
+    state: str = tg_field(compare=True)
+    city: str = tg_field(compare=True)
+    street_line1: str = tg_field(compare=True)
+    street_line2: str = tg_field(compare=True)
+    post_code: str = tg_field(compare=True)

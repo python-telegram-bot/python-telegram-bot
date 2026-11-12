@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import ForceReply, ReplyKeyboardRemove
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -35,11 +34,6 @@ class ForceReplyTestBase:
 
 
 class TestForceReplyWithoutRequest(ForceReplyTestBase):
-    def test_slot_behaviour(self, force_reply):
-        for attr in force_reply.__slots__:
-            assert getattr(force_reply, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(force_reply)) == len(set(mro_slots(force_reply))), "duplicate slot"
-
     def test_expected(self, force_reply):
         assert force_reply.force_reply == self.force_reply
         assert force_reply.selective == self.selective

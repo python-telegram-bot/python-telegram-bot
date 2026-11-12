@@ -25,7 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -73,8 +73,8 @@ def user(bot):
         supports_guest_queries=UserTestBase.supports_guest_queries,
     )
     user.set_bot(bot)
-    user._unfreeze()
-    return user
+    with unfrozen(user):
+        yield user
 
 
 class UserTestBase:
@@ -98,11 +98,6 @@ class UserTestBase:
 
 
 class TestUserWithoutRequest(UserTestBase):
-    def test_slot_behaviour(self, user):
-        for attr in user.__slots__:
-            assert getattr(user, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(user)) == len(set(mro_slots(user))), "duplicate slot"
-
     def test_de_json(self, json_dict, offline_bot):
         user = User.de_json(json_dict, offline_bot)
         assert user.api_kwargs == {}

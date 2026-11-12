@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import BotCommand, ProximityAlertTriggered, User
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -38,12 +37,6 @@ class ProximityAlertTriggeredTestBase:
 
 
 class TestProximityAlertTriggeredWithoutRequest(ProximityAlertTriggeredTestBase):
-    def test_slot_behaviour(self, proximity_alert_triggered):
-        inst = proximity_alert_triggered
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "traveler": self.traveler.to_dict(),

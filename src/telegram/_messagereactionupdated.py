@@ -19,16 +19,16 @@
 """This module contains an object that represents a Telegram MessageReaction Update."""
 
 import datetime as dtm
-from collections.abc import Sequence
 
 from telegram._chat import Chat
 from telegram._reaction import ReactionCount, ReactionType
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class MessageReactionCountUpdated(TelegramObject):
     """This class represents reaction changes on a message with anonymous reactions.
 
@@ -55,33 +55,13 @@ class MessageReactionCountUpdated(TelegramObject):
             the message
     """
 
-    __slots__ = (
-        "chat",
-        "date",
-        "message_id",
-        "reactions",
-    )
-
-    def __init__(
-        self,
-        chat: Chat,
-        message_id: int,
-        date: dtm.datetime,
-        reactions: Sequence[ReactionCount],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.chat: Chat = chat
-        self.message_id: int = message_id
-        self.date: dtm.datetime = date
-        self.reactions: tuple[ReactionCount, ...] = parse_sequence_arg(reactions)
-
-        self._id_attrs = (self.chat, self.message_id, self.date, self.reactions)
-        self._freeze()
+    chat: Chat = tg_field(compare=True)
+    message_id: int = tg_field(compare=True)
+    date: dtm.datetime = tg_field(compare=True)
+    reactions: tuple[ReactionCount, ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class MessageReactionUpdated(TelegramObject):
     """This class represents a change of a reaction on a message performed by a user.
 
@@ -120,45 +100,12 @@ class MessageReactionUpdated(TelegramObject):
             changed, if the user is anonymous.
     """
 
-    __slots__ = (
-        "actor_chat",
-        "chat",
-        "date",
-        "message_id",
-        "new_reaction",
-        "old_reaction",
-        "user",
-    )
-
-    def __init__(
-        self,
-        chat: Chat,
-        message_id: int,
-        date: dtm.datetime,
-        old_reaction: Sequence[ReactionType],
-        new_reaction: Sequence[ReactionType],
-        user: User | None = None,
-        actor_chat: Chat | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.chat: Chat = chat
-        self.message_id: int = message_id
-        self.date: dtm.datetime = date
-        self.old_reaction: tuple[ReactionType, ...] = parse_sequence_arg(old_reaction)
-        self.new_reaction: tuple[ReactionType, ...] = parse_sequence_arg(new_reaction)
-
-        # Optional
-        self.user: User | None = user
-        self.actor_chat: Chat | None = actor_chat
-
-        self._id_attrs = (
-            self.chat,
-            self.message_id,
-            self.date,
-            self.old_reaction,
-            self.new_reaction,
-        )
-        self._freeze()
+    # Required
+    chat: Chat = tg_field(compare=True)
+    message_id: int = tg_field(compare=True)
+    date: dtm.datetime = tg_field(compare=True)
+    old_reaction: tuple[ReactionType, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    new_reaction: tuple[ReactionType, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    # Optional
+    user: User | None = tg_field(default=None)
+    actor_chat: Chat | None = tg_field(default=None)

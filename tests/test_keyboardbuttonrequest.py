@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import ChatAdministratorRights, KeyboardButtonRequestChat, KeyboardButtonRequestUsers
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="class")
@@ -41,13 +40,6 @@ class KeyboardButtonRequestUsersTestBase:
 
 
 class TestKeyboardButtonRequestUsersWithoutRequest(KeyboardButtonRequestUsersTestBase):
-    def test_slot_behaviour(self, request_users):
-        for attr in request_users.__slots__:
-            assert getattr(request_users, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(request_users)) == len(set(mro_slots(request_users))), (
-            "duplicate slot"
-        )
-
     def test_to_dict(self, request_users):
         request_users_dict = request_users.to_dict()
 
@@ -135,11 +127,6 @@ class KeyboardButtonRequestChatTestBase:
 
 
 class TestKeyboardButtonRequestChatWithoutRequest(KeyboardButtonRequestChatTestBase):
-    def test_slot_behaviour(self, request_chat):
-        for attr in request_chat.__slots__:
-            assert getattr(request_chat, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(request_chat)) == len(set(mro_slots(request_chat))), "duplicate slot"
-
     def test_to_dict(self, request_chat):
         request_chat_dict = request_chat.to_dict()
 

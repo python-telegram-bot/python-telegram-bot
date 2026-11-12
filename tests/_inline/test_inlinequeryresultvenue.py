@@ -25,7 +25,6 @@ from telegram import (
     InlineQueryResultVoice,
     InputTextMessageContent,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -67,12 +66,6 @@ class InlineQueryResultVenueTestBase:
 
 
 class TestInlineQueryResultVenueWithoutRequest(InlineQueryResultVenueTestBase):
-    def test_slot_behaviour(self, inline_query_result_venue):
-        inst = inline_query_result_venue
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, inline_query_result_venue):
         assert inline_query_result_venue.id == self.id_
         assert inline_query_result_venue.type == self.type_

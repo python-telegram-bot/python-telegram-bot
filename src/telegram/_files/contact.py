@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram Contact."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class Contact(TelegramObject):
     """This object represents a phone contact.
 
@@ -44,27 +45,10 @@ class Contact(TelegramObject):
 
     """
 
-    __slots__ = ("first_name", "last_name", "phone_number", "user_id", "vcard")
-
-    def __init__(
-        self,
-        phone_number: str,
-        first_name: str,
-        last_name: str | None = None,
-        user_id: int | None = None,
-        vcard: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.phone_number: str = str(phone_number)
-        self.first_name: str = first_name
-        # Optionals
-        self.last_name: str | None = last_name
-        self.user_id: int | None = user_id
-        self.vcard: str | None = vcard
-
-        self._id_attrs = (self.phone_number,)
-
-        self._freeze()
+    # Required
+    phone_number: str = tg_field(compare=True)
+    first_name: str = tg_field()
+    # Optional
+    last_name: str | None = tg_field(default=None)
+    user_id: int | None = tg_field(default=None)
+    vcard: str | None = tg_field(default=None)

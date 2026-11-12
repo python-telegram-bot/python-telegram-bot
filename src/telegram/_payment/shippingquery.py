@@ -24,6 +24,7 @@ from typing import TYPE_CHECKING
 from telegram._payment.shippingaddress import ShippingAddress
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -31,6 +32,7 @@ if TYPE_CHECKING:
     from telegram._payment.shippingoption import ShippingOption
 
 
+@tg_dataclass()
 class ShippingQuery(TelegramObject):
     """This object contains information about an incoming shipping query.
 
@@ -55,26 +57,10 @@ class ShippingQuery(TelegramObject):
 
     """
 
-    __slots__ = ("from_user", "id", "invoice_payload", "shipping_address")
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        from_user: User,
-        invoice_payload: str,
-        shipping_address: ShippingAddress,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: str = id
-        self.from_user: User = from_user
-        self.invoice_payload: str = invoice_payload
-        self.shipping_address: ShippingAddress = shipping_address
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    id: str = tg_field(compare=True)
+    from_user: User = tg_field()
+    invoice_payload: str = tg_field()
+    shipping_address: ShippingAddress = tg_field()
 
     async def answer(
         self,

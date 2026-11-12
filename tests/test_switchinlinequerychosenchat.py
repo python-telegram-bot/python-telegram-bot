@@ -20,7 +20,6 @@
 import pytest
 
 from telegram import SwitchInlineQueryChosenChat
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -43,12 +42,6 @@ class SwitchInlineQueryChosenChatTestBase:
 
 
 class TestSwitchInlineQueryChosenChat(SwitchInlineQueryChosenChatTestBase):
-    def test_slot_behaviour(self, switch_inline_query_chosen_chat):
-        inst = switch_inline_query_chosen_chat
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, switch_inline_query_chosen_chat):
         assert switch_inline_query_chosen_chat.query == self.query
         assert switch_inline_query_chosen_chat.allow_user_chats == self.allow_user_chats

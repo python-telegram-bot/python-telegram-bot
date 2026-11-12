@@ -22,13 +22,14 @@ from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultVenue(InlineQueryResult):
     """
     Represents a venue. By default, the venue will be sent by the user. Alternatively, you can
@@ -105,56 +106,20 @@ class InlineQueryResultVenue(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "address",
-        "foursquare_id",
-        "foursquare_type",
-        "google_place_id",
-        "google_place_type",
-        "input_message_content",
-        "latitude",
-        "longitude",
-        "reply_markup",
-        "thumbnail_height",
-        "thumbnail_url",
-        "thumbnail_width",
-        "title",
-    )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        latitude: float,
-        longitude: float,
-        title: str,
-        address: str,
-        foursquare_id: str | None = None,
-        foursquare_type: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        google_place_id: str | None = None,
-        google_place_type: str | None = None,
-        thumbnail_url: str | None = None,
-        thumbnail_width: int | None = None,
-        thumbnail_height: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.VENUE, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.latitude: float = latitude
-            self.longitude: float = longitude
-            self.title: str = title
-            self.address: str = address
-
-            # Optional
-            self.foursquare_id: str | None = foursquare_id
-            self.foursquare_type: str | None = foursquare_type
-            self.google_place_id: str | None = google_place_id
-            self.google_place_type: str | None = google_place_type
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
-            self.thumbnail_url: str | None = thumbnail_url
-            self.thumbnail_width: int | None = thumbnail_width
-            self.thumbnail_height: int | None = thumbnail_height
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.VENUE)
+    # Required
+    latitude: float = tg_field()
+    longitude: float = tg_field()
+    title: str = tg_field()
+    address: str = tg_field()
+    # Optional
+    foursquare_id: str | None = tg_field(default=None)
+    foursquare_type: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    google_place_id: str | None = tg_field(default=None)
+    google_place_type: str | None = tg_field(default=None)
+    thumbnail_url: str | None = tg_field(default=None)
+    thumbnail_width: int | None = tg_field(default=None)
+    thumbnail_height: int | None = tg_field(default=None)

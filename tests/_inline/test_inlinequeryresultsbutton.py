@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import InlineQueryResultsButton, WebAppInfo
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -38,12 +37,6 @@ class InlineQueryResultsButtonTestBase:
 
 
 class TestInlineQueryResultsButtonWithoutRequest(InlineQueryResultsButtonTestBase):
-    def test_slot_behaviour(self, inline_query_results_button):
-        inst = inline_query_results_button
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_to_dict(self, inline_query_results_button):
         inline_query_results_button_dict = inline_query_results_button.to_dict()
         assert isinstance(inline_query_results_button_dict, dict)

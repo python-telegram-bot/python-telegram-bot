@@ -19,19 +19,19 @@
 """This module contains an objects that are related to Telegram giveaways."""
 
 import datetime as dtm
-from collections.abc import Sequence
 from typing import TYPE_CHECKING
 
 from telegram._chat import Chat
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 if TYPE_CHECKING:
     from telegram import Message
 
 
+@tg_dataclass()
 class Giveaway(TelegramObject):
     """This object represents a message about a scheduled giveaway.
 
@@ -90,53 +90,18 @@ class Giveaway(TelegramObject):
             giveaways only.
     """
 
-    __slots__ = (
-        "chats",
-        "country_codes",
-        "has_public_winners",
-        "only_new_members",
-        "premium_subscription_month_count",
-        "prize_description",
-        "prize_star_count",
-        "winner_count",
-        "winners_selection_date",
-    )
-
-    def __init__(
-        self,
-        chats: Sequence[Chat],
-        winners_selection_date: dtm.datetime,
-        winner_count: int,
-        only_new_members: bool | None = None,
-        has_public_winners: bool | None = None,
-        prize_description: str | None = None,
-        country_codes: Sequence[str] | None = None,
-        premium_subscription_month_count: int | None = None,
-        prize_star_count: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.chats: tuple[Chat, ...] = tuple(chats)
-        self.winners_selection_date: dtm.datetime = winners_selection_date
-        self.winner_count: int = winner_count
-        self.only_new_members: bool | None = only_new_members
-        self.has_public_winners: bool | None = has_public_winners
-        self.prize_description: str | None = prize_description
-        self.country_codes: tuple[str, ...] = parse_sequence_arg(country_codes)
-        self.premium_subscription_month_count: int | None = premium_subscription_month_count
-        self.prize_star_count: int | None = prize_star_count
-
-        self._id_attrs = (
-            self.chats,
-            self.winners_selection_date,
-            self.winner_count,
-        )
-
-        self._freeze()
+    chats: tuple[Chat, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    winners_selection_date: dtm.datetime = tg_field(compare=True)
+    winner_count: int = tg_field(compare=True)
+    only_new_members: bool | None = tg_field(default=None)
+    has_public_winners: bool | None = tg_field(default=None)
+    prize_description: str | None = tg_field(default=None)
+    country_codes: tuple[str, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    premium_subscription_month_count: int | None = tg_field(default=None)
+    prize_star_count: int | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class GiveawayCreated(TelegramObject):
     """This object represents a service message about the creation of a scheduled giveaway.
 
@@ -154,15 +119,10 @@ class GiveawayCreated(TelegramObject):
 
     """
 
-    __slots__ = ("prize_star_count",)
-
-    def __init__(self, prize_star_count: int | None = None, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.prize_star_count: int | None = prize_star_count
-
-        self._freeze()
+    prize_star_count: int | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class GiveawayWinners(TelegramObject):
     """This object represents a message about the completion of a giveaway with public winners.
 
@@ -219,64 +179,21 @@ class GiveawayWinners(TelegramObject):
         prize_description (:obj:`str`): Optional. Description of additional giveaway prize
     """
 
-    __slots__ = (
-        "additional_chat_count",
-        "chat",
-        "giveaway_message_id",
-        "only_new_members",
-        "premium_subscription_month_count",
-        "prize_description",
-        "prize_star_count",
-        "unclaimed_prize_count",
-        "was_refunded",
-        "winner_count",
-        "winners",
-        "winners_selection_date",
-    )
-
-    def __init__(
-        self,
-        chat: Chat,
-        giveaway_message_id: int,
-        winners_selection_date: dtm.datetime,
-        winner_count: int,
-        winners: Sequence[User],
-        additional_chat_count: int | None = None,
-        premium_subscription_month_count: int | None = None,
-        unclaimed_prize_count: int | None = None,
-        only_new_members: bool | None = None,
-        was_refunded: bool | None = None,
-        prize_description: str | None = None,
-        prize_star_count: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.chat: Chat = chat
-        self.giveaway_message_id: int = giveaway_message_id
-        self.winners_selection_date: dtm.datetime = winners_selection_date
-        self.winner_count: int = winner_count
-        self.winners: tuple[User, ...] = tuple(winners)
-        self.additional_chat_count: int | None = additional_chat_count
-        self.premium_subscription_month_count: int | None = premium_subscription_month_count
-        self.unclaimed_prize_count: int | None = unclaimed_prize_count
-        self.only_new_members: bool | None = only_new_members
-        self.was_refunded: bool | None = was_refunded
-        self.prize_description: str | None = prize_description
-        self.prize_star_count: int | None = prize_star_count
-
-        self._id_attrs = (
-            self.chat,
-            self.giveaway_message_id,
-            self.winners_selection_date,
-            self.winner_count,
-            self.winners,
-        )
-
-        self._freeze()
+    chat: Chat = tg_field(compare=True)
+    giveaway_message_id: int = tg_field(compare=True)
+    winners_selection_date: dtm.datetime = tg_field(compare=True)
+    winner_count: int = tg_field(compare=True)
+    winners: tuple[User, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    additional_chat_count: int | None = tg_field(default=None)
+    premium_subscription_month_count: int | None = tg_field(default=None)
+    unclaimed_prize_count: int | None = tg_field(default=None)
+    only_new_members: bool | None = tg_field(default=None)
+    was_refunded: bool | None = tg_field(default=None)
+    prize_description: str | None = tg_field(default=None)
+    prize_star_count: int | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class GiveawayCompleted(TelegramObject):
     """This object represents a service message about the completion of a giveaway without public
     winners.
@@ -307,27 +224,7 @@ class GiveawayCompleted(TelegramObject):
             .. versionadded:: 21.6
     """
 
-    __slots__ = ("giveaway_message", "is_star_giveaway", "unclaimed_prize_count", "winner_count")
-
-    def __init__(
-        self,
-        winner_count: int,
-        unclaimed_prize_count: int | None = None,
-        giveaway_message: "Message | None" = None,
-        is_star_giveaway: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        self.winner_count: int = winner_count
-        self.unclaimed_prize_count: int | None = unclaimed_prize_count
-        self.giveaway_message: Message | None = giveaway_message
-        self.is_star_giveaway: bool | None = is_star_giveaway
-
-        self._id_attrs = (
-            self.winner_count,
-            self.unclaimed_prize_count,
-        )
-
-        self._freeze()
+    winner_count: int = tg_field(compare=True)
+    unclaimed_prize_count: int | None = tg_field(compare=True, default=None)
+    giveaway_message: "Message | None" = tg_field(default=None)
+    is_star_giveaway: bool | None = tg_field(default=None)

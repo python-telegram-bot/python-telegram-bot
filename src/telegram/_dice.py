@@ -18,13 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Dice."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class Dice(TelegramObject):
     """
     This object represents an animated emoji with a random value for currently supported base
@@ -88,73 +89,65 @@ class Dice(TelegramObject):
 
     """
 
-    __slots__ = ("emoji", "value")
+    value: int = tg_field(compare=True)
+    emoji: str = tg_field(compare=True)
 
-    def __init__(self, value: int, emoji: str, *, api_kwargs: JSONDict | None = None):
-        super().__init__(api_kwargs=api_kwargs)
-        self.value: int = value
-        self.emoji: str = emoji
-
-        self._id_attrs = (self.value, self.emoji)
-
-        self._freeze()
-
-    DICE: Final[str] = constants.DiceEmoji.DICE
+    DICE: ClassVar[str] = constants.DiceEmoji.DICE
     """:const:`telegram.constants.DiceEmoji.DICE`"""
-    DARTS: Final[str] = constants.DiceEmoji.DARTS
+    DARTS: ClassVar[str] = constants.DiceEmoji.DARTS
     """:const:`telegram.constants.DiceEmoji.DARTS`"""
-    BASKETBALL: Final[str] = constants.DiceEmoji.BASKETBALL
+    BASKETBALL: ClassVar[str] = constants.DiceEmoji.BASKETBALL
     """:const:`telegram.constants.DiceEmoji.BASKETBALL`"""
-    FOOTBALL: Final[str] = constants.DiceEmoji.FOOTBALL
+    FOOTBALL: ClassVar[str] = constants.DiceEmoji.FOOTBALL
     """:const:`telegram.constants.DiceEmoji.FOOTBALL`"""
-    SLOT_MACHINE: Final[str] = constants.DiceEmoji.SLOT_MACHINE
+    SLOT_MACHINE: ClassVar[str] = constants.DiceEmoji.SLOT_MACHINE
     """:const:`telegram.constants.DiceEmoji.SLOT_MACHINE`"""
-    BOWLING: Final[str] = constants.DiceEmoji.BOWLING
+    BOWLING: ClassVar[str] = constants.DiceEmoji.BOWLING
     """
     :const:`telegram.constants.DiceEmoji.BOWLING`
 
     .. versionadded:: 13.4
     """
-    ALL_EMOJI: Final[list[str]] = list(constants.DiceEmoji)
+    ALL_EMOJI: ClassVar[list[str]] = list(constants.DiceEmoji)
     """list[:obj:`str`]: A list of all available dice emoji."""
 
-    MIN_VALUE: Final[int] = constants.DiceLimit.MIN_VALUE
+    MIN_VALUE: ClassVar[int] = constants.DiceLimit.MIN_VALUE
     """:const:`telegram.constants.DiceLimit.MIN_VALUE`
 
     .. versionadded:: 20.0
     """
 
-    MAX_VALUE_BOWLING: Final[int] = constants.DiceLimit.MAX_VALUE_BOWLING
+    MAX_VALUE_BOWLING: ClassVar[int] = constants.DiceLimit.MAX_VALUE_BOWLING
     """:const:`telegram.constants.DiceLimit.MAX_VALUE_BOWLING`
 
     .. versionadded:: 20.0
     """
 
-    MAX_VALUE_DARTS: Final[int] = constants.DiceLimit.MAX_VALUE_DARTS
+    MAX_VALUE_DARTS: ClassVar[int] = constants.DiceLimit.MAX_VALUE_DARTS
     """:const:`telegram.constants.DiceLimit.MAX_VALUE_DARTS`
 
     .. versionadded:: 20.0
     """
 
-    MAX_VALUE_DICE: Final[int] = constants.DiceLimit.MAX_VALUE_DICE
+    MAX_VALUE_DICE: ClassVar[int] = constants.DiceLimit.MAX_VALUE_DICE
     """:const:`telegram.constants.DiceLimit.MAX_VALUE_DICE`
 
     .. versionadded:: 20.0
     """
 
-    MAX_VALUE_BASKETBALL: Final[int] = constants.DiceLimit.MAX_VALUE_BASKETBALL
+    MAX_VALUE_BASKETBALL: ClassVar[int] = constants.DiceLimit.MAX_VALUE_BASKETBALL
     """:const:`telegram.constants.DiceLimit.MAX_VALUE_BASKETBALL`
 
     .. versionadded:: 20.0
     """
 
-    MAX_VALUE_FOOTBALL: Final[int] = constants.DiceLimit.MAX_VALUE_FOOTBALL
+    MAX_VALUE_FOOTBALL: ClassVar[int] = constants.DiceLimit.MAX_VALUE_FOOTBALL
     """:const:`telegram.constants.DiceLimit.MAX_VALUE_FOOTBALL`
 
     .. versionadded:: 20.0
     """
 
-    MAX_VALUE_SLOT_MACHINE: Final[int] = constants.DiceLimit.MAX_VALUE_SLOT_MACHINE
+    MAX_VALUE_SLOT_MACHINE: ClassVar[int] = constants.DiceLimit.MAX_VALUE_SLOT_MACHINE
     """:const:`telegram.constants.DiceLimit.MAX_VALUE_SLOT_MACHINE`
 
     .. versionadded:: 20.0

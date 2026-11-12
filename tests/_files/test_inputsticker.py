@@ -22,7 +22,6 @@ import pytest
 from telegram import InputSticker, MaskPosition
 from telegram._files.inputfile import InputFile
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -45,12 +44,6 @@ class InputStickerTestBase:
 
 
 class TestInputStickerWithoutRequest(InputStickerTestBase):
-    def test_slot_behaviour(self, input_sticker):
-        inst = input_sticker
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_sticker):
         assert input_sticker.sticker == self.sticker
         assert isinstance(input_sticker.sticker, str)
