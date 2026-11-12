@@ -25,10 +25,11 @@ from dataclasses import dataclass
 from typing import final
 
 from telegram._files.inputfile import InputFile
-from telegram._files.inputmedia import InputMedia, InputPaidMedia
+from telegram._files.inputmedia import InputMedia, InputMediaSticker, InputPaidMedia
 from telegram._files.inputprofilephoto import InputProfilePhoto, InputProfilePhotoStatic
 from telegram._files.inputsticker import InputSticker
 from telegram._files.inputstorycontent import InputStoryContent
+from telegram._poll import InputPollOption
 from telegram._telegramobject import TelegramObject
 from telegram._utils.datetime import to_timestamp
 from telegram._utils.enum import StringEnum
@@ -133,24 +134,30 @@ class RequestParameter:
                 return value.attach_uri, [value]
             return None, [value]
 
-        if isinstance(value, InputMedia | InputPaidMedia) and isinstance(value.media, InputFile):
+        if isinstance(value, InputMedia | InputMediaSticker | InputPaidMedia):
             # We call to_dict and change the returned dict instead of overriding
-            # value.media in case the same value is reused for another request
+            # the attributes in case the same value is reused for another request
             data = value.to_dict()
-            if value.media.attach_uri:
-                data["media"] = value.media.attach_uri
-            else:
-                data.pop("media", None)
-
-            thumbnail = data.get("thumbnail", None)
-            if isinstance(thumbnail, InputFile):
-                if thumbnail.attach_uri:
-                    data["thumbnail"] = thumbnail.attach_uri
+            input_files: list[InputFile] = []
+            # All fields of the InputMedia* and InputPaidMedia* classes that accept file uploads
+            for key in ("media", "thumbnail", "cover", "photo"):
+                input_file = data.get(key)
+                if not isinstance(input_file, InputFile):
+                    continue
+                if input_file.attach_uri:
+                    data[key] = input_file.attach_uri
                 else:
-                    data.pop("thumbnail", None)
-                return data, [value.media, thumbnail]
+                    data.pop(key)
+                input_files.append(input_file)
 
-            return data, [value.media]
+            return data, input_files
+
+        if isinstance(value, InputPollOption) and value.media is not None:
+            data = value.to_dict()
+            data["media"], input_files = RequestParameter._value_and_input_files_from_input(
+                value.media
+            )
+            return data, input_files
 
         if isinstance(value, InputProfilePhoto):
             attr = "photo" if isinstance(value, InputProfilePhotoStatic) else "animation"
