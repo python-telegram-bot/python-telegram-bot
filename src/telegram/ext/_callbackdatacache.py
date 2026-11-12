@@ -258,7 +258,7 @@ class CallbackDataCache:
             return reply_markup
 
         self._keyboard_data[keyboard_uuid] = keyboard_data
-        return InlineKeyboardMarkup(buttons)
+        return InlineKeyboardMarkup(buttons)  # type: ignore[arg-type]
 
     @staticmethod
     def __put_button(callback_data: object, keyboard_data: _KeyboardData) -> str:

@@ -196,7 +196,7 @@ class ReplyKeyboardMarkup(TelegramObject):
                 .. versionadded:: 20.0
         """
         return cls(
-            [[button]],
+            [[button]],  # type: ignore[arg-type]
             resize_keyboard=resize_keyboard,
             one_time_keyboard=one_time_keyboard,
             selective=selective,
@@ -258,7 +258,7 @@ class ReplyKeyboardMarkup(TelegramObject):
 
         """
         return cls(
-            [button_row],
+            [button_row],  # type: ignore[arg-type]
             resize_keyboard=resize_keyboard,
             one_time_keyboard=one_time_keyboard,
             selective=selective,
@@ -321,7 +321,7 @@ class ReplyKeyboardMarkup(TelegramObject):
         """
         button_grid = [[button] for button in button_column]
         return cls(
-            button_grid,
+            button_grid,  # type: ignore[arg-type]
             resize_keyboard=resize_keyboard,
             one_time_keyboard=one_time_keyboard,
             selective=selective,

@@ -30,6 +30,7 @@ import inspect
 from collections.abc import Callable, Sequence
 from dataclasses import MISSING, dataclass, field, is_dataclass
 from enum import Enum
+from types import GenericAlias
 from typing import Any, TypeVar, get_args, get_origin
 
 from typing_extensions import dataclass_transform
@@ -46,13 +47,13 @@ ENUM_KEY = object()
 """Special marker indicating whether or not this field gets converted to an enum member."""
 
 
-def to_sequence_annotation(annotation: object) -> object:
+def to_sequence_annotation(annotation: object) -> GenericAlias:
     item_type = get_args(annotation)[0]
 
     if get_origin(item_type) is tuple:
         item_type = to_sequence_annotation(item_type)
 
-    return Sequence[item_type]
+    return GenericAlias(Sequence, item_type)
 
 
 def process_init(cls: type[_T]) -> type[_T]:
@@ -255,7 +256,9 @@ def tg_dataclass(
         if eq:
             compare_fields = tuple(
                 dataclass_field.name
-                for dataclass_field in dataclasses.fields(transformed_cls)
+                for dataclass_field in dataclasses.fields(
+                    transformed_cls  # type: ignore[arg-type] # transformed_cls *is* a dataclass
+                )
                 if dataclass_field.compare
             )
 

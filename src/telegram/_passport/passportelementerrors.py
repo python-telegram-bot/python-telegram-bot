@@ -76,7 +76,7 @@ class PassportElementError(_BasePassportElementError):
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
-        super().__init__(source, type, api_kwargs=api_kwargs)
+        super().__init__(source, type, api_kwargs=api_kwargs)  # type: ignore[arg-type]
 
         self._set("message", str(message))
 

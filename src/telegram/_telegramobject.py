@@ -126,12 +126,6 @@ class TelegramObject:
     )
     _bot: "Bot | None" = tg_field(init=False, default=None)
 
-    if TYPE_CHECKING:
-        # FIXME: not sure what to do about this
-        # mypy doesn't recognize converters currently
-        # https://github.com/python/mypy/issues/17547
-        def __init__(self, *, api_kwargs: JSONDict | None = None) -> None: ...  # pylint: disable=unused-argument
-
     def __post_init__(self) -> None:
         for dataclass_field in dataclasses.fields(self):
             converter = dataclass_field.metadata.get(CONVERTER_KEY)
@@ -408,7 +402,7 @@ class TelegramObject:
     ) -> Self:
         # try-except is significantly faster in case we already have a correct argument set
         try:
-            obj = cls(**data, api_kwargs=api_kwargs)
+            obj = cls(**data, api_kwargs=api_kwargs)  # type: ignore[arg-type]
         except TypeError:
             unknown_field_names = data.keys() - cls.__INIT_PARAMS
             missing_required_parameter_names = cls.__DE_JSON_COMPAT__.keys() - data.keys()
@@ -567,6 +561,7 @@ class TelegramObject:
         all_slots = (
             slot
             for cls in self.__class__.__mro__[:-1]
+            # We read __slots__ off of dict to avoid parent look up which can lead to duplicates
             for slot in cls.__dict__.get("__slots__", ())
         )
         # chain the class's slots with the user defined subclass __dict__ (class has no slots)
@@ -723,14 +718,11 @@ class TelegramObject:
         Raises:
             RuntimeError: If no :class:`telegram.Bot` instance was set for this object.
         """
-        # FIXME: This is a pylint hack without it pylint thinks the return type
-        # of get_bot() (i.e type of self._bot) is dataclasses.Field
-        bot = cast("Bot | None", object.__getattribute__(self, "_bot"))
-        if bot is None:
+        if self._bot is None:
             raise RuntimeError(
                 "This object has no bot associated with it. Shortcuts cannot be used."
             )
-        return bot
+        return self._bot
 
     def _set(self, key: str, value: Any) -> None:
         """Sets the attribute with name :paramref:`key` to :paramref:`value` bypassing dataclasses

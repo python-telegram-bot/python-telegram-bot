@@ -162,7 +162,7 @@ class InputMedia(_BaseInputMedia):
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
-        super().__init__(media_type=media_type, api_kwargs=api_kwargs)
+        super().__init__(media_type=media_type, api_kwargs=api_kwargs)  # type: ignore[arg-type]
 
         self.media: str | InputFile
         self._set("media", media)
