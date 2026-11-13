@@ -339,7 +339,7 @@ class ExtBot(Bot, Generic[RLARGS]):
         """Inserts the `rate_limit_args` into `api_kwargs` with the special key `__RL_KEY` so
         that we can extract them later without having to modify the `telegram.Bot` class.
         """
-        if not rate_limit_args:
+        if rate_limit_args is None:
             return api_kwargs
         if api_kwargs is None:
             api_kwargs = {}
