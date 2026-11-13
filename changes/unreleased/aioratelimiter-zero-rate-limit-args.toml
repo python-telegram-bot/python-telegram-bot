@@ -1,5 +1,5 @@
 bugfixes = "Fixed falsy values for ``rate_limit_args`` (e.g. ``0``) being silently dropped by ``ExtBot`` and ``AIORateLimiter``. In particular, ``rate_limit_args=0`` now disables retries for that request instead of falling back to ``AIORateLimiter.max_retries``."
 [[pull_requests]]
-uid = "REPLACE_WITH_PR_NUMBER"
+uid = "5405"
 author_uids = ["KshitijKasodkar"]
 closes_threads = []
