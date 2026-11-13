@@ -17,14 +17,20 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
+import json
 from collections.abc import Sequence
 
 import pytest
 
 from telegram import (
     InputFile,
+    InputMediaLivePhoto,
     InputMediaPhoto,
+    InputMediaSticker,
     InputMediaVideo,
+    InputPaidMediaLivePhoto,
+    InputPaidMediaVideo,
+    InputPollOption,
     InputProfilePhotoAnimated,
     InputProfilePhotoStatic,
     InputSticker,
@@ -185,6 +191,59 @@ class TestRequestParameterWithoutRequest:
         request_parameter = RequestParameter.from_input("key", input_media)
         assert request_parameter.value == {"type": "video"}
         assert request_parameter.input_files == [input_media.media, input_media.thumbnail]
+
+    @pytest.mark.parametrize(
+        ("input_media", "file_keys"),
+        [
+            (
+                InputMediaVideo(media=b"video", thumbnail=b"thumbnail", cover=b"cover"),
+                ("media", "thumbnail", "cover"),
+            ),
+            (
+                InputPaidMediaVideo(media=b"video", thumbnail=b"thumbnail", cover=b"cover"),
+                ("media", "thumbnail", "cover"),
+            ),
+            (InputMediaLivePhoto(media=b"video", photo=b"photo"), ("media", "photo")),
+            (InputPaidMediaLivePhoto(media=b"video", photo=b"photo"), ("media", "photo")),
+            (InputMediaSticker(media=b"sticker"), ("media",)),
+            # files next to media that is not uploaded
+            (
+                InputMediaVideo(media="file_id", thumbnail=b"thumbnail", cover=b"cover"),
+                ("thumbnail", "cover"),
+            ),
+            (InputMediaLivePhoto(media="file_id", photo=b"photo"), ("photo",)),
+        ],
+        ids=[
+            "InputMediaVideo",
+            "InputPaidMediaVideo",
+            "InputMediaLivePhoto",
+            "InputPaidMediaLivePhoto",
+            "InputMediaSticker",
+            "InputMediaVideo-file_id",
+            "InputMediaLivePhoto-file_id",
+        ],
+    )
+    def test_from_input_input_media_all_file_fields(self, input_media, file_keys):
+        input_files = [getattr(input_media, key) for key in file_keys]
+        expected = input_media.to_dict()
+        expected.update({key: getattr(input_media, key).attach_uri for key in file_keys})
+
+        request_parameter = RequestParameter.from_input("key", input_media)
+        assert request_parameter.value == expected
+        assert request_parameter.input_files == input_files
+        # No InputFile may be left in the value, as it could not be JSON dumped
+        assert json.loads(request_parameter.json_value) == expected
+
+    def test_from_input_input_poll_option_media(self):
+        option = InputPollOption("text", media=InputMediaPhoto(media=b"photo"))
+        option_no_media = InputPollOption("other text")
+        expected = option.to_dict()
+        expected["media"]["media"] = option.media.media.attach_uri
+
+        request_parameter = RequestParameter.from_input("key", [option, option_no_media])
+        assert request_parameter.value == [expected, option_no_media.to_dict()]
+        assert request_parameter.input_files == [option.media.media]
+        assert json.loads(request_parameter.json_value) == [expected, option_no_media.to_dict()]
 
     def test_from_input_profile_photo_static(self):
         input_profile_photo = InputProfilePhotoStatic(data_file("telegram.jpg").read_bytes())
