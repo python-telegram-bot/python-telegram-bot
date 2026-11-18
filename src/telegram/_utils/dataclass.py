@@ -31,14 +31,19 @@ from collections.abc import Callable, Sequence
 from dataclasses import MISSING, dataclass, field, is_dataclass
 from enum import Enum
 from types import GenericAlias
-from typing import Any, TypeVar, get_args, get_origin
+from typing import TYPE_CHECKING, Any, TypeVar, get_args, get_origin
 
 from typing_extensions import dataclass_transform
 
 from telegram._utils import enum as _enum
 from telegram._utils.de_json import unwrap_optional
 
+if TYPE_CHECKING:
+    from telegram import TelegramObject
+
 _T = TypeVar("_T")
+TelegramObj = TypeVar("TelegramObj", bound="TelegramObject")
+
 CONVERTER_KEY = object()
 """Special marker for storing the `converter` function."""
 ALIAS_KEY = object()
@@ -48,6 +53,12 @@ ENUM_KEY = object()
 
 
 def to_sequence_annotation(annotation: object) -> GenericAlias:
+    """Given a `tuple[T, ...]` returns a corresponding `Sequence[T]` recursively on `T`.
+    Recursion is need to support cases such as (`InlineKeyboardMarkup.inline_keyboard`, ..etc)
+
+    `Sequence[T]` is returened so that :meth:`TelegramObject._build_plan` can build the appropriate
+    transformer, see its docstring.
+    """
     item_type = get_args(annotation)[0]
 
     if get_origin(item_type) is tuple:
@@ -92,9 +103,10 @@ def process_init(cls: type[_T]) -> type[_T]:
         raise TypeError(f"{cls!r} is not a dataclass")
 
     fields = {dataclass_field.name: dataclass_field for dataclass_field in dataclasses.fields(cls)}
-    has_aliases = any(
-        dataclass_field.init and dataclass_field.metadata.get(ALIAS_KEY) is not None
+    alias_pairs = tuple(
+        (dataclass_field.name, alias)
         for dataclass_field in fields.values()
+        if dataclass_field.init and (alias := dataclass_field.metadata.get(ALIAS_KEY)) is not None
     )
 
     generated_init = cls.__init__
@@ -102,12 +114,7 @@ def process_init(cls: type[_T]) -> type[_T]:
 
     @functools.wraps(generated_init)
     def aliased_init(self: object, *args: object, **kwargs: object) -> None:
-        for field_name, dataclass_field in fields.items():
-            alias = dataclass_field.metadata.get(ALIAS_KEY)
-
-            if not dataclass_field.init or dataclass_field.metadata.get(ALIAS_KEY) is None:
-                continue
-
+        for field_name, alias in alias_pairs:
             # Reject kwargs keys using the raw (unaliased) field name
             if field_name in kwargs:
                 raise TypeError(
@@ -173,7 +180,7 @@ def process_init(cls: type[_T]) -> type[_T]:
     annotations = {param.name: param.annotation for param in parameters if param.name != "self"}
     annotations["return"] = None
 
-    if not has_aliases:
+    if len(alias_pairs) == 0:
         generated_init.__signature__ = signature  # type: ignore[attr-defined]
         generated_init.__annotations__ = annotations
         return cls
@@ -196,6 +203,27 @@ def tg_field(
     alias: str | None = None,
     enum: type[Enum] | None = None,
 ) -> Any:
+    """Wrapper around :func:`dataclasses.field`. For defining fields for classes decorated with
+    :func:`tg_dataclass`.
+
+    See `Field specifier parameters
+    <https://typing.python.org/en/latest/spec/dataclasses.html#field-specifier-parameters>`_
+    for standard parameter descriptions.
+
+    Args:
+        compare (:obj:`bool`, optional): Passed to :func:`dataclasses.field`. Defaults to
+            :obj:`False`.
+        converter (:obj:`callable`, optional): A callable used to convert values when assigning to
+            the field. Mutually exclusive with :paramref:`enum`.
+        enum (:obj:`type[enum.Enum]`, optional): An enum class used to generate a default converter
+            from. Mutually exclusive with :paramref:`converter`.
+
+    Returns:
+        :class:`dataclasses.Field`
+
+    Raises:
+        `ValueError` if both :paramref:`enum` and :paramref:`converter` are passed.
+    """
     if enum is not None and converter is not None:
         raise ValueError("`enum` and `converter` are mutually exclusive!")
 
@@ -227,17 +255,24 @@ def tg_field(
 
 
 @dataclass_transform(
-    eq_default=True,
-    order_default=False,
-    kw_only_default=False,
     frozen_default=True,
     field_specifiers=(tg_field,),
 )
 def tg_dataclass(
     *,
     eq: bool = True,
-) -> Callable[[type[_T]], type[_T]]:
-    def decorate(cls: type[_T]) -> type[_T]:
+) -> Callable[[type[TelegramObj]], type[TelegramObj]]:
+    """Decorator for creating PTB-flavoured dataclasses. It [is]:
+
+    - Sets suitable values for frozen, slots, repr, and match_args.
+    - Used to decorate `TelegramObject`, all Bot API types, `Bot` and `ExtBot`.
+    - Tweaks standard `dataclasses.dataclass` behaviours for PTB needs.
+
+    Args:
+        eq (:obj:`bool`): Value to pass to :func:`dataclasses.dataclass`. Defaults to ``True``
+    """
+
+    def decorate(cls: type[TelegramObj]) -> type[TelegramObj]:
         transformed_cls = dataclass(
             cls,
             frozen=True,
@@ -248,6 +283,15 @@ def tg_dataclass(
         )
         transformed_cls = process_init(transformed_cls)
 
+        fields = dataclasses.fields(transformed_cls)
+
+        # Set the cache of (filed, converter) pairs
+        transformed_cls.__FIELD_CONVERTERS__ = tuple(
+            (dataclass_field.name, dataclass_field.metadata[CONVERTER_KEY])
+            for dataclass_field in fields
+            if dataclass_field.metadata.get(CONVERTER_KEY) is not None
+        )
+
         # `dataclass()` generates __[get/set]state__ functions that override our custom ones
         if cls.__name__ != "TelegramObject":
             delattr(transformed_cls, "__getstate__")
@@ -255,13 +299,11 @@ def tg_dataclass(
 
         if eq:
             compare_fields = tuple(
-                dataclass_field.name
-                for dataclass_field in dataclasses.fields(
-                    transformed_cls  # type: ignore[arg-type] # transformed_cls *is* a dataclass
-                )
-                if dataclass_field.compare
+                dataclass_field.name for dataclass_field in fields if dataclass_field.compare
             )
 
+            # Below we'll overwrite dc-generated __hash__ with this implemenattion that (i)
+            # *includes* class name in the compare fields and (ii) uses object id as a fallback
             def __hash__(self: object) -> int:
                 if compare_fields:
                     values = tuple(getattr(self, name) for name in compare_fields)

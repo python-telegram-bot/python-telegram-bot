@@ -19,17 +19,16 @@
 """Base class for Telegram Objects."""
 
 import contextlib
-import dataclasses
 import datetime as dtm
 import inspect
 import json
-from collections.abc import Iterator, Mapping, Sequence, Sized
+from collections.abc import Callable, Iterator, Mapping, Sequence, Sized
 from copy import deepcopy
 from itertools import chain
 from types import MappingProxyType
 from typing import TYPE_CHECKING, Any, ClassVar, Self, cast, get_args, get_origin
 
-from telegram._utils.dataclass import CONVERTER_KEY, tg_dataclass, tg_field
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.datetime import extract_tzinfo_from_defaults, from_timestamp, to_timestamp
 from telegram._utils.de_json import (
     build_sequence_transformer,
@@ -98,6 +97,10 @@ class TelegramObject:
     #   callable(value, bot)      → Sequence transform (from build_sequence_transformer)
     __DE_JSON_PLAN__: ClassVar[dict[str, Any]] = {}
 
+    # Cache of (field name, converter function) pairs. Built and set
+    # by :func:`~telegram._utils.dataclass.tg_dataclass`
+    __FIELD_CONVERTERS__: ClassVar[tuple[tuple[str, Callable[[Any], Any]], ...]] = ()
+
     # Forward-compatibility defaults for required __init__ parameters. If the Bot API stops
     # sending one of them, _de_json uses () for sequences and None for every other type.
     __DE_JSON_COMPAT__: ClassVar[Mapping[str, object]] = MappingProxyType({})
@@ -127,10 +130,8 @@ class TelegramObject:
     _bot: "Bot | None" = tg_field(init=False, default=None)
 
     def __post_init__(self) -> None:
-        for dataclass_field in dataclasses.fields(self):
-            converter = dataclass_field.metadata.get(CONVERTER_KEY)
-            if converter is not None:
-                self._set(dataclass_field.name, converter(getattr(self, dataclass_field.name)))
+        for name, converter in self.__FIELD_CONVERTERS__:
+            self._set(name, converter(getattr(self, name)))
 
     def __repr__(self) -> str:
         """Gives a string representation of this object in the form

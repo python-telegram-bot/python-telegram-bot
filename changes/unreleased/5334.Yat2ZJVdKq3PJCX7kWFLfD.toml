@@ -4,7 +4,7 @@ With this release we restructured Telegram types and implemented them as Python 
 
 - User defined classes that subclass from :class:`~telegram.TelegramObject` will no longer work unchanged.
 - Direct instances of :class:`~telegram.TelegramObject` are frozen by default.
-- Loading a pickled :class:`~telegram.TelegramObject` will return a frozen instance by default.
+- Previously, loading a pickled :class:`~telegram.TelegramObject` that was unfrozen when pickled returned it unfrozen. Now, loading objects (older & new ones) will always return a frozen instance.
 - Comparing a parent :class:`telegram.TelegramObject` with a child whose comparison attributes equal the parent's, or where both have no comparison attributes, will now evaluate to :obj:`False`.
   For example:
 
