@@ -35,6 +35,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -54,7 +55,23 @@ class AnimationTestBase:
     caption = "Test *animation*"
 
 
-class TestAnimationWithoutRequest(AnimationTestBase):
+class TestAnimationWithoutRequest(AnimationTestBase, DeserializationTestBase):
+    de_json_class = Animation
+
+    @pytest.fixture
+    def de_json_dict(self, offline_animation):
+        return {
+            "file_id": self.animation_file_id,
+            "file_unique_id": self.animation_file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "duration": int(self.duration.total_seconds()),
+            "thumbnail": offline_animation.thumbnail.to_dict(),
+            "file_name": self.file_name,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
+        }
+
     def test_slot_behaviour(self, offline_animation):
         for attr in offline_animation.__slots__:
             assert getattr(offline_animation, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -76,26 +93,26 @@ class TestAnimationWithoutRequest(AnimationTestBase):
         )
         assert isinstance(offline_animation.thumbnail, PhotoSize)
 
-    def test_de_json(self, offline_bot, offline_animation):
-        json_dict = {
-            "file_id": self.animation_file_id,
-            "file_unique_id": self.animation_file_unique_id,
-            "width": self.width,
-            "height": self.height,
-            "duration": self.duration.total_seconds(),
-            "thumbnail": offline_animation.thumbnail.to_dict(),
-            "file_name": self.file_name,
-            "mime_type": self.mime_type,
-            "file_size": self.file_size,
-        }
-        offline_animation = Animation.de_json(json_dict, offline_bot)
-        assert offline_animation.api_kwargs == {}
-        assert offline_animation.file_id == self.animation_file_id
-        assert offline_animation.file_unique_id == self.animation_file_unique_id
-        assert offline_animation.file_name == self.file_name
-        assert offline_animation.mime_type == self.mime_type
-        assert offline_animation.file_size == self.file_size
-        assert offline_animation._duration == self.duration
+    def test_de_json(self, offline_bot, offline_animation, de_json_dict):
+        json_animation = Animation.de_json(de_json_dict, offline_bot)
+        assert json_animation.api_kwargs == {}
+
+        assert json_animation.file_id == self.animation_file_id
+        assert json_animation.file_unique_id == self.animation_file_unique_id
+        assert json_animation.width == self.width
+        assert json_animation.height == self.height
+        assert json_animation._duration == self.duration
+        assert json_animation.thumbnail == offline_animation.thumbnail
+        assert json_animation.file_name == self.file_name
+        assert json_animation.mime_type == self.mime_type
+        assert json_animation.file_size == self.file_size
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="`file_id` is converted with `str()`, so a missing value becomes the string 'None'",
+    )
+    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
+        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
 
     def test_to_dict(self, offline_animation):
         animation_dict = offline_animation.to_dict()

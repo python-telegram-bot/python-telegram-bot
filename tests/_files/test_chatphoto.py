@@ -31,6 +31,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.networking import expect_bad_request
 from tests.auxil.slots import mro_slots
@@ -72,7 +73,18 @@ class ChatPhotoTestBase:
     chatphoto_file_url = "https://python-telegram-bot.org/static/testfiles/telegram.jpg"
 
 
-class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
+class TestChatPhotoWithoutRequest(ChatPhotoTestBase, DeserializationTestBase):
+    de_json_class = ChatPhoto
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "small_file_id": self.chatphoto_small_file_id,
+            "big_file_id": self.chatphoto_big_file_id,
+            "small_file_unique_id": self.chatphoto_small_file_unique_id,
+            "big_file_unique_id": self.chatphoto_big_file_unique_id,
+        }
+
     def test_slot_behaviour(self, offline_chat_photo):
         for attr in offline_chat_photo.__slots__:
             assert getattr(offline_chat_photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -80,19 +92,14 @@ class TestChatPhotoWithoutRequest(ChatPhotoTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "small_file_id": self.chatphoto_small_file_id,
-            "big_file_id": self.chatphoto_big_file_id,
-            "small_file_unique_id": self.chatphoto_small_file_unique_id,
-            "big_file_unique_id": self.chatphoto_big_file_unique_id,
-        }
-        offline_chat_photo = ChatPhoto.de_json(json_dict, offline_bot)
-        assert offline_chat_photo.api_kwargs == {}
-        assert offline_chat_photo.small_file_id == self.chatphoto_small_file_id
-        assert offline_chat_photo.big_file_id == self.chatphoto_big_file_id
-        assert offline_chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id
-        assert offline_chat_photo.big_file_unique_id == self.chatphoto_big_file_unique_id
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_photo = ChatPhoto.de_json(de_json_dict, offline_bot)
+        assert chat_photo.api_kwargs == {}
+
+        assert chat_photo.small_file_id == self.chatphoto_small_file_id
+        assert chat_photo.big_file_id == self.chatphoto_big_file_id
+        assert chat_photo.small_file_unique_id == self.chatphoto_small_file_unique_id
+        assert chat_photo.big_file_unique_id == self.chatphoto_big_file_unique_id
 
     async def test_to_dict(self, offline_chat_photo):
         chat_photo_dict = offline_chat_photo.to_dict()
