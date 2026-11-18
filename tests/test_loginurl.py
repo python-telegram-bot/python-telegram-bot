@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import LoginUrl
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -39,7 +40,18 @@ class LoginUrlTestBase:
     request_write_access = True
 
 
-class TestLoginUrlWithoutRequest(LoginUrlTestBase):
+class TestLoginUrlWithoutRequest(LoginUrlTestBase, DeserializationTestBase):
+    de_json_class = LoginUrl
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "url": self.url,
+            "forward_text": self.forward_text,
+            "bot_username": self.bot_username,
+            "request_write_access": self.request_write_access,
+        }
+
     def test_slot_behaviour(self, login_url):
         for attr in login_url.__slots__:
             assert getattr(login_url, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -53,6 +65,15 @@ class TestLoginUrlWithoutRequest(LoginUrlTestBase):
         assert login_url_dict["forward_text"] == self.forward_text
         assert login_url_dict["bot_username"] == self.bot_username
         assert login_url_dict["request_write_access"] == self.request_write_access
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        login_url = LoginUrl.de_json(de_json_dict, offline_bot)
+        assert login_url.api_kwargs == {}
+
+        assert login_url.url == self.url
+        assert login_url.forward_text == self.forward_text
+        assert login_url.bot_username == self.bot_username
+        assert login_url.request_write_access == self.request_write_access
 
     def test_equality(self):
         a = LoginUrl(self.url, self.forward_text, self.bot_username, self.request_write_access)

@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import WebAppInfo
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -32,7 +33,13 @@ class WebAppInfoTestBase:
     url = "https://www.example.com"
 
 
-class TestWebAppInfoWithoutRequest(WebAppInfoTestBase):
+class TestWebAppInfoWithoutRequest(WebAppInfoTestBase, DeserializationTestBase):
+    de_json_class = WebAppInfo
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"url": self.url}
+
     def test_slot_behaviour(self, web_app_info):
         for attr in web_app_info.__slots__:
             assert getattr(web_app_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -44,9 +51,8 @@ class TestWebAppInfoWithoutRequest(WebAppInfoTestBase):
         assert isinstance(web_app_info_dict, dict)
         assert web_app_info_dict["url"] == self.url
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"url": self.url}
-        web_app_info = WebAppInfo.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        web_app_info = WebAppInfo.de_json(de_json_dict, offline_bot)
         assert web_app_info.api_kwargs == {}
 
         assert web_app_info.url == self.url

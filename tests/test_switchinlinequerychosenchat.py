@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import SwitchInlineQueryChosenChat
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -42,7 +43,19 @@ class SwitchInlineQueryChosenChatTestBase:
     allow_group_chats = True
 
 
-class TestSwitchInlineQueryChosenChat(SwitchInlineQueryChosenChatTestBase):
+class TestSwitchInlineQueryChosenChat(SwitchInlineQueryChosenChatTestBase, DeserializationTestBase):
+    de_json_class = SwitchInlineQueryChosenChat
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "query": self.query,
+            "allow_user_chats": self.allow_user_chats,
+            "allow_bot_chats": self.allow_bot_chats,
+            "allow_channel_chats": self.allow_channel_chats,
+            "allow_group_chats": self.allow_group_chats,
+        }
+
     def test_slot_behaviour(self, switch_inline_query_chosen_chat):
         inst = switch_inline_query_chosen_chat
         for attr in inst.__slots__:
@@ -55,6 +68,16 @@ class TestSwitchInlineQueryChosenChat(SwitchInlineQueryChosenChatTestBase):
         assert switch_inline_query_chosen_chat.allow_bot_chats == self.allow_bot_chats
         assert switch_inline_query_chosen_chat.allow_channel_chats == self.allow_channel_chats
         assert switch_inline_query_chosen_chat.allow_group_chats == self.allow_group_chats
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        siqcc = SwitchInlineQueryChosenChat.de_json(de_json_dict, offline_bot)
+        assert siqcc.api_kwargs == {}
+
+        assert siqcc.query == self.query
+        assert siqcc.allow_user_chats == self.allow_user_chats
+        assert siqcc.allow_bot_chats == self.allow_bot_chats
+        assert siqcc.allow_channel_chats == self.allow_channel_chats
+        assert siqcc.allow_group_chats == self.allow_group_chats
 
     def test_to_dict(self, switch_inline_query_chosen_chat):
         siqcc = switch_inline_query_chosen_chat.to_dict()

@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import WebAppData
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -33,7 +34,13 @@ class WebAppDataTestBase:
     button_text = "button_text"
 
 
-class TestWebAppDataWithoutRequest(WebAppDataTestBase):
+class TestWebAppDataWithoutRequest(WebAppDataTestBase, DeserializationTestBase):
+    de_json_class = WebAppData
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"data": self.data, "button_text": self.button_text}
+
     def test_slot_behaviour(self, web_app_data):
         for attr in web_app_data.__slots__:
             assert getattr(web_app_data, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -46,9 +53,8 @@ class TestWebAppDataWithoutRequest(WebAppDataTestBase):
         assert web_app_data_dict["data"] == self.data
         assert web_app_data_dict["button_text"] == self.button_text
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"data": self.data, "button_text": self.button_text}
-        web_app_data = WebAppData.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        web_app_data = WebAppData.de_json(de_json_dict, offline_bot)
         assert web_app_data.api_kwargs == {}
 
         assert web_app_data.data == self.data
