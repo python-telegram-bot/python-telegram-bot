@@ -21,8 +21,9 @@ import datetime as dtm
 import pytest
 
 from telegram import ChatInviteLink, User
-from telegram._utils.datetime import UTC, to_timestamp
+from telegram._utils.datetime import to_timestamp
 from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -61,32 +62,17 @@ class ChatInviteLinkTestBase:
     subscription_price = 44
 
 
-class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
+class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase, DeserializationTestBase):
+    de_json_class = ChatInviteLink
+
     def test_slot_behaviour(self, invite_link):
         for attr in invite_link.__slots__:
             assert getattr(invite_link, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invite_link)) == len(set(mro_slots(invite_link))), "duplicate slot"
 
-    def test_de_json_required_args(self, offline_bot, creator):
-        json_dict = {
-            "invite_link": self.link,
-            "creator": creator.to_dict(),
-            "creates_join_request": self.creates_join_request,
-            "is_primary": self.primary,
-            "is_revoked": self.revoked,
-        }
-
-        invite_link = ChatInviteLink.de_json(json_dict, offline_bot)
-        assert invite_link.api_kwargs == {}
-
-        assert invite_link.invite_link == self.link
-        assert invite_link.creator == creator
-        assert invite_link.creates_join_request == self.creates_join_request
-        assert invite_link.is_primary == self.primary
-        assert invite_link.is_revoked == self.revoked
-
-    def test_de_json_all_args(self, offline_bot, creator):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self, creator):
+        return {
             "invite_link": self.link,
             "creator": creator.to_dict(),
             "creates_join_request": self.creates_join_request,
@@ -100,7 +86,8 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
             "subscription_price": self.subscription_price,
         }
 
-        invite_link = ChatInviteLink.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, creator, de_json_dict):
+        invite_link = ChatInviteLink.de_json(de_json_dict, offline_bot)
         assert invite_link.api_kwargs == {}
 
         assert invite_link.invite_link == self.link
@@ -115,33 +102,6 @@ class TestChatInviteLinkWithoutRequest(ChatInviteLinkTestBase):
         assert invite_link.pending_join_request_count == self.pending_join_request_count
         assert invite_link._subscription_period == self.subscription_period
         assert invite_link.subscription_price == self.subscription_price
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, creator):
-        json_dict = {
-            "invite_link": self.link,
-            "creator": creator.to_dict(),
-            "creates_join_request": self.creates_join_request,
-            "is_primary": self.primary,
-            "is_revoked": self.revoked,
-            "expire_date": to_timestamp(self.expire_date),
-            "member_limit": self.member_limit,
-            "name": self.name,
-            "pending_join_request_count": str(self.pending_join_request_count),
-        }
-
-        invite_link_raw = ChatInviteLink.de_json(json_dict, raw_bot)
-        invite_link_bot = ChatInviteLink.de_json(json_dict, offline_bot)
-        invite_link_tz = ChatInviteLink.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        invite_offset = invite_link_tz.expire_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            invite_link_tz.expire_date.replace(tzinfo=None)
-        )
-
-        assert invite_link_raw.expire_date.tzinfo == UTC
-        assert invite_link_bot.expire_date.tzinfo == UTC
-        assert invite_offset == tz_bot_offset
 
     def test_to_dict(self, invite_link):
         invite_link_dict = invite_link.to_dict()

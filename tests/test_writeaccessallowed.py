@@ -16,21 +16,41 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+import pytest
+
 from telegram import WriteAccessAllowed
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
-class TestWriteAccessAllowed:
+class TestWriteAccessAllowed(DeserializationTestBase):
+    de_json_class = WriteAccessAllowed
+    web_app_name = "web_app_name"
+    from_request = True
+    from_attachment_menu = False
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "web_app_name": self.web_app_name,
+            "from_request": self.from_request,
+            "from_attachment_menu": self.from_attachment_menu,
+        }
+
     def test_slot_behaviour(self):
         action = WriteAccessAllowed()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        action = WriteAccessAllowed.de_json({}, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        action = WriteAccessAllowed.de_json(de_json_dict, offline_bot)
         assert action.api_kwargs == {}
         assert isinstance(action, WriteAccessAllowed)
+
+        assert action.web_app_name == self.web_app_name
+        assert action.from_request == self.from_request
+        assert action.from_attachment_menu == self.from_attachment_menu
 
     def test_to_dict(self):
         action = WriteAccessAllowed()

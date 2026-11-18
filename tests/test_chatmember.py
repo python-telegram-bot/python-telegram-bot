@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatMemberStatus
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -319,7 +320,8 @@ def chat_member_banned():
     )
 
 
-class TestChatMemberBannedWithoutRequest(ChatMemberTestBase):
+class TestChatMemberBannedWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberBanned
     status = ChatMemberStatus.BANNED
 
     def test_slot_behaviour(self, chat_member_banned):
@@ -328,38 +330,21 @@ class TestChatMemberBannedWithoutRequest(ChatMemberTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "user": self.user.to_dict(),
             "until_date": to_timestamp(self.until_date),
         }
-        chat_member = ChatMemberBanned.de_json(data, offline_bot)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMemberBanned.de_json(de_json_dict, offline_bot)
 
         assert type(chat_member) is ChatMemberBanned
         assert chat_member.api_kwargs == {}
 
         assert chat_member.user == self.user
         assert chat_member.until_date == self.until_date
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "user": self.user.to_dict(),
-            "until_date": to_timestamp(self.until_date),
-        }
-
-        cmb_raw = ChatMemberBanned.de_json(json_dict, raw_bot)
-        cmb_bot = ChatMemberBanned.de_json(json_dict, offline_bot)
-        cmb_bot_tz = ChatMemberBanned.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        cmb_bot_tz_offset = cmb_bot_tz.until_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            cmb_bot_tz.until_date.replace(tzinfo=None)
-        )
-
-        assert cmb_raw.until_date.tzinfo == UTC
-        assert cmb_bot.until_date.tzinfo == UTC
-        assert cmb_bot_tz_offset == tz_bot_offset
 
     def test_to_dict(self, chat_member_banned):
         assert chat_member_banned.to_dict() == {

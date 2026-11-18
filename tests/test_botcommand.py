@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import BotCommand, Dice
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -28,18 +29,23 @@ def bot_command():
     return BotCommand(command="start", description="A command")
 
 
-class TestBotCommandWithoutRequest:
+class TestBotCommandWithoutRequest(DeserializationTestBase):
+    de_json_class = BotCommand
+
     command = "start"
     description = "A command"
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"command": self.command, "description": self.description}
 
     def test_slot_behaviour(self, bot_command):
         for attr in bot_command.__slots__:
             assert getattr(bot_command, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(bot_command)) == len(set(mro_slots(bot_command))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"command": self.command, "description": self.description}
-        bot_command = BotCommand.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        bot_command = BotCommand.de_json(de_json_dict, offline_bot)
         assert bot_command.api_kwargs == {}
 
         assert bot_command.command == self.command

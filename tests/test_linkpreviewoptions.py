@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import LinkPreviewOptions
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -41,7 +42,19 @@ class LinkPreviewOptionsTestBase:
     show_above_text = True
 
 
-class TestLinkPreviewOptionsWithoutRequest(LinkPreviewOptionsTestBase):
+class TestLinkPreviewOptionsWithoutRequest(LinkPreviewOptionsTestBase, DeserializationTestBase):
+    de_json_class = LinkPreviewOptions
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "is_disabled": self.is_disabled,
+            "url": self.url,
+            "prefer_small_media": self.prefer_small_media,
+            "prefer_large_media": self.prefer_large_media,
+            "show_above_text": self.show_above_text,
+        }
+
     def test_slot_behaviour(self, link_preview_options):
         a = link_preview_options
         for attr in a.__slots__:
@@ -58,16 +71,8 @@ class TestLinkPreviewOptionsWithoutRequest(LinkPreviewOptionsTestBase):
         assert link_preview_options_dict["prefer_large_media"] == self.prefer_large_media
         assert link_preview_options_dict["show_above_text"] == self.show_above_text
 
-    def test_de_json(self, link_preview_options):
-        link_preview_options_dict = {
-            "is_disabled": self.is_disabled,
-            "url": self.url,
-            "prefer_small_media": self.prefer_small_media,
-            "prefer_large_media": self.prefer_large_media,
-            "show_above_text": self.show_above_text,
-        }
-
-        link_preview_options = LinkPreviewOptions.de_json(link_preview_options_dict, bot=None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        link_preview_options = LinkPreviewOptions.de_json(de_json_dict, offline_bot)
         assert link_preview_options.api_kwargs == {}
 
         assert link_preview_options.is_disabled == self.is_disabled

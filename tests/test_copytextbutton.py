@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import BotCommand, CopyTextButton
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -32,7 +33,13 @@ class CopyTextButtonTestBase:
     text = "This is some text"
 
 
-class TestCopyTextButtonWithoutRequest(CopyTextButtonTestBase):
+class TestCopyTextButtonWithoutRequest(CopyTextButtonTestBase, DeserializationTestBase):
+    de_json_class = CopyTextButton
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"text": self.text}
+
     def test_slot_behaviour(self, copy_text_button):
         for attr in copy_text_button.__slots__:
             assert getattr(copy_text_button, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -40,9 +47,8 @@ class TestCopyTextButtonWithoutRequest(CopyTextButtonTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"text": self.text}
-        copy_text_button = CopyTextButton.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        copy_text_button = CopyTextButton.de_json(de_json_dict, offline_bot)
         assert copy_text_button.api_kwargs == {}
 
         assert copy_text_button.text == self.text

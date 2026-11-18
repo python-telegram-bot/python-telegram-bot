@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import BotCommand, UserRating
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -40,40 +41,31 @@ class UserRatingTestBase:
     next_level_rating = 180
 
 
-class TestUserRatingWithoutRequest(UserRatingTestBase):
-    def test_slot_behaviour(self, user_rating):
-        for attr in user_rating.__slots__:
-            assert getattr(user_rating, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(user_rating)) == len(set(mro_slots(user_rating))), "duplicate slot"
+class TestUserRatingWithoutRequest(UserRatingTestBase, DeserializationTestBase):
+    de_json_class = UserRating
 
-    def test_de_json_with_next(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "level": self.level,
             "rating": self.rating,
             "current_level_rating": self.current_level_rating,
             "next_level_rating": self.next_level_rating,
         }
-        ur = UserRating.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, user_rating):
+        for attr in user_rating.__slots__:
+            assert getattr(user_rating, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(user_rating)) == len(set(mro_slots(user_rating))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        ur = UserRating.de_json(de_json_dict, offline_bot)
         assert ur.api_kwargs == {}
 
         assert ur.level == self.level
         assert ur.rating == self.rating
         assert ur.current_level_rating == self.current_level_rating
         assert ur.next_level_rating == self.next_level_rating
-
-    def test_de_json_no_optional(self, offline_bot):
-        json_dict = {
-            "level": self.level,
-            "rating": self.rating,
-            "current_level_rating": self.current_level_rating,
-        }
-        ur = UserRating.de_json(json_dict, offline_bot)
-        assert ur.api_kwargs == {}
-
-        assert ur.level == self.level
-        assert ur.rating == self.rating
-        assert ur.current_level_rating == self.current_level_rating
-        assert ur.next_level_rating is None
 
     def test_to_dict(self, user_rating):
         ur_dict = user_rating.to_dict()

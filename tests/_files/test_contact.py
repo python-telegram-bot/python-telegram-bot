@@ -26,6 +26,7 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -44,36 +45,43 @@ class ContactTestBase:
     first_name = "Leandro"
     last_name = "Toledo"
     user_id = 23
+    vcard = "BEGIN:VCARD\nVERSION:3.0\nFN:Leandro Toledo\nEND:VCARD"
 
 
-class TestContactWithoutRequest(ContactTestBase):
+class TestContactWithoutRequest(ContactTestBase, DeserializationTestBase):
+    de_json_class = Contact
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "phone_number": self.phone_number,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "user_id": self.user_id,
+            "vcard": self.vcard,
+        }
+
     def test_slot_behaviour(self, contact):
         for attr in contact.__slots__:
             assert getattr(contact, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(contact)) == len(set(mro_slots(contact))), "duplicate slot"
 
-    def test_de_json_required(self, offline_bot):
-        json_dict = {"phone_number": self.phone_number, "first_name": self.first_name}
-        contact = Contact.de_json(json_dict, offline_bot)
-        assert contact.api_kwargs == {}
-
-        assert contact.phone_number == self.phone_number
-        assert contact.first_name == self.first_name
-
-    def test_de_json_all(self, offline_bot):
-        json_dict = {
-            "phone_number": self.phone_number,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "user_id": self.user_id,
-        }
-        contact = Contact.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        contact = Contact.de_json(de_json_dict, offline_bot)
         assert contact.api_kwargs == {}
 
         assert contact.phone_number == self.phone_number
         assert contact.first_name == self.first_name
         assert contact.last_name == self.last_name
         assert contact.user_id == self.user_id
+        assert contact.vcard == self.vcard
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="`phone_number` is converted with `str()`, so a missing value becomes the string 'None'",
+    )
+    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
+        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
 
     def test_to_dict(self, contact):
         contact_dict = contact.to_dict()

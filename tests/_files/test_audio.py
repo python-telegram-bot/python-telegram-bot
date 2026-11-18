@@ -35,6 +35,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -57,7 +58,23 @@ class AudioTestBase:
     audio_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestAudioWithoutRequest(AudioTestBase):
+class TestAudioWithoutRequest(AudioTestBase, DeserializationTestBase):
+    de_json_class = Audio
+
+    @pytest.fixture
+    def de_json_dict(self, offline_audio):
+        return {
+            "file_id": self.audio_file_id,
+            "file_unique_id": self.audio_file_unique_id,
+            "duration": int(self.duration.total_seconds()),
+            "performer": self.performer,
+            "title": self.title,
+            "file_name": self.file_name,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
+            "thumbnail": offline_audio.thumbnail.to_dict(),
+        }
+
     def test_slot_behaviour(self, offline_audio):
         for attr in offline_audio.__slots__:
             assert getattr(offline_audio, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -83,19 +100,8 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert offline_audio.thumbnail.width == self.thumb_width
         assert offline_audio.thumbnail.height == self.thumb_height
 
-    def test_de_json(self, offline_bot, offline_audio):
-        json_dict = {
-            "file_id": self.audio_file_id,
-            "file_unique_id": self.audio_file_unique_id,
-            "duration": int(self.duration.total_seconds()),
-            "performer": self.performer,
-            "title": self.title,
-            "file_name": self.file_name,
-            "mime_type": self.mime_type,
-            "file_size": self.file_size,
-            "thumbnail": offline_audio.thumbnail.to_dict(),
-        }
-        json_audio = Audio.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_audio, de_json_dict):
+        json_audio = Audio.de_json(de_json_dict, offline_bot)
         assert json_audio.api_kwargs == {}
 
         assert json_audio.file_id == self.audio_file_id
@@ -107,6 +113,13 @@ class TestAudioWithoutRequest(AudioTestBase):
         assert json_audio.mime_type == self.mime_type
         assert json_audio.file_size == self.file_size
         assert json_audio.thumbnail == offline_audio.thumbnail
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="`file_id` is converted with `str()`, so a missing value becomes the string 'None'",
+    )
+    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
+        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
 
     def test_to_dict(self, offline_audio):
         audio_dict = offline_audio.to_dict()

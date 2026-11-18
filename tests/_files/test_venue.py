@@ -25,6 +25,7 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -51,14 +52,12 @@ class VenueTestBase:
     google_place_type = "google place type"
 
 
-class TestVenueWithoutRequest(VenueTestBase):
-    def test_slot_behaviour(self, venue):
-        for attr in venue.__slots__:
-            assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(venue)) == len(set(mro_slots(venue))), "duplicate slot"
+class TestVenueWithoutRequest(VenueTestBase, DeserializationTestBase):
+    de_json_class = Venue
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "location": self.location.to_dict(),
             "title": self.title,
             "address": self.address,
@@ -67,7 +66,14 @@ class TestVenueWithoutRequest(VenueTestBase):
             "google_place_id": self.google_place_id,
             "google_place_type": self.google_place_type,
         }
-        venue = Venue.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, venue):
+        for attr in venue.__slots__:
+            assert getattr(venue, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(venue)) == len(set(mro_slots(venue))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        venue = Venue.de_json(de_json_dict, offline_bot)
         assert venue.api_kwargs == {}
 
         assert venue.location == self.location
