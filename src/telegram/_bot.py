@@ -11957,8 +11957,8 @@ CHAT_ACTIVITY_TIMEOUT` seconds.
                    * The video must be at most 10MB in size.
                    * The video duration must not exceed 10 seconds.
                    * If you pass a :class:`telegram.LivePhoto`, its
-                   :attr:`~telegram.LivePhoto.photo` field will not be considered, use
-                   :paramref:`photo` to specify the photo to send.
+                     :attr:`~telegram.LivePhoto.photo` field will not be considered, use
+                     :paramref:`photo` to specify the photo to send.
 
             photo (:obj:`str` | :term:`file object` | :class:`~telegram.InputFile` | :obj:`bytes` \
                 | :class:`pathlib.Path` | :class:`telegram.PhotoSize`): The static photo to send.
