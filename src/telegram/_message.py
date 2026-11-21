@@ -193,7 +193,9 @@ class MaybeInaccessibleMessage(TelegramObject):
         self._set("chat", chat)
         self._set("message_id", message_id)
         self._set("date", date)
-        TelegramObject.__init__(self, api_kwargs=api_kwargs)
+        super(MaybeInaccessibleMessage, self).__init__(  # noqa: UP008  # pylint: disable=super-with-arguments
+            api_kwargs=api_kwargs
+        )
 
     @property
     def is_accessible(self) -> bool:
@@ -253,12 +255,8 @@ class InaccessibleMessage(MaybeInaccessibleMessage):
         *,
         api_kwargs: JSONDict | None = None,
     ) -> None:
-        MaybeInaccessibleMessage.__init__(
-            self,
-            chat,
-            message_id,
-            ZERO_DATE,
-            api_kwargs=api_kwargs,
+        super(InaccessibleMessage, self).__init__(  # noqa: UP008  # pylint: disable=super-with-arguments
+            chat, message_id, ZERO_DATE, api_kwargs=api_kwargs
         )
 
 

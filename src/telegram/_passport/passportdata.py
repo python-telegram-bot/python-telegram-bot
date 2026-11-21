@@ -74,7 +74,7 @@ class PassportData(TelegramObject):
 
     def __post_init__(self) -> None:
         self._set("_comparison_key", tuple([x.type for x in self.data] + [self.credentials.hash]))
-        TelegramObject.__post_init__(self)
+        super(PassportData, self).__post_init__()  # noqa: UP008  # pylint: disable=super-with-arguments
 
     @property
     def decrypted_data(self) -> tuple[EncryptedPassportElement, ...]:

@@ -379,12 +379,38 @@ class TestTelegramObject:
             f"{cls.__name__} doesn't seem to pass `api_kwargs` to `super().__init__`"
         )
 
+    @pytest.mark.parametrize("cls", TO_SUBCLASSES, ids=[cls.__name__ for cls in TO_SUBCLASSES])
+    def test_subclasses_call_super_post_init(self, cls):
+        """Checks that subclasses with their own `__post_init__` call
+        `super(<cls>, self).__post_init__()`
+        """
+        if cls is TelegramObject:
+            return
+
+        # only relevant for subclasses that have their own __post_init__
+        if inspect.getsourcefile(cls.__post_init__) != inspect.getsourcefile(
+            cls
+        ) or "__post_init__" not in vars(cls):
+            return
+
+        # Ignore classes in the test directory
+        source_file = Path(inspect.getsourcefile(cls))
+        parents = source_file.parents
+        is_test_file = Path(__file__).parent.resolve() in parents
+        if is_test_file:
+            return
+
+        # Now check for the super call in the source code of `__post_init__`
+        assert f"super({cls.__name__}, self).__post_init__(" in inspect.getsource(
+            cls.__post_init__
+        ), f"{cls.__name__} doesn't call `super.({cls.__name__}, self)__post_init__`"
+
     def test_de_json_arbitrary_exceptions(self, bot):
 
         @tg_dataclass()
         class SubClass(TelegramObject):
             def __init__(self, **kwargs):
-                TelegramObject.__init__(self, **kwargs)
+                super(SubClass, self).__init__(**kwargs)
                 raise TypeError("This is a test")
 
         with pytest.raises(TypeError, match="This is a test"):

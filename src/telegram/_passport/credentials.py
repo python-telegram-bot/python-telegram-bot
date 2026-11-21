@@ -350,7 +350,7 @@ class _CredentialsBase(TelegramObject):
         # Aliases just to be sure
         self._set("data_hash", self.hash)
         self._set("file_hash", self.hash)
-        TelegramObject.__post_init__(self)
+        super(_CredentialsBase, self).__post_init__()  # noqa: UP008  # pylint: disable=super-with-arguments
 
 
 @tg_dataclass()

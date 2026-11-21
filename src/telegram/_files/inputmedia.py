@@ -16,6 +16,8 @@
 #
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
+# ruff: noqa: UP008
+# pylint: disable=super-with-arguments,arguments-differ
 """Base classes for Telegram InputMedia, InputPaidMedia, InputPollMedia
 and InputPollOptionMedia Objects."""
 
@@ -323,7 +325,7 @@ class InputPaidMediaVideo(InputPaidMedia):
             if self._duration is None:
                 self._set("_duration", media._duration)  # pylint: disable=protected-access
 
-        InputPaidMedia.__post_init__(self)
+        super(InputPaidMediaVideo, self).__post_init__()
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
@@ -493,7 +495,6 @@ class InputMediaAnimation(InputMedia):
         self,
         filename_depr: str | None,
         filename: str | None,
-        /,
     ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
@@ -528,7 +529,7 @@ class InputMediaAnimation(InputMedia):
                     ),
                 )
 
-        InputMedia.__post_init__(self)
+        super(InputMediaAnimation, self).__post_init__()
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
@@ -623,7 +624,6 @@ class InputMediaPhoto(InputMedia):
         self,
         filename_depr: str | None,
         filename: str | None,
-        /,
     ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
@@ -653,7 +653,7 @@ class InputMediaPhoto(InputMedia):
                 ),
             )
 
-        InputMedia.__post_init__(self)
+        super(InputMediaPhoto, self).__post_init__()
 
 
 @tg_dataclass()
@@ -804,7 +804,6 @@ class InputMediaVideo(InputMedia):
         self,
         filename_depr: str | None,
         filename: str | None,
-        /,
     ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
@@ -839,7 +838,7 @@ class InputMediaVideo(InputMedia):
                     ),
                 )
 
-        InputMedia.__post_init__(self)
+        super(InputMediaVideo, self).__post_init__()
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
@@ -963,7 +962,6 @@ class InputMediaSticker(_BaseInputMedia):
     def __post_init__(
         self,
         filename: str | None,
-        /,
     ) -> None:
         if filename is not None:
             # We have to convert here because it requires both `media` and `filename`.
@@ -979,7 +977,7 @@ class InputMediaSticker(_BaseInputMedia):
                 ),
             )
 
-        _BaseInputMedia.__post_init__(self)
+        super(InputMediaSticker, self).__post_init__()
 
 
 @tg_dataclass()
@@ -1095,7 +1093,6 @@ class InputMediaAudio(InputMedia):
         self,
         filename_depr: str | None,
         filename: str | None,
-        /,
     ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
@@ -1130,7 +1127,7 @@ class InputMediaAudio(InputMedia):
                     ),
                 )
 
-        InputMedia.__post_init__(self)
+        super(InputMediaAudio, self).__post_init__()
 
     @property
     def duration(self) -> int | dtm.timedelta | None:
@@ -1230,7 +1227,6 @@ class InputMediaDocument(InputMedia):
         self,
         filename_depr: str | None,
         filename: str | None,
-        /,
     ) -> None:
         if filename_depr is not None and filename is not None:
             raise ValueError("`filename_depr` and `filename` are mutually exclusive.")
@@ -1260,7 +1256,7 @@ class InputMediaDocument(InputMedia):
                 ),
             )
 
-        InputMedia.__post_init__(self)
+        super(InputMediaDocument, self).__post_init__()
 
 
 @tg_dataclass()

@@ -103,12 +103,11 @@ class InputTextMessageContent(InputMessageContent):
 
     def __post_init__(  # pylint: disable=arguments-differ
         self,
-        disable_web_page_preview: bool | None = None,
-        /,
+        disable_web_page_preview: bool | None,
     ) -> None:
         self._set(
             "link_preview_options",
             parse_lpo_and_dwpp(disable_web_page_preview, self.link_preview_options),
         )
 
-        InputMessageContent.__post_init__(self)
+        super(InputTextMessageContent, self).__post_init__()  # pylint: disable=super-with-arguments  # noqa: UP008
