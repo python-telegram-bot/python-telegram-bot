@@ -69,7 +69,6 @@ class BotCommandScope(TelegramObject):
         },
     )
 
-    # TODO: https://docs.python.org/3.13/library/typing.html#typing.ClassVar
     DEFAULT: ClassVar[str] = constants.BotCommandScopeType.DEFAULT
     """:const:`telegram.constants.BotCommandScopeType.DEFAULT`"""
     ALL_PRIVATE_CHATS: ClassVar[str] = constants.BotCommandScopeType.ALL_PRIVATE_CHATS
