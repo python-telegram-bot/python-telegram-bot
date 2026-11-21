@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import BotCommand, ChatOwnerChanged, ChatOwnerLeft, User
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -37,12 +36,6 @@ class ChatOwnerTestBase:
 
 
 class TestChatOwnerChangedWithoutRequest(ChatOwnerTestBase):
-    def test_slot_behaviour(self, chat_owner_changed):
-        inst = chat_owner_changed
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "new_owner": self.new_owner.to_dict(),
@@ -76,12 +69,6 @@ class TestChatOwnerChangedWithoutRequest(ChatOwnerTestBase):
 
 
 class TestChatOwnerLeftWithoutRequest(ChatOwnerTestBase):
-    def test_slot_behaviour(self, chat_owner_left):
-        inst = chat_owner_left
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "new_owner": self.new_owner.to_dict(),

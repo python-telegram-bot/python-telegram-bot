@@ -24,7 +24,7 @@
 
 import datetime as dtm
 
-from telegram._utils.argumentparsing import to_timedelta
+from telegram._utils.argumentparsing import int_to_timedelta
 from telegram._utils.datetime import get_timedelta_value
 from telegram._utils.types import TimePeriod
 
@@ -230,7 +230,7 @@ class RetryAfter(TelegramError):
     __slots__ = ("_retry_after",)
 
     def __init__(self, retry_after: TimePeriod):
-        self._retry_after: dtm.timedelta = to_timedelta(retry_after)
+        self._retry_after: dtm.timedelta = int_to_timedelta(retry_after)
 
         if isinstance(self.retry_after, int):
             super().__init__(f"Flood control exceeded. Retry in {self.retry_after} seconds")

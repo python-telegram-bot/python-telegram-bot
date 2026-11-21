@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import RefundedPayment
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -42,12 +41,6 @@ class RefundedPaymentTestBase:
 
 
 class TestRefundedPaymentWithoutRequest(RefundedPaymentTestBase):
-    def test_slot_behaviour(self, refunded_payment):
-        inst = refunded_payment
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "invoice_payload": self.invoice_payload,

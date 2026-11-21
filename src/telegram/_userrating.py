@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram user rating."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class UserRating(TelegramObject):
     """
     This object describes the rating of a user based on their Telegram Star spendings.
@@ -53,23 +54,9 @@ class UserRating(TelegramObject):
 
     """
 
-    __slots__ = ("current_level_rating", "level", "next_level_rating", "rating")
-
-    def __init__(
-        self,
-        level: int,
-        rating: int,
-        current_level_rating: int,
-        next_level_rating: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ) -> None:
-        super().__init__(api_kwargs=api_kwargs)
-        self.level: int = level
-        self.rating: int = rating
-        self.current_level_rating: int = current_level_rating
-        self.next_level_rating: int | None = next_level_rating
-
-        self._id_attrs = (self.level, self.rating)
-
-        self._freeze()
+    # Required
+    level: int = tg_field(compare=True)
+    rating: int = tg_field(compare=True)
+    current_level_rating: int = tg_field()
+    # Optional
+    next_level_rating: int | None = tg_field(default=None)

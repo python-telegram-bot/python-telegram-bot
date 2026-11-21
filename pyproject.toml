@@ -39,7 +39,8 @@ classifiers = [
 ]
 dependencies = [
     "httpx >=0.27,<0.29",
-    "httpcore >=1.0.9; python_version >= '3.14'"  # httpx doesn't pin this as of 0.28.1
+    "httpcore >=1.0.9; python_version >= '3.14'",  # httpx doesn't pin this as of 0.28.1
+    "typing-extensions~=4.16",
 ]
 
 [project.urls]
@@ -202,6 +203,10 @@ disable = ["duplicate-code", "too-many-arguments", "too-many-public-methods",
         "fixme", "missing-function-docstring", "missing-class-docstring", "too-many-locals",
         "too-many-lines", "too-many-branches", "too-many-statements", "cyclic-import",
         "too-many-positional-arguments",
+        # These rules dont play well with custom dataclass decorators, e.g
+        # tg_dataclass (and mypy will catch their violations)
+        # https://github.com/pylint-dev/pylint/issues/7437, https://github.com/pylint-dev/pylint/issues/4899
+        "no-member", "not-an-iterable", "unsubscriptable-object",
 ]
 
 [tool.pylint.main]
@@ -211,7 +216,7 @@ jobs = 0
 py-version = "3.11"
 
 [tool.pylint.classes]
-exclude-protected = ["_unfrozen"]
+exclude-protected = ["_set"]
 
 # PYTEST:
 [tool.pytest.ini_options]

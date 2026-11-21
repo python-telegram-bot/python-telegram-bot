@@ -28,18 +28,17 @@ import enum as _enum
 from typing import Self, TypeVar
 
 _A = TypeVar("_A")
-_B = TypeVar("_B")
 _Enum = TypeVar("_Enum", bound=_enum.Enum)
 
 
-def get_member(enum_cls: type[_Enum], value: _A, default: _B) -> _Enum | _A | _B:
+def get_member(enum_cls: type[_Enum], value: _A) -> _Enum | _A:
     """Tries to call ``enum_cls(value)`` to convert the value into an enumeration member.
-    If that fails, the ``default`` is returned.
+    If that fails, the ``value`` is returned.
     """
     try:
         return enum_cls(value)
     except ValueError:
-        return default
+        return value
 
 
 class StringEnum(_enum.StrEnum):

@@ -18,14 +18,13 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains a class that represents a Telegram InputInvoiceMessageContent."""
 
-from collections.abc import Sequence
-
 from telegram._inline.inputmessagecontent import InputMessageContent
 from telegram._payment.labeledprice import LabeledPrice
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class InputInvoiceMessageContent(InputMessageContent):
     """
     Represents the content of a invoice message to be sent as the result of an inline query.
@@ -170,83 +169,25 @@ class InputInvoiceMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = (
-        "currency",
-        "description",
-        "is_flexible",
-        "max_tip_amount",
-        "need_email",
-        "need_name",
-        "need_phone_number",
-        "need_shipping_address",
-        "payload",
-        "photo_height",
-        "photo_size",
-        "photo_url",
-        "photo_width",
-        "prices",
-        "provider_data",
-        "provider_token",
-        "send_email_to_provider",
-        "send_phone_number_to_provider",
-        "suggested_tip_amounts",
-        "title",
-    )
-
-    def __init__(
-        self,
-        title: str,
-        description: str,
-        payload: str,
-        currency: str,
-        prices: Sequence[LabeledPrice],
-        provider_token: str | None = None,
-        max_tip_amount: int | None = None,
-        suggested_tip_amounts: Sequence[int] | None = None,
-        provider_data: str | None = None,
-        photo_url: str | None = None,
-        photo_size: int | None = None,
-        photo_width: int | None = None,
-        photo_height: int | None = None,
-        need_name: bool | None = None,
-        need_phone_number: bool | None = None,
-        need_email: bool | None = None,
-        need_shipping_address: bool | None = None,
-        send_phone_number_to_provider: bool | None = None,
-        send_email_to_provider: bool | None = None,
-        is_flexible: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        with self._unfrozen():
-            # Required
-            self.title: str = title
-            self.description: str = description
-            self.payload: str = payload
-            self.currency: str = currency
-            self.prices: tuple[LabeledPrice, ...] = parse_sequence_arg(prices)
-            # Optionals
-            self.provider_token: str | None = provider_token
-            self.max_tip_amount: int | None = max_tip_amount
-            self.suggested_tip_amounts: tuple[int, ...] = parse_sequence_arg(suggested_tip_amounts)
-            self.provider_data: str | None = provider_data
-            self.photo_url: str | None = photo_url
-            self.photo_size: int | None = photo_size
-            self.photo_width: int | None = photo_width
-            self.photo_height: int | None = photo_height
-            self.need_name: bool | None = need_name
-            self.need_phone_number: bool | None = need_phone_number
-            self.need_email: bool | None = need_email
-            self.need_shipping_address: bool | None = need_shipping_address
-            self.send_phone_number_to_provider: bool | None = send_phone_number_to_provider
-            self.send_email_to_provider: bool | None = send_email_to_provider
-            self.is_flexible: bool | None = is_flexible
-
-            self._id_attrs = (
-                self.title,
-                self.description,
-                self.payload,
-                self.currency,
-                self.prices,
-            )
+    # Required
+    title: str = tg_field(compare=True)
+    description: str = tg_field(compare=True)
+    payload: str = tg_field(compare=True)
+    currency: str = tg_field(compare=True)
+    prices: tuple[LabeledPrice, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    # Optional
+    provider_token: str | None = tg_field(default=None)
+    max_tip_amount: int | None = tg_field(default=None)
+    suggested_tip_amounts: tuple[int, ...] = tg_field(default=None, converter=parse_sequence_arg)
+    provider_data: str | None = tg_field(default=None)
+    photo_url: str | None = tg_field(default=None)
+    photo_size: int | None = tg_field(default=None)
+    photo_width: int | None = tg_field(default=None)
+    photo_height: int | None = tg_field(default=None)
+    need_name: bool | None = tg_field(default=None)
+    need_phone_number: bool | None = tg_field(default=None)
+    need_email: bool | None = tg_field(default=None)
+    need_shipping_address: bool | None = tg_field(default=None)
+    send_phone_number_to_provider: bool | None = tg_field(default=None)
+    send_email_to_provider: bool | None = tg_field(default=None)
+    is_flexible: bool | None = tg_field(default=None)

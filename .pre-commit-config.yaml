@@ -50,6 +50,9 @@ repos:
       args:
         - --no-strict-optional
         - --follow-imports=silent
+        # This is to ignore mypy issues with fields that use converters
+        # Which they do not support (https://github.com/python/mypy/issues/17547)
+        - --disable-error-code=arg-type
       additional_dependencies:
         - tornado~=6.4
         - APScheduler>=3.10.4,<3.12.0

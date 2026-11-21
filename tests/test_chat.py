@@ -36,7 +36,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -52,8 +52,8 @@ def chat(bot):
         is_direct_messages=ChatTestBase.is_direct_messages,
     )
     chat.set_bot(bot)
-    chat._unfreeze()
-    return chat
+    with unfrozen(chat):
+        yield chat
 
 
 class ChatTestBase:
@@ -68,11 +68,6 @@ class ChatTestBase:
 
 
 class TestChatWithoutRequest(ChatTestBase):
-    def test_slot_behaviour(self, chat):
-        for attr in chat.__slots__:
-            assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "id": self.id_,

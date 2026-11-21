@@ -18,13 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram Invoice."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class Invoice(TelegramObject):
     """This object contains basic information about an invoice.
 
@@ -62,72 +63,43 @@ class Invoice(TelegramObject):
 
     """
 
-    __slots__ = (
-        "currency",
-        "description",
-        "start_parameter",
-        "title",
-        "total_amount",
-    )
+    title: str = tg_field(compare=True)
+    description: str = tg_field(compare=True)
+    start_parameter: str = tg_field(compare=True)
+    currency: str = tg_field(compare=True)
+    total_amount: int = tg_field(compare=True)
 
-    def __init__(
-        self,
-        title: str,
-        description: str,
-        start_parameter: str,
-        currency: str,
-        total_amount: int,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.title: str = title
-        self.description: str = description
-        self.start_parameter: str = start_parameter
-        self.currency: str = currency
-        self.total_amount: int = total_amount
-
-        self._id_attrs = (
-            self.title,
-            self.description,
-            self.start_parameter,
-            self.currency,
-            self.total_amount,
-        )
-
-        self._freeze()
-
-    MIN_TITLE_LENGTH: Final[int] = constants.InvoiceLimit.MIN_TITLE_LENGTH
+    MIN_TITLE_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_TITLE_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MIN_TITLE_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_TITLE_LENGTH: Final[int] = constants.InvoiceLimit.MAX_TITLE_LENGTH
+    MAX_TITLE_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_TITLE_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MAX_TITLE_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_DESCRIPTION_LENGTH: Final[int] = constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH
+    MIN_DESCRIPTION_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MIN_DESCRIPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_DESCRIPTION_LENGTH: Final[int] = constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH
+    MAX_DESCRIPTION_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MAX_DESCRIPTION_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MIN_PAYLOAD_LENGTH: Final[int] = constants.InvoiceLimit.MIN_PAYLOAD_LENGTH
+    MIN_PAYLOAD_LENGTH: ClassVar[int] = constants.InvoiceLimit.MIN_PAYLOAD_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MIN_PAYLOAD_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_PAYLOAD_LENGTH: Final[int] = constants.InvoiceLimit.MAX_PAYLOAD_LENGTH
+    MAX_PAYLOAD_LENGTH: ClassVar[int] = constants.InvoiceLimit.MAX_PAYLOAD_LENGTH
     """:const:`telegram.constants.InvoiceLimit.MAX_PAYLOAD_LENGTH`
 
     .. versionadded:: 20.0
     """
-    MAX_TIP_AMOUNTS: Final[int] = constants.InvoiceLimit.MAX_TIP_AMOUNTS
+    MAX_TIP_AMOUNTS: ClassVar[int] = constants.InvoiceLimit.MAX_TIP_AMOUNTS
     """:const:`telegram.constants.InvoiceLimit.MAX_TIP_AMOUNTS`
 
     .. versionadded:: 20.0

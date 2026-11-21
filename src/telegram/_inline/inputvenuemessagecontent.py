@@ -19,9 +19,10 @@
 """This module contains the classes that represent Telegram InputVenueMessageContent."""
 
 from telegram._inline.inputmessagecontent import InputMessageContent
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class InputVenueMessageContent(InputMessageContent):
     """Represents the content of a venue message to be sent as the result of an inline query.
 
@@ -63,45 +64,13 @@ class InputVenueMessageContent(InputMessageContent):
 
     """
 
-    __slots__ = (
-        "address",
-        "foursquare_id",
-        "foursquare_type",
-        "google_place_id",
-        "google_place_type",
-        "latitude",
-        "longitude",
-        "title",
-    )
-
-    def __init__(
-        self,
-        latitude: float,
-        longitude: float,
-        title: str,
-        address: str,
-        foursquare_id: str | None = None,
-        foursquare_type: str | None = None,
-        google_place_id: str | None = None,
-        google_place_type: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        with self._unfrozen():
-            # Required
-            self.latitude: float = latitude
-            self.longitude: float = longitude
-            self.title: str = title
-            self.address: str = address
-            # Optionals
-            self.foursquare_id: str | None = foursquare_id
-            self.foursquare_type: str | None = foursquare_type
-            self.google_place_id: str | None = google_place_id
-            self.google_place_type: str | None = google_place_type
-
-            self._id_attrs = (
-                self.latitude,
-                self.longitude,
-                self.title,
-            )
+    # Required
+    latitude: float = tg_field(compare=True)
+    longitude: float = tg_field(compare=True)
+    title: str = tg_field(compare=True)
+    address: str = tg_field()
+    # Optional
+    foursquare_id: str | None = tg_field(default=None)
+    foursquare_type: str | None = tg_field(default=None)
+    google_place_id: str | None = tg_field(default=None)
+    google_place_type: str | None = tg_field(default=None)

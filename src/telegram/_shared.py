@@ -18,15 +18,14 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains two objects used for request chats/users service messages."""
 
-from collections.abc import Sequence
-
 from telegram._files.photosize import PhotoSize
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.usernames import get_full_name, get_link, get_name
 
 
+@tg_dataclass()
 class UsersShared(TelegramObject):
     """
     This object contains information about the user whose identifier was shared with the bot
@@ -64,30 +63,17 @@ class UsersShared(TelegramObject):
             .. versionadded:: 21.1
     """
 
-    __slots__ = ("request_id", "users")
-
     __REMOVED_API_FIELDS__ = frozenset(
         {
             "user_ids",
         }
     )
 
-    def __init__(
-        self,
-        request_id: int,
-        users: Sequence["SharedUser"],
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.request_id: int = request_id
-        self.users: tuple[SharedUser, ...] = parse_sequence_arg(users)
-
-        self._id_attrs = (self.request_id, self.users)
-
-        self._freeze()
+    request_id: int = tg_field(compare=True)
+    users: tuple["SharedUser", ...] = tg_field(compare=True, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class ChatShared(TelegramObject):
     """
     This object contains information about the chat whose identifier was shared with the bot
@@ -135,28 +121,13 @@ class ChatShared(TelegramObject):
             .. versionadded:: 21.1
     """
 
-    __slots__ = ("chat_id", "photo", "request_id", "title", "username")
-
-    def __init__(
-        self,
-        request_id: int,
-        chat_id: int,
-        title: str | None = None,
-        username: str | None = None,
-        photo: Sequence[PhotoSize] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.request_id: int = request_id
-        self.chat_id: int = chat_id
-        self.title: str | None = title
-        self.username: str | None = username
-        self.photo: tuple[PhotoSize, ...] | None = parse_sequence_arg(photo)
-
-        self._id_attrs = (self.request_id, self.chat_id)
-
-        self._freeze()
+    # Required
+    request_id: int = tg_field(compare=True)
+    chat_id: int = tg_field(compare=True)
+    # Optional
+    title: str | None = tg_field(default=None)
+    username: str | None = tg_field(default=None)
+    photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
 
     @property
     def link(self) -> str | None:
@@ -168,6 +139,7 @@ class ChatShared(TelegramObject):
         return get_link(self)
 
 
+@tg_dataclass()
 class SharedUser(TelegramObject):
     """
     This object contains information about a user that was shared with the bot using a
@@ -211,28 +183,13 @@ class SharedUser(TelegramObject):
             the photo was requested by the bot. This list is empty if the photo was not requsted.
     """
 
-    __slots__ = ("first_name", "last_name", "photo", "user_id", "username")
-
-    def __init__(
-        self,
-        user_id: int,
-        first_name: str | None = None,
-        last_name: str | None = None,
-        username: str | None = None,
-        photo: Sequence[PhotoSize] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.user_id: int = user_id
-        self.first_name: str | None = first_name
-        self.last_name: str | None = last_name
-        self.username: str | None = username
-        self.photo: tuple[PhotoSize, ...] | None = parse_sequence_arg(photo)
-
-        self._id_attrs = (self.user_id,)
-
-        self._freeze()
+    # Required
+    user_id: int = tg_field(compare=True)
+    # Optional
+    first_name: str | None = tg_field(default=None)
+    last_name: str | None = tg_field(default=None)
+    username: str | None = tg_field(default=None)
+    photo: tuple[PhotoSize, ...] = tg_field(default=None, converter=parse_sequence_arg)
 
     @property
     def name(self) -> str | None:

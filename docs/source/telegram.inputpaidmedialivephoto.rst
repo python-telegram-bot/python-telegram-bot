@@ -1,5 +1,5 @@
 InputPaidMediaLivePhoto
-======================
+=======================
 
 .. autoclass:: telegram.InputPaidMediaLivePhoto
     :members:

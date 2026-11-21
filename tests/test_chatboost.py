@@ -37,7 +37,6 @@ from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatBoostSources
 from telegram.request import RequestData
 from tests.auxil.dummy_objects import get_dummy_object_json_dict
-from tests.auxil.slots import mro_slots
 
 
 class ChatBoostDefaults:
@@ -67,12 +66,6 @@ def chat_boost_source():
 
 
 class TestChatBoostSourceWithoutRequest(ChatBoostDefaults):
-    def test_slot_behaviour(self, chat_boost_source):
-        inst = chat_boost_source
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self, chat_boost_source):
         assert type(ChatBoostSource("premium").source) is ChatBoostSources
         assert ChatBoostSource("unknown").source == "unknown"
@@ -140,12 +133,6 @@ def chat_boost_source_premium():
 class TestChatBoostSourcePremiumWithoutRequest(ChatBoostDefaults):
     source = ChatBoostSources.PREMIUM
 
-    def test_slot_behaviour(self, chat_boost_source_premium):
-        inst = chat_boost_source_premium
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "user": self.user.to_dict(),
@@ -183,12 +170,6 @@ def chat_boost_source_gift_code():
 
 class TestChatBoostSourceGiftCodeWithoutRequest(ChatBoostDefaults):
     source = ChatBoostSources.GIFT_CODE
-
-    def test_slot_behaviour(self, chat_boost_source_gift_code):
-        inst = chat_boost_source_gift_code
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -228,12 +209,6 @@ def chat_boost_source_giveaway():
 
 class TestChatBoostSourceGiveawayWithoutRequest(ChatBoostDefaults):
     source = ChatBoostSources.GIVEAWAY
-
-    def test_slot_behaviour(self, chat_boost_source_giveaway):
-        inst = chat_boost_source_giveaway
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         json_dict = {
@@ -277,12 +252,6 @@ def chat_boost():
 
 
 class TestChatBoostWithoutRequest(ChatBoostDefaults):
-    def test_slot_behaviour(self, chat_boost):
-        inst = chat_boost
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot, chat_boost):
         json_dict = {
             "boost_id": self.boost_id,
@@ -363,12 +332,6 @@ def chat_boost_updated(chat_boost):
 
 
 class TestChatBoostUpdatedWithoutRequest(ChatBoostDefaults):
-    def test_slot_behaviour(self, chat_boost_updated):
-        inst = chat_boost_updated
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot, chat_boost):
         json_dict = {
             "chat": self.chat.to_dict(),
@@ -434,12 +397,6 @@ def chat_boost_removed():
 
 
 class TestChatBoostRemovedWithoutRequest(ChatBoostDefaults):
-    def test_slot_behaviour(self, chat_boost_removed):
-        inst = chat_boost_removed
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot, chat_boost_removed):
         json_dict = {
             "chat": self.chat.to_dict(),
@@ -521,12 +478,6 @@ def user_chat_boosts(chat_boost):
 
 
 class TestUserChatBoostsWithoutRequest(ChatBoostDefaults):
-    def test_slot_behaviour(self, user_chat_boosts):
-        inst = user_chat_boosts
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot, user_chat_boosts):
         json_dict = {
             "boosts": [
@@ -567,12 +518,6 @@ class TestUserChatBoostsWithRequest(ChatBoostDefaults):
 
 class TestChatBoostAddedWithoutRequest:
     boost_count = 100
-
-    def test_slot_behaviour(self):
-        action = ChatBoostAdded(8)
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
     def test_de_json(self):
         json_dict = {"boost_count": self.boost_count}

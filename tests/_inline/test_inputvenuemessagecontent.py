@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import InputVenueMessageContent, Location
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -48,12 +47,6 @@ class InputVenueMessageContentTestBase:
 
 
 class TestInputVenueMessageContentWithoutRequest(InputVenueMessageContentTestBase):
-    def test_slot_behaviour(self, input_venue_message_content):
-        inst = input_venue_message_content
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, input_venue_message_content):
         assert input_venue_message_content.longitude == self.longitude
         assert input_venue_message_content.latitude == self.latitude

@@ -258,7 +258,7 @@ class CallbackDataCache:
             return reply_markup
 
         self._keyboard_data[keyboard_uuid] = keyboard_data
-        return InlineKeyboardMarkup(buttons)
+        return InlineKeyboardMarkup(buttons)  # type: ignore[arg-type]
 
     @staticmethod
     def __put_button(callback_data: object, keyboard_data: _KeyboardData) -> str:
@@ -390,8 +390,7 @@ class CallbackDataCache:
 
             # Get the cached callback data for the CallbackQuery
             keyboard_uuid, button_data = self.__get_keyboard_uuid_and_button_data(data)
-            with callback_query._unfrozen():
-                callback_query.data = button_data  # type: ignore[assignment]
+            callback_query._set("data", button_data)
 
             # Map the callback queries ID to the keyboards UUID for later use
             if not mapped and not isinstance(button_data, InvalidCallbackData):

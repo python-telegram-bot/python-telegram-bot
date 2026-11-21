@@ -20,9 +20,10 @@
 
 from telegram._telegramobject import TelegramObject
 from telegram._user import User
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class DirectMessagesTopic(TelegramObject):
     """
     This class represents a topic for direct messages in a chat.
@@ -54,18 +55,8 @@ class DirectMessagesTopic(TelegramObject):
 
     """
 
-    __slots__ = ("topic_id", "user")
+    # Required:
+    topic_id: int = tg_field(compare=True)
 
-    def __init__(
-        self, topic_id: int, user: User | None = None, *, api_kwargs: JSONDict | None = None
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required:
-        self.topic_id: int = topic_id
-
-        # Optionals:
-        self.user: User | None = user
-
-        self._id_attrs = (self.topic_id, self.user)
-        self._freeze()
+    # Optionals:
+    user: User | None = tg_field(compare=True, default=None)

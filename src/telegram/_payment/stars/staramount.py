@@ -19,9 +19,10 @@
 """This module contains an object that represents a Telegram StarAmount."""
 
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class StarAmount(TelegramObject):
     """Describes an amount of Telegram Stars.
 
@@ -46,19 +47,5 @@ class StarAmount(TelegramObject):
 
     """
 
-    __slots__ = ("amount", "nanostar_amount")
-
-    def __init__(
-        self,
-        amount: int,
-        nanostar_amount: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.amount: int = amount
-        self.nanostar_amount: int | None = nanostar_amount
-
-        self._id_attrs = (self.amount, self.nanostar_amount)
-
-        self._freeze()
+    amount: int = tg_field(compare=True)
+    nanostar_amount: int | None = tg_field(compare=True, default=None)

@@ -34,6 +34,7 @@ from telegram import (
 )
 from telegram.ext import CallbackContext, ChosenInlineResultHandler, JobQueue
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -73,9 +74,8 @@ def chosen_inline_result():
         1,
         chosen_inline_result=ChosenInlineResult("result_id", User(1, "test_user", False), "query"),
     )
-    out._unfreeze()
-    out.chosen_inline_result._unfreeze()
-    return out
+    with unfrozen(out), unfrozen(out.chosen_inline_result):
+        yield out
 
 
 class TestChosenInlineResultHandler:

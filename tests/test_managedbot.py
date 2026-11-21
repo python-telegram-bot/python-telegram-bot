@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import ManagedBotCreated, ManagedBotUpdated, User
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -63,12 +62,6 @@ class ManagedBotTestBase:
 
 
 class TestManagedBotCreatedWithoutRequest(ManagedBotTestBase):
-    def test_slot_behaviour(self, managed_bot_created):
-        inst = managed_bot_created
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot, managed_bot_created):
         json_dict = {
             "bot": managed_bot_created.bot.to_dict(),
@@ -127,12 +120,6 @@ class TestManagedBotCreatedWithoutRequest(ManagedBotTestBase):
 
 
 class TestManagedBotUpdatedWithoutRequest(ManagedBotTestBase):
-    def test_slot_behaviour(self, managed_bot_updated):
-        inst = managed_bot_updated
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot, managed_bot_updated):
         json_dict = {
             "user": managed_bot_updated.user.to_dict(),

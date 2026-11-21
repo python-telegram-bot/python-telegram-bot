@@ -18,10 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a Telegram ChatPhoto."""
 
-from typing import TYPE_CHECKING, Final
+from typing import TYPE_CHECKING, ClassVar
 
 from telegram import constants
 from telegram._telegramobject import TelegramObject
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import JSONDict, ODVInput
 
@@ -29,6 +30,7 @@ if TYPE_CHECKING:
     from telegram import File
 
 
+@tg_dataclass()
 class ChatPhoto(TelegramObject):
     """This object represents a chat photo.
 
@@ -74,34 +76,10 @@ class ChatPhoto(TelegramObject):
 
     """
 
-    __slots__ = (
-        "big_file_id",
-        "big_file_unique_id",
-        "small_file_id",
-        "small_file_unique_id",
-    )
-
-    def __init__(
-        self,
-        small_file_id: str,
-        small_file_unique_id: str,
-        big_file_id: str,
-        big_file_unique_id: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.small_file_id: str = small_file_id
-        self.small_file_unique_id: str = small_file_unique_id
-        self.big_file_id: str = big_file_id
-        self.big_file_unique_id: str = big_file_unique_id
-
-        self._id_attrs = (
-            self.small_file_unique_id,
-            self.big_file_unique_id,
-        )
-
-        self._freeze()
+    small_file_id: str = tg_field()
+    small_file_unique_id: str = tg_field(compare=True)
+    big_file_id: str = tg_field()
+    big_file_unique_id: str = tg_field(compare=True)
 
     async def get_small_file(
         self,
@@ -165,12 +143,12 @@ class ChatPhoto(TelegramObject):
             api_kwargs=api_kwargs,
         )
 
-    SIZE_SMALL: Final[int] = constants.ChatPhotoSize.SMALL
+    SIZE_SMALL: ClassVar[int] = constants.ChatPhotoSize.SMALL
     """:const:`telegram.constants.ChatPhotoSize.SMALL`
 
     .. versionadded:: 20.0
     """
-    SIZE_BIG: Final[int] = constants.ChatPhotoSize.BIG
+    SIZE_BIG: ClassVar[int] = constants.ChatPhotoSize.BIG
     """:const:`telegram.constants.ChatPhotoSize.BIG`
 
     .. versionadded:: 20.0
