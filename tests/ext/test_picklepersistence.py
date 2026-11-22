@@ -716,6 +716,23 @@ class TestPicklePersistence:
         )
         assert await persistence.get_user_data() == {}
 
+    @pytest.mark.parametrize("single_file", [True, False])
+    async def test_unpicklable_data_keeps_stored_data(self, pickle_persistence, single_file):
+        pickle_persistence.single_file = single_file
+        await pickle_persistence.update_user_data(123, {"foo": "bar"})
+
+        # AttributeError is raised instead of PicklingError on Python < 3.14
+        with pytest.raises((pickle.PicklingError, AttributeError)):
+            await pickle_persistence.update_user_data(456, {"unpicklable": lambda: None})
+
+        # The failed attempt must not destroy what was written to the file before
+        persistence = PicklePersistence(
+            "pickletest",
+            single_file=single_file,
+            store_data=PersistenceInput(callback_data=False),
+        )
+        assert await persistence.get_user_data() == {123: {"foo": "bar"}}
+
     async def test_save_on_flush_multi_files(self, pickle_persistence, good_pickle_files):
         # Should run without error
         await pickle_persistence.flush()
