@@ -250,9 +250,10 @@ class AIORateLimiter(BaseRateLimiter[int]):
         Args:
             rate_limit_args (:obj:`None` | :obj:`int`): If set, specifies the maximum number of
                 retries to be made in case of a :exc:`~telegram.error.RetryAfter` exception.
+                Pass ``0`` to disable retries for this request.
                 Defaults to :paramref:`AIORateLimiter.max_retries`.
         """
-        max_retries = rate_limit_args or self._max_retries
+        max_retries = self._max_retries if rate_limit_args is None else rate_limit_args
 
         group: int | str | bool = False
         chat: bool = False
