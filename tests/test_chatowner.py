@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import BotCommand, ChatOwnerChanged, ChatOwnerLeft, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -36,18 +37,21 @@ class ChatOwnerTestBase:
     new_owner = User(1, "SnowCrash", False)
 
 
-class TestChatOwnerChangedWithoutRequest(ChatOwnerTestBase):
+class TestChatOwnerChangedWithoutRequest(ChatOwnerTestBase, DeserializationTestBase):
+    de_json_class = ChatOwnerChanged
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"new_owner": self.new_owner.to_dict()}
+
     def test_slot_behaviour(self, chat_owner_changed):
         inst = chat_owner_changed
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "new_owner": self.new_owner.to_dict(),
-        }
-        chat_owner_changed = ChatOwnerChanged.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_owner_changed = ChatOwnerChanged.de_json(de_json_dict, offline_bot)
         assert chat_owner_changed.api_kwargs == {}
 
         assert chat_owner_changed.new_owner == self.new_owner
@@ -75,18 +79,21 @@ class TestChatOwnerChangedWithoutRequest(ChatOwnerTestBase):
         assert hash(a) != hash(d)
 
 
-class TestChatOwnerLeftWithoutRequest(ChatOwnerTestBase):
+class TestChatOwnerLeftWithoutRequest(ChatOwnerTestBase, DeserializationTestBase):
+    de_json_class = ChatOwnerLeft
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"new_owner": self.new_owner.to_dict()}
+
     def test_slot_behaviour(self, chat_owner_left):
         inst = chat_owner_left
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "new_owner": self.new_owner.to_dict(),
-        }
-        chat_owner_left = ChatOwnerLeft.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_owner_left = ChatOwnerLeft.de_json(de_json_dict, offline_bot)
         assert chat_owner_left.api_kwargs == {}
 
         assert chat_owner_left.new_owner == self.new_owner

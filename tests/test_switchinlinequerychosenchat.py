@@ -43,7 +43,9 @@ class SwitchInlineQueryChosenChatTestBase:
     allow_group_chats = True
 
 
-class TestSwitchInlineQueryChosenChat(SwitchInlineQueryChosenChatTestBase, DeserializationTestBase):
+class TestSwitchInlineQueryChosenChat(
+    SwitchInlineQueryChosenChatTestBase, DeserializationTestBase
+):
     de_json_class = SwitchInlineQueryChosenChat
 
     @pytest.fixture

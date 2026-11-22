@@ -32,7 +32,9 @@ class PreparedKeyboardButtonTestBase:
     id = "4"
 
 
-class TestPreparedKeyboardButtonWithoutRequest(PreparedKeyboardButtonTestBase, DeserializationTestBase):
+class TestPreparedKeyboardButtonWithoutRequest(
+    PreparedKeyboardButtonTestBase, DeserializationTestBase
+):
     de_json_class = PreparedKeyboardButton
 
     @pytest.fixture

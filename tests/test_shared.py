@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ChatShared, PhotoSize, SharedUser, UsersShared
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -34,7 +35,16 @@ class UsersSharedTestBase:
     users = (SharedUser(101112, "user1"), SharedUser(101113, "user2"))
 
 
-class TestUsersSharedWithoutRequest(UsersSharedTestBase):
+class TestUsersSharedWithoutRequest(UsersSharedTestBase, DeserializationTestBase):
+    de_json_class = UsersShared
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "request_id": self.request_id,
+            "users": [user.to_dict() for user in self.users],
+        }
+
     def test_slot_behaviour(self, users_shared):
         for attr in users_shared.__slots__:
             assert getattr(users_shared, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -47,17 +57,18 @@ class TestUsersSharedWithoutRequest(UsersSharedTestBase):
         assert users_shared_dict["request_id"] == self.request_id
         assert users_shared_dict["users"] == [user.to_dict() for user in self.users]
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "request_id": self.request_id,
-            "users": [user.to_dict() for user in self.users],
-            "user_ids": self.user_ids,
-        }
-        users_shared = UsersShared.de_json(json_dict, offline_bot)
-        assert users_shared.api_kwargs == {"user_ids": self.user_ids}
+    def test_de_json(self, offline_bot, de_json_dict):
+        users_shared = UsersShared.de_json(de_json_dict, offline_bot)
+        assert users_shared.api_kwargs == {}
 
         assert users_shared.request_id == self.request_id
         assert users_shared.users == self.users
+
+    def test_de_json_user_ids(self, offline_bot, de_json_dict):
+        # user_ids was removed from the Bot API, but Telegram may still send it
+        json_dict = de_json_dict | {"user_ids": self.user_ids}
+        users_shared = UsersShared.de_json(json_dict, offline_bot)
+        assert users_shared.api_kwargs == {"user_ids": self.user_ids}
 
     def test_equality(self):
         a = UsersShared(self.request_id, users=self.users)
@@ -91,9 +102,27 @@ def chat_shared():
 class ChatSharedTestBase:
     request_id = 131415
     chat_id = 161718
+    title = "title"
+    username = "username"
+    photo = (
+        PhotoSize(file_id="file_id", width=1, height=1, file_unique_id="1"),
+        PhotoSize(file_id="file_id", width=2, height=2, file_unique_id="2"),
+    )
 
 
-class TestChatSharedWithoutRequest(ChatSharedTestBase):
+class TestChatSharedWithoutRequest(ChatSharedTestBase, DeserializationTestBase):
+    de_json_class = ChatShared
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "request_id": self.request_id,
+            "chat_id": self.chat_id,
+            "title": self.title,
+            "username": self.username,
+            "photo": [photo.to_dict() for photo in self.photo],
+        }
+
     def test_slot_behaviour(self, chat_shared):
         for attr in chat_shared.__slots__:
             assert getattr(chat_shared, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -106,16 +135,15 @@ class TestChatSharedWithoutRequest(ChatSharedTestBase):
         assert chat_shared_dict["request_id"] == self.request_id
         assert chat_shared_dict["chat_id"] == self.chat_id
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "request_id": self.request_id,
-            "chat_id": self.chat_id,
-        }
-        chat_shared = ChatShared.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_shared = ChatShared.de_json(de_json_dict, offline_bot)
         assert chat_shared.api_kwargs == {}
 
         assert chat_shared.request_id == self.request_id
         assert chat_shared.chat_id == self.chat_id
+        assert chat_shared.title == self.title
+        assert chat_shared.username == self.username
+        assert chat_shared.photo == self.photo
 
     def test_link(self):
         chat_shared = ChatShared(1, 123, username="username")
@@ -166,7 +194,19 @@ class SharedUserTestBase:
     )
 
 
-class TestSharedUserWithoutRequest(SharedUserTestBase):
+class TestSharedUserWithoutRequest(SharedUserTestBase, DeserializationTestBase):
+    de_json_class = SharedUser
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "user_id": self.user_id,
+            "first_name": self.first_name,
+            "last_name": self.last_name,
+            "username": self.username,
+            "photo": [photo.to_dict() for photo in self.photo],
+        }
+
     def test_slot_behaviour(self, shared_user):
         for attr in shared_user.__slots__:
             assert getattr(shared_user, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -182,29 +222,8 @@ class TestSharedUserWithoutRequest(SharedUserTestBase):
         assert shared_user_dict["username"] == self.username
         assert shared_user_dict["photo"] == [photo.to_dict() for photo in self.photo]
 
-    def test_de_json_required(self, offline_bot):
-        json_dict = {
-            "user_id": self.user_id,
-            "first_name": self.first_name,
-        }
-        shared_user = SharedUser.de_json(json_dict, offline_bot)
-        assert shared_user.api_kwargs == {}
-
-        assert shared_user.user_id == self.user_id
-        assert shared_user.first_name == self.first_name
-        assert shared_user.last_name is None
-        assert shared_user.username is None
-        assert shared_user.photo == ()
-
-    def test_de_json_all(self, offline_bot):
-        json_dict = {
-            "user_id": self.user_id,
-            "first_name": self.first_name,
-            "last_name": self.last_name,
-            "username": self.username,
-            "photo": [photo.to_dict() for photo in self.photo],
-        }
-        shared_user = SharedUser.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        shared_user = SharedUser.de_json(de_json_dict, offline_bot)
         assert shared_user.api_kwargs == {}
 
         assert shared_user.user_id == self.user_id

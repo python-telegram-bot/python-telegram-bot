@@ -27,6 +27,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -63,31 +64,28 @@ class ChatJoinRequestTestBase:
     )
 
 
-class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
+class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase, DeserializationTestBase):
+    de_json_class = ChatJoinRequest
+
+    @pytest.fixture
+    def de_json_dict(self, time):
+        return {
+            "chat": self.chat.to_dict(),
+            "from": self.from_user.to_dict(),
+            "date": to_timestamp(time),
+            "user_chat_id": self.from_user.id,
+            "bio": self.bio,
+            "invite_link": self.invite_link.to_dict(),
+        }
+
     def test_slot_behaviour(self, chat_join_request):
         inst = chat_join_request
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, time):
-        json_dict = {
-            "chat": self.chat.to_dict(),
-            "from": self.from_user.to_dict(),
-            "date": to_timestamp(time),
-            "user_chat_id": self.from_user.id,
-        }
-        chat_join_request = ChatJoinRequest.de_json(json_dict, offline_bot)
-        assert chat_join_request.api_kwargs == {}
-
-        assert chat_join_request.chat == self.chat
-        assert chat_join_request.from_user == self.from_user
-        assert abs(chat_join_request.date - time) < dtm.timedelta(seconds=1)
-        assert to_timestamp(chat_join_request.date) == to_timestamp(time)
-        assert chat_join_request.user_chat_id == self.from_user.id
-
-        json_dict.update({"bio": self.bio, "invite_link": self.invite_link.to_dict()})
-        chat_join_request = ChatJoinRequest.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, time, de_json_dict):
+        chat_join_request = ChatJoinRequest.de_json(de_json_dict, offline_bot)
         assert chat_join_request.api_kwargs == {}
 
         assert chat_join_request.chat == self.chat
@@ -97,26 +95,6 @@ class TestChatJoinRequestWithoutRequest(ChatJoinRequestTestBase):
         assert chat_join_request.user_chat_id == self.from_user.id
         assert chat_join_request.bio == self.bio
         assert chat_join_request.invite_link == self.invite_link
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, time):
-        json_dict = {
-            "chat": self.chat.to_dict(),
-            "from": self.from_user.to_dict(),
-            "date": to_timestamp(time),
-            "user_chat_id": self.from_user.id,
-        }
-
-        chatjoin_req_raw = ChatJoinRequest.de_json(json_dict, raw_bot)
-        chatjoin_req_bot = ChatJoinRequest.de_json(json_dict, offline_bot)
-        chatjoin_req_tz = ChatJoinRequest.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        chatjoin_req_offset = chatjoin_req_tz.date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(chatjoin_req_tz.date.replace(tzinfo=None))
-
-        assert chatjoin_req_raw.date.tzinfo == UTC
-        assert chatjoin_req_bot.date.tzinfo == UTC
-        assert chatjoin_req_offset == tz_bot_offset
 
     def test_to_dict(self, chat_join_request, time):
         chat_join_request_dict = chat_join_request.to_dict()

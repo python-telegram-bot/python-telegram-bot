@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ChatLocation, Location, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -33,19 +34,24 @@ class ChatLocationTestBase:
     address = "The Shire"
 
 
-class TestChatLocationWithoutRequest(ChatLocationTestBase):
+class TestChatLocationWithoutRequest(ChatLocationTestBase, DeserializationTestBase):
+    de_json_class = ChatLocation
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "location": self.location.to_dict(),
+            "address": self.address,
+        }
+
     def test_slot_behaviour(self, chat_location):
         inst = chat_location
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "location": self.location.to_dict(),
-            "address": self.address,
-        }
-        chat_location = ChatLocation.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_location = ChatLocation.de_json(de_json_dict, offline_bot)
         assert chat_location.api_kwargs == {}
 
         assert chat_location.location == self.location
