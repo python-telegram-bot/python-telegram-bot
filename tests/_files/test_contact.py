@@ -78,7 +78,10 @@ class TestContactWithoutRequest(ContactTestBase, DeserializationTestBase):
 
     @pytest.mark.xfail(
         strict=True,
-        reason="`phone_number` is converted with `str()`, so a missing value becomes the string 'None'",
+        reason=(
+            "`phone_number` is converted with `str()`, so a missing value becomes the string "
+            "'None'"
+        ),
     )
     def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
         super().test_de_json_missing_required_args(offline_bot, de_json_dict)
