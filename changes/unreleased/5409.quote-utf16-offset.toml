@@ -1,0 +1,5 @@
+bugfixes = "Fixed ``Message.compute_quote_position_and_entities`` returning incorrect offsets or finding quotes that are absent when UTF-16 bytes match across character boundaries."
+[[pull_requests]]
+uid = "5409"
+author_uids = ["xsneh"]
+closes_threads = []
