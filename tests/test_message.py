@@ -1577,6 +1577,11 @@ class TestMessageWithoutRequest(MessageTestBase):
         ):
             message.compute_quote_position_and_entities("A", 5)
 
+    def test_compute_quote_position_and_entities_rejects_byte_boundary_match(self, message):
+        message.text = "\u4100\u0100"
+        with pytest.raises(ValueError, match="this text appears only 0 times"):
+            message.compute_quote_position_and_entities("A")
+
     def test_compute_quote_position_and_entities_no_text_or_caption(self, message):
         message.text = None
         message.caption = None
@@ -1595,6 +1600,8 @@ class TestMessageWithoutRequest(MessageTestBase):
             ("ABC ABC ABC ABC", "ABC", None, 0),
             ("ABC ABC ABC ABC", "ABC", 0, 0),
             ("ABC ABC ABC ABC", "ABC", 3, 12),
+            ("\u4100\u0100A", "A", None, 2),
+            ("\u4100\u0100A A", "A", 1, 4),
             ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👨‍👨‍👧", 0, 0),
             ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👨‍👨‍👧", 3, 24),
             ("👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧👨‍👨‍👧", "👨", 1, 3),
