@@ -268,8 +268,8 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         "_per_user",
         "_persistent",
         "_states",
+        "_timeout_jobs",
         "_timeout_jobs_lock",
-        "timeout_jobs",
     )
 
     END: Final[int] = -1
@@ -326,7 +326,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
 
         # if conversation_timeout is used, this dict is used to schedule a job which runs when the
         # conv has timed out.
-        self.timeout_jobs: dict[ConversationKey, Job[Any]] = {}
+        self._timeout_jobs: dict[ConversationKey, Job[Any]] = {}
         self._timeout_jobs_lock = asyncio.Lock()
         self._conversations: ConversationDict = {}
         self._child_conversations: set[ConversationHandler] = set()
@@ -694,7 +694,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         try:
             # both job_queue & conversation_timeout are checked before calling _schedule_job
             j_queue = application.job_queue
-            self.timeout_jobs[conversation_key] = j_queue.run_once(  # type: ignore[union-attr]
+            self._timeout_jobs[conversation_key] = j_queue.run_once(  # type: ignore[union-attr]
                 self._trigger_timeout,
                 self.conversation_timeout,  # type: ignore[arg-type]
                 data=_ConversationTimeoutContext(conversation_key, update, application, context),
@@ -818,7 +818,7 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
 
         async with self._timeout_jobs_lock:
             # Remove the old timeout job (if present)
-            timeout_job = self.timeout_jobs.pop(conversation_key, None)
+            timeout_job = self._timeout_jobs.pop(conversation_key, None)
 
             if timeout_job is not None:
                 timeout_job.schedule_removal()
@@ -932,11 +932,11 @@ class ConversationHandler(BaseHandler[Update, CCT, object]):
         callback_context = ctxt.callback_context
 
         async with self._timeout_jobs_lock:
-            found_job = self.timeout_jobs.get(ctxt.conversation_key)
+            found_job = self._timeout_jobs.get(ctxt.conversation_key)
             if found_job is not job:
                 # The timeout has been cancelled in handle_update
                 return
-            del self.timeout_jobs[ctxt.conversation_key]
+            del self._timeout_jobs[ctxt.conversation_key]
 
         # Now run all handlers which are in TIMEOUT state
         handlers = self.states.get(self.TIMEOUT, [])

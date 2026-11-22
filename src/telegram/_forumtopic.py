@@ -42,17 +42,6 @@ class ForumTopic(TelegramObject):
             specified explicitly by its creator and likely needs to be changed by the bot.
 
             .. versionadded:: 22.6
-
-    Attributes:
-        message_thread_id (:obj:`int`): Unique identifier of the forum topic
-        name (:obj:`str`): Name of the topic
-        icon_color (:obj:`int`): Color of the topic icon in RGB format
-        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
-            as the topic icon.
-        is_name_implicit (:obj:`bool`): Optional. :obj:`True`, if the name of the topic wasn't
-            specified explicitly by its creator and likely needs to be changed by the bot.
-
-            .. versionadded:: 22.6
     """
 
     __slots__ = (
@@ -101,16 +90,6 @@ class ForumTopicCreated(TelegramObject):
         icon_custom_emoji_id (:obj:`str`, optional): Unique identifier of the custom emoji shown
             as the topic icon.
         is_name_implicit (:obj:`bool`, optional): :obj:`True`, if the name of the topic wasn't
-            specified explicitly by its creator and likely needs to be changed by the bot.
-
-            .. versionadded:: 22.6
-
-    Attributes:
-        name (:obj:`str`): Name of the topic
-        icon_color (:obj:`int`): Color of the topic icon in RGB format
-        icon_custom_emoji_id (:obj:`str`): Optional. Unique identifier of the custom emoji shown
-            as the topic icon.
-        is_name_implicit (:obj:`bool`): Optional. :obj:`True`, if the name of the topic wasn't
             specified explicitly by its creator and likely needs to be changed by the bot.
 
             .. versionadded:: 22.6
@@ -182,11 +161,6 @@ class ForumTopicEdited(TelegramObject):
     Args:
         name (:obj:`str`, optional): New name of the topic, if it was edited.
         icon_custom_emoji_id (:obj:`str`, optional): New identifier of the custom emoji shown as
-            the topic icon, if it was edited; an empty string if the icon was removed.
-
-    Attributes:
-        name (:obj:`str`): Optional. New name of the topic, if it was edited.
-        icon_custom_emoji_id (:obj:`str`): Optional. New identifier of the custom emoji shown as
             the topic icon, if it was edited; an empty string if the icon was removed.
     """
 

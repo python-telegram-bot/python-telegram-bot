@@ -58,26 +58,11 @@ class Animation(_BaseThumbedMedium):
             .. versionadded:: 20.2
 
     Attributes:
-        file_id (:obj:`str`): Identifier for this file, which can be used to download
-            or reuse the file.
-        file_unique_id (:obj:`str`): Unique identifier for this file, which
-            is supposed to be the same over time and for different bots.
-            Can't be used to download or reuse the file.
-        width (:obj:`int`): Video width as defined by the sender.
-        height (:obj:`int`): Video height as defined by the sender.
         duration (:obj:`int` | :class:`datetime.timedelta`): Duration of the video in seconds
             as defined by the sender.
 
             .. deprecated:: v22.2
                 |time-period-int-deprecated|
-        file_name (:obj:`str`): Optional. Original animation filename as defined by the sender.
-        mime_type (:obj:`str`): Optional. MIME type of the file as defined by the sender.
-        file_size (:obj:`int`): Optional. File size in bytes.
-        thumbnail (:class:`telegram.PhotoSize`): Optional. Animation thumbnail as defined by
-            sender.
-
-            .. versionadded:: 20.2
-
     """
 
     __slots__ = ("_duration", "file_name", "height", "mime_type", "width")

@@ -50,21 +50,6 @@ class WriteAccessAllowed(TelegramObject):
          the bot was added to the attachment or side menu.
 
          .. versionadded:: 20.6
-
-    Attributes:
-        web_app_name (:obj:`str`): Optional. Name of the Web App, if the access was granted when
-            the Web App was launched from a link.
-
-            .. versionadded:: 20.3
-        from_request (:obj:`bool`): Optional. :obj:`True`, if the access was granted after the user
-            accepted an explicit request from a Web App.
-
-            .. versionadded:: 20.6
-        from_attachment_menu (:obj:`bool`): Optional. :obj:`True`, if the access was granted when
-            the bot was added to the attachment or side menu.
-
-            .. versionadded:: 20.6
-
     """
 
     __slots__ = ("from_attachment_menu", "from_request", "web_app_name")

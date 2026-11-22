@@ -37,11 +37,6 @@ class UserProfileAudios(TelegramObject):
     Args:
         total_count (:obj:`int`): Total number of profile audios for the target user.
         audios (Sequence[:class:`telegram.Audio`]): Requested profile audios.
-
-    Attributes:
-        total_count (:obj:`int`): Total number of profile audios for the target user.
-        audios (tuple[:class:`telegram.Audio`]): Requested profile audios.
-
     """
 
     __slots__ = ("audios", "total_count")
