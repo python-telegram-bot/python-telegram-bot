@@ -66,7 +66,7 @@ class UserTestBase:
     can_read_all_group_messages = True
     supports_inline_queries = False
     is_premium = True
-    added_to_attachment_menu = False
+    added_to_attachment_menu = True
     can_connect_to_business = True
     has_main_web_app = False
     has_topics_enabled = False
