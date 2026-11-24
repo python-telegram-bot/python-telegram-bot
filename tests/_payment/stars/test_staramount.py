@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import StarAmount
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -36,19 +37,24 @@ class StarTransactionTestBase:
     nanostar_amount = 356
 
 
-class TestStarAmountWithoutRequest(StarTransactionTestBase):
+class TestStarAmountWithoutRequest(StarTransactionTestBase, DeserializationTestBase):
+    de_json_class = StarAmount
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "amount": self.amount,
+            "nanostar_amount": self.nanostar_amount,
+        }
+
     def test_slot_behaviour(self, star_amount):
         inst = star_amount
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "amount": self.amount,
-            "nanostar_amount": self.nanostar_amount,
-        }
-        st = StarAmount.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        st = StarAmount.de_json(de_json_dict, offline_bot)
         assert st.api_kwargs == {}
         assert st.amount == self.amount
         assert st.nanostar_amount == self.nanostar_amount

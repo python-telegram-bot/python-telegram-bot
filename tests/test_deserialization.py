@@ -142,7 +142,6 @@ NOT_RECEIVED_FROM_API: frozenset[type[TelegramObject]] = frozenset(
 PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
     {
         telegram.AcceptedGiftTypes,
-        telegram.AffiliateInfo,
         telegram.BusinessBotRights,
         telegram.BusinessConnection,
         telegram.BusinessIntro,
@@ -223,9 +222,6 @@ PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
         telegram.RevenueWithdrawalStateSucceeded,
         telegram.SecureData,
         telegram.SecureValue,
-        telegram.StarAmount,
-        telegram.StarTransaction,
-        telegram.StarTransactions,
         telegram.Story,
         telegram.SuggestedPostApprovalFailed,
         telegram.SuggestedPostApproved,

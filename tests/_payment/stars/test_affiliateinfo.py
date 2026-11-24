@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import AffiliateInfo, Chat, Dice, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -41,22 +42,27 @@ class AffiliateInfoTestBase:
     nanostar_amount = -42
 
 
-class TestAffiliateInfoWithoutRequest(AffiliateInfoTestBase):
-    def test_slot_behaviour(self, affiliate_info):
-        inst = affiliate_info
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+class TestAffiliateInfoWithoutRequest(AffiliateInfoTestBase, DeserializationTestBase):
+    de_json_class = AffiliateInfo
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "affiliate_user": self.affiliate_user.to_dict(),
             "affiliate_chat": self.affiliate_chat.to_dict(),
             "commission_per_mille": self.commission_per_mille,
             "amount": self.amount,
             "nanostar_amount": self.nanostar_amount,
         }
-        ai = AffiliateInfo.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, affiliate_info):
+        inst = affiliate_info
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        ai = AffiliateInfo.de_json(de_json_dict, offline_bot)
         assert ai.api_kwargs == {}
         assert ai.affiliate_user == self.affiliate_user
         assert ai.affiliate_chat == self.affiliate_chat
