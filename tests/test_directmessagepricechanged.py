@@ -18,15 +18,11 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object for testing a Direct Message Price."""
 
-from typing import TYPE_CHECKING
-
 import pytest
 
 from telegram import DirectMessagePriceChanged, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
-
-if TYPE_CHECKING:
-    from telegram._utils.types import JSONDict
 
 
 @pytest.fixture
@@ -42,19 +38,26 @@ class DirectMessagePriceChangedTestBase:
     direct_message_star_count: int = 100
 
 
-class TestDirectMessagePriceChangedWithoutRequest(DirectMessagePriceChangedTestBase):
+class TestDirectMessagePriceChangedWithoutRequest(
+    DirectMessagePriceChangedTestBase, DeserializationTestBase
+):
+    de_json_class = DirectMessagePriceChanged
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "are_direct_messages_enabled": self.are_direct_messages_enabled,
+            "direct_message_star_count": self.direct_message_star_count,
+        }
+
     def test_slot_behaviour(self, direct_message_price_changed):
         action = direct_message_price_changed
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict: JSONDict = {
-            "are_direct_messages_enabled": self.are_direct_messages_enabled,
-            "direct_message_star_count": self.direct_message_star_count,
-        }
-        dmpc = DirectMessagePriceChanged.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        dmpc = DirectMessagePriceChanged.de_json(de_json_dict, offline_bot)
         assert dmpc.api_kwargs == {}
 
         assert dmpc.are_direct_messages_enabled == self.are_direct_messages_enabled

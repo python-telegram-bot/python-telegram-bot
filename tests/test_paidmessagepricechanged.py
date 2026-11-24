@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import Dice, PaidMessagePriceChanged
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -32,7 +33,15 @@ def paid_message_price_changed():
     return PaidMessagePriceChanged(PaidMessagePriceChangedTestBase.paid_message_star_count)
 
 
-class TestPaidMessagePriceChangedWithoutRequest(PaidMessagePriceChangedTestBase):
+class TestPaidMessagePriceChangedWithoutRequest(
+    PaidMessagePriceChangedTestBase, DeserializationTestBase
+):
+    de_json_class = PaidMessagePriceChanged
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"paid_message_star_count": self.paid_message_star_count}
+
     def test_slot_behaviour(self, paid_message_price_changed):
         for attr in paid_message_price_changed.__slots__:
             assert getattr(paid_message_price_changed, attr, "err") != "err", (
@@ -47,9 +56,8 @@ class TestPaidMessagePriceChangedWithoutRequest(PaidMessagePriceChangedTestBase)
         assert isinstance(pmpc_dict, dict)
         assert pmpc_dict["paid_message_star_count"] == self.paid_message_star_count
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"paid_message_star_count": self.paid_message_star_count}
-        pmpc = PaidMessagePriceChanged.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        pmpc = PaidMessagePriceChanged.de_json(de_json_dict, offline_bot)
         assert isinstance(pmpc, PaidMessagePriceChanged)
         assert pmpc.paid_message_star_count == self.paid_message_star_count
         assert pmpc.api_kwargs == {}
