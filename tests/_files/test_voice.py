@@ -118,13 +118,6 @@ class TestVoiceWithoutRequest(VoiceTestBase, DeserializationTestBase):
         assert json_voice.mime_type == self.mime_type
         assert json_voice.file_size == self.file_size
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="`file_id` is converted with `str()`, so a missing value becomes the string 'None'",
-    )
-    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
-        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
-
     def test_to_dict(self, offline_voice):
         voice_dict = offline_voice.to_dict()
 

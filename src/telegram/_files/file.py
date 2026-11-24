@@ -94,8 +94,8 @@ class File(TelegramObject):
         super().__init__(api_kwargs=api_kwargs)
 
         # Required
-        self.file_id: str = str(file_id)
-        self.file_unique_id: str = str(file_unique_id)
+        self.file_id: str = file_id
+        self.file_unique_id: str = file_unique_id
         # Optionals
         self.file_size: int | None = file_size
         self.file_path: str | None = file_path

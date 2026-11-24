@@ -131,13 +131,6 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase, DeserializationTestBase):
         assert json_video_note.file_size == self.file_size
         assert json_video_note.thumbnail == offline_video_note.thumbnail
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="`file_id` is converted with `str()`, so a missing value becomes the string 'None'",
-    )
-    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
-        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
-
     def test_to_dict(self, offline_video_note):
         video_note_dict = offline_video_note.to_dict()
 

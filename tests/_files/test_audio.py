@@ -114,13 +114,6 @@ class TestAudioWithoutRequest(AudioTestBase, DeserializationTestBase):
         assert json_audio.file_size == self.file_size
         assert json_audio.thumbnail == offline_audio.thumbnail
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="`file_id` is converted with `str()`, so a missing value becomes the string 'None'",
-    )
-    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
-        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
-
     def test_to_dict(self, offline_audio):
         audio_dict = offline_audio.to_dict()
 

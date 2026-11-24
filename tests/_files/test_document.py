@@ -98,13 +98,6 @@ class TestDocumentWithoutRequest(DocumentTestBase, DeserializationTestBase):
         assert test_document.mime_type == self.mime_type
         assert test_document.file_size == self.file_size
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="`file_id` is converted with `str()`, so a missing value becomes the string 'None'",
-    )
-    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
-        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
-
     def test_to_dict(self, offline_document):
         document_dict = offline_document.to_dict()
 

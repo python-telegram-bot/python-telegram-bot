@@ -103,13 +103,6 @@ class TestLivePhotoWithoutRequest(LivePhotoTestBase, DeserializationTestBase):
         assert json_live_photo.file_size == self.file_size
         assert json_live_photo.photo == self.photo
 
-    @pytest.mark.xfail(
-        strict=True,
-        reason="`file_id` is converted with `str()`, so a missing value becomes the string 'None'",
-    )
-    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
-        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
-
     def test_to_dict(self, live_photo):
         live_photo_dict = live_photo.to_dict()
 
