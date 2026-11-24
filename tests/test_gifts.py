@@ -24,6 +24,7 @@ from telegram import BotCommand, Chat, Gift, GiftInfo, Gifts, MessageEntity, Sti
 from telegram._gifts import AcceptedGiftTypes, GiftBackground
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram.request import RequestData
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -42,7 +43,17 @@ class GiftBackgroundTestBase:
     text_color = 0xFF0000
 
 
-class TestGiftBackgroundWithoutRequest(GiftBackgroundTestBase):
+class TestGiftBackgroundWithoutRequest(GiftBackgroundTestBase, DeserializationTestBase):
+    de_json_class = GiftBackground
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "center_color": self.center_color,
+            "edge_color": self.edge_color,
+            "text_color": self.text_color,
+        }
+
     def test_slot_behaviour(self, gift_background):
         for attr in gift_background.__slots__:
             assert getattr(gift_background, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -50,13 +61,8 @@ class TestGiftBackgroundWithoutRequest(GiftBackgroundTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "center_color": self.center_color,
-            "edge_color": self.edge_color,
-            "text_color": self.text_color,
-        }
-        gift_background = GiftBackground.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        gift_background = GiftBackground.de_json(de_json_dict, offline_bot)
         assert gift_background.api_kwargs == {}
         assert gift_background.center_color == self.center_color
         assert gift_background.edge_color == self.edge_color
@@ -135,14 +141,12 @@ class GiftTestBase:
     unique_gift_variant_count = 42
 
 
-class TestGiftWithoutRequest(GiftTestBase):
-    def test_slot_behaviour(self, gift):
-        for attr in gift.__slots__:
-            assert getattr(gift, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(gift)) == len(set(mro_slots(gift))), "duplicate slot"
+class TestGiftWithoutRequest(GiftTestBase, DeserializationTestBase):
+    de_json_class = Gift
 
-    def test_de_json(self, offline_bot, gift):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "id": self.id,
             "sticker": self.sticker.to_dict(),
             "star_count": self.star_count,
@@ -157,7 +161,14 @@ class TestGiftWithoutRequest(GiftTestBase):
             "has_colors": self.has_colors,
             "unique_gift_variant_count": self.unique_gift_variant_count,
         }
-        gift = Gift.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, gift):
+        for attr in gift.__slots__:
+            assert getattr(gift, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(gift)) == len(set(mro_slots(gift))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        gift = Gift.de_json(de_json_dict, offline_bot)
         assert gift.api_kwargs == {}
 
         assert gift.id == self.id
@@ -351,15 +362,20 @@ class GiftsTestBase:
     ]
 
 
-class TestGiftsWithoutRequest(GiftsTestBase):
+class TestGiftsWithoutRequest(GiftsTestBase, DeserializationTestBase):
+    de_json_class = Gifts
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"gifts": [gift.to_dict() for gift in self.gifts]}
+
     def test_slot_behaviour(self, gifts):
         for attr in gifts.__slots__:
             assert getattr(gifts, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(gifts)) == len(set(mro_slots(gifts))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, gifts):
-        json_dict = {"gifts": [gift.to_dict() for gift in self.gifts]}
-        gifts = Gifts.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        gifts = Gifts.de_json(de_json_dict, offline_bot)
         assert gifts.api_kwargs == {}
 
         assert gifts.gifts == tuple(self.gifts)
@@ -435,18 +451,16 @@ class GiftInfoTestBase:
         MessageEntity(MessageEntity.ITALIC, 5, 8),
     )
     is_private = True
-    is_upgrade_separate = False
+    is_upgrade_separate = True
     unique_gift_number = 42
 
 
-class TestGiftInfoWithoutRequest(GiftInfoTestBase):
-    def test_slot_behaviour(self, gift_info):
-        for attr in gift_info.__slots__:
-            assert getattr(gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(gift_info)) == len(set(mro_slots(gift_info))), "duplicate slot"
+class TestGiftInfoWithoutRequest(GiftInfoTestBase, DeserializationTestBase):
+    de_json_class = GiftInfo
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "gift": self.gift.to_dict(),
             "owned_gift_id": self.owned_gift_id,
             "convert_star_count": self.convert_star_count,
@@ -458,7 +472,14 @@ class TestGiftInfoWithoutRequest(GiftInfoTestBase):
             "is_upgrade_separate": self.is_upgrade_separate,
             "unique_gift_number": self.unique_gift_number,
         }
-        gift_info = GiftInfo.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, gift_info):
+        for attr in gift_info.__slots__:
+            assert getattr(gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(gift_info)) == len(set(mro_slots(gift_info))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        gift_info = GiftInfo.de_json(de_json_dict, offline_bot)
         assert gift_info.api_kwargs == {}
         assert gift_info.gift == self.gift
         assert gift_info.owned_gift_id == self.owned_gift_id
@@ -547,7 +568,19 @@ class AcceptedGiftTypesTestBase:
     gifts_from_channels = False
 
 
-class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
+class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase, DeserializationTestBase):
+    de_json_class = AcceptedGiftTypes
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "unlimited_gifts": self.unlimited_gifts,
+            "limited_gifts": self.limited_gifts,
+            "unique_gifts": self.unique_gifts,
+            "premium_subscription": self.premium_subscription,
+            "gifts_from_channels": self.gifts_from_channels,
+        }
+
     def test_slot_behaviour(self, accepted_gift_types):
         for attr in accepted_gift_types.__slots__:
             assert getattr(accepted_gift_types, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -555,15 +588,8 @@ class TestAcceptedGiftTypesWithoutRequest(AcceptedGiftTypesTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "unlimited_gifts": self.unlimited_gifts,
-            "limited_gifts": self.limited_gifts,
-            "unique_gifts": self.unique_gifts,
-            "premium_subscription": self.premium_subscription,
-            "gifts_from_channels": self.gifts_from_channels,
-        }
-        accepted_gift_types = AcceptedGiftTypes.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        accepted_gift_types = AcceptedGiftTypes.de_json(de_json_dict, offline_bot)
         assert accepted_gift_types.api_kwargs == {}
         assert accepted_gift_types.unlimited_gifts == self.unlimited_gifts
         assert accepted_gift_types.limited_gifts == self.limited_gifts
