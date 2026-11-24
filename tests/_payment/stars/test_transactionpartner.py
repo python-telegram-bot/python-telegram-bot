@@ -39,6 +39,7 @@ from telegram import (
     Video,
 )
 from telegram.constants import TransactionPartnerType
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -87,7 +88,7 @@ class TransactionPartnerTestBase:
             height=10,
             is_animated=False,
             is_video=False,
-            type="type",
+            type=Sticker.REGULAR,
         ),
         total_count=42,
         remaining_count=42,
@@ -105,7 +106,14 @@ class TransactionPartnerTestBase:
     premium_subscription_duration = 3
 
 
-class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase, DeserializationTestBase):
+    de_json_class = TransactionPartner
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that TransactionPartner.de_json does not dispatch to a subclass
+        return {"type": "unknown"}
+
     def test_slot_behaviour(self, transaction_partner):
         inst = transaction_partner
         for attr in inst.__slots__:
@@ -116,9 +124,8 @@ class TestTransactionPartnerWithoutRequest(TransactionPartnerTestBase):
         assert type(TransactionPartner("affiliate_program").type) is TransactionPartnerType
         assert TransactionPartner("unknown").type == "unknown"
 
-    def test_de_json(self, offline_bot):
-        data = {"type": "unknown"}
-        transaction_partner = TransactionPartner.de_json(data, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        transaction_partner = TransactionPartner.de_json(de_json_dict, offline_bot)
         assert transaction_partner.api_kwargs == {}
         assert transaction_partner.type == "unknown"
 
@@ -178,8 +185,18 @@ def transaction_partner_affiliate_program():
     )
 
 
-class TestTransactionPartnerAffiliateProgramWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerAffiliateProgramWithoutRequest(
+    TransactionPartnerTestBase, DeserializationTestBase
+):
+    de_json_class = TransactionPartnerAffiliateProgram
     type = TransactionPartnerType.AFFILIATE_PROGRAM
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "commission_per_mille": self.commission_per_mille,
+            "sponsor_user": self.sponsor_user.to_dict(),
+        }
 
     def test_slot_behaviour(self, transaction_partner_affiliate_program):
         inst = transaction_partner_affiliate_program
@@ -187,12 +204,8 @@ class TestTransactionPartnerAffiliateProgramWithoutRequest(TransactionPartnerTes
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "commission_per_mille": self.commission_per_mille,
-            "sponsor_user": self.sponsor_user.to_dict(),
-        }
-        tp = TransactionPartnerAffiliateProgram.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        tp = TransactionPartnerAffiliateProgram.de_json(de_json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "affiliate_program"
         assert tp.commission_per_mille == self.commission_per_mille
@@ -231,8 +244,15 @@ def transaction_partner_fragment():
     )
 
 
-class TestTransactionPartnerFragmentWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerFragmentWithoutRequest(
+    TransactionPartnerTestBase, DeserializationTestBase
+):
+    de_json_class = TransactionPartnerFragment
     type = TransactionPartnerType.FRAGMENT
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"withdrawal_state": self.withdrawal_state.to_dict()}
 
     def test_slot_behaviour(self, transaction_partner_fragment):
         inst = transaction_partner_fragment
@@ -240,9 +260,8 @@ class TestTransactionPartnerFragmentWithoutRequest(TransactionPartnerTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"withdrawal_state": self.withdrawal_state.to_dict()}
-        tp = TransactionPartnerFragment.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        tp = TransactionPartnerFragment.de_json(de_json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "fragment"
         assert tp.withdrawal_state == self.withdrawal_state
@@ -281,8 +300,25 @@ def transaction_partner_user():
     )
 
 
-class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerUserWithoutRequest(
+    TransactionPartnerTestBase, DeserializationTestBase
+):
+    de_json_class = TransactionPartnerUser
     type = TransactionPartnerType.USER
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "user": self.user.to_dict(),
+            "transaction_type": self.transaction_type,
+            "invoice_payload": self.invoice_payload,
+            "paid_media": [pm.to_dict() for pm in self.paid_media],
+            "paid_media_payload": self.paid_media_payload,
+            "subscription_period": int(self.subscription_period.total_seconds()),
+            "gift": self.gift.to_dict(),
+            "affiliate": self.affiliate.to_dict(),
+            "premium_subscription_duration": self.premium_subscription_duration,
+        }
 
     def test_slot_behaviour(self, transaction_partner_user):
         inst = transaction_partner_user
@@ -290,17 +326,8 @@ class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "user": self.user.to_dict(),
-            "transaction_type": self.transaction_type,
-            "invoice_payload": self.invoice_payload,
-            "paid_media": [pm.to_dict() for pm in self.paid_media],
-            "paid_media_payload": self.paid_media_payload,
-            "subscription_period": self.subscription_period.total_seconds(),
-            "premium_subscription_duration": self.premium_subscription_duration,
-        }
-        tp = TransactionPartnerUser.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        tp = TransactionPartnerUser.de_json(de_json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "user"
         assert tp.user == self.user
@@ -309,6 +336,8 @@ class TestTransactionPartnerUserWithoutRequest(TransactionPartnerTestBase):
         assert tp.paid_media == self.paid_media
         assert tp.paid_media_payload == self.paid_media_payload
         assert tp.subscription_period == self.subscription_period
+        assert tp.gift == self.gift
+        assert tp.affiliate == self.affiliate
         assert tp.premium_subscription_duration == self.premium_subscription_duration
 
     def test_to_dict(self, transaction_partner_user):
@@ -349,8 +378,15 @@ def transaction_partner_other():
     return TransactionPartnerOther()
 
 
-class TestTransactionPartnerOtherWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerOtherWithoutRequest(
+    TransactionPartnerTestBase, DeserializationTestBase
+):
+    de_json_class = TransactionPartnerOther
     type = TransactionPartnerType.OTHER
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
 
     def test_slot_behaviour(self, transaction_partner_other):
         inst = transaction_partner_other
@@ -358,9 +394,8 @@ class TestTransactionPartnerOtherWithoutRequest(TransactionPartnerTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {}
-        tp = TransactionPartnerOther.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        tp = TransactionPartnerOther.de_json(de_json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "other"
 
@@ -389,8 +424,15 @@ def transaction_partner_telegram_ads():
     return TransactionPartnerTelegramAds()
 
 
-class TestTransactionPartnerTelegramAdsWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerTelegramAdsWithoutRequest(
+    TransactionPartnerTestBase, DeserializationTestBase
+):
+    de_json_class = TransactionPartnerTelegramAds
     type = TransactionPartnerType.TELEGRAM_ADS
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
 
     def test_slot_behaviour(self, transaction_partner_telegram_ads):
         inst = transaction_partner_telegram_ads
@@ -398,9 +440,8 @@ class TestTransactionPartnerTelegramAdsWithoutRequest(TransactionPartnerTestBase
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {}
-        tp = TransactionPartnerTelegramAds.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        tp = TransactionPartnerTelegramAds.de_json(de_json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "telegram_ads"
 
@@ -431,8 +472,15 @@ def transaction_partner_telegram_api():
     )
 
 
-class TestTransactionPartnerTelegramApiWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerTelegramApiWithoutRequest(
+    TransactionPartnerTestBase, DeserializationTestBase
+):
+    de_json_class = TransactionPartnerTelegramApi
     type = TransactionPartnerType.TELEGRAM_API
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"request_count": self.request_count}
 
     def test_slot_behaviour(self, transaction_partner_telegram_api):
         inst = transaction_partner_telegram_api
@@ -440,9 +488,8 @@ class TestTransactionPartnerTelegramApiWithoutRequest(TransactionPartnerTestBase
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"request_count": self.request_count}
-        tp = TransactionPartnerTelegramApi.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        tp = TransactionPartnerTelegramApi.de_json(de_json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "telegram_api"
         assert tp.request_count == self.request_count
@@ -480,8 +527,18 @@ def transaction_partner_chat():
     )
 
 
-class TestTransactionPartnerChatWithoutRequest(TransactionPartnerTestBase):
+class TestTransactionPartnerChatWithoutRequest(
+    TransactionPartnerTestBase, DeserializationTestBase
+):
+    de_json_class = TransactionPartnerChat
     type = TransactionPartnerType.CHAT
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "chat": self.chat.to_dict(),
+            "gift": self.gift.to_dict(),
+        }
 
     def test_slot_behaviour(self, transaction_partner_chat):
         inst = transaction_partner_chat
@@ -489,12 +546,8 @@ class TestTransactionPartnerChatWithoutRequest(TransactionPartnerTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "chat": self.chat.to_dict(),
-            "gift": self.gift.to_dict(),
-        }
-        tp = TransactionPartnerChat.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        tp = TransactionPartnerChat.de_json(de_json_dict, offline_bot)
         assert tp.api_kwargs == {}
         assert tp.type == "chat"
         assert tp.chat == self.chat
