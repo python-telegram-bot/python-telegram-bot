@@ -22,6 +22,7 @@ import pytest
 
 from telegram import OrderInfo, SuccessfulPayment
 from telegram._utils.datetime import UTC, to_timestamp
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -54,15 +55,12 @@ class SuccessfulPaymentTestBase:
     is_first_recurring = True
 
 
-class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
-    def test_slot_behaviour(self, successful_payment):
-        inst = successful_payment
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase, DeserializationTestBase):
+    de_json_class = SuccessfulPayment
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "invoice_payload": self.invoice_payload,
             "shipping_option_id": self.shipping_option_id,
             "currency": self.currency,
@@ -74,7 +72,15 @@ class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
             "is_recurring": self.is_recurring,
             "is_first_recurring": self.is_first_recurring,
         }
-        successful_payment = SuccessfulPayment.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, successful_payment):
+        inst = successful_payment
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        successful_payment = SuccessfulPayment.de_json(de_json_dict, offline_bot)
         assert successful_payment.api_kwargs == {}
 
         assert successful_payment.invoice_payload == self.invoice_payload
@@ -87,29 +93,6 @@ class TestSuccessfulPaymentWithoutRequest(SuccessfulPaymentTestBase):
         assert successful_payment.subscription_expiration_date == self.subscription_expiration_date
         assert successful_payment.is_recurring == self.is_recurring
         assert successful_payment.is_first_recurring == self.is_first_recurring
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "invoice_payload": self.invoice_payload,
-            "currency": self.currency,
-            "total_amount": self.total_amount,
-            "telegram_payment_charge_id": self.telegram_payment_charge_id,
-            "provider_payment_charge_id": self.provider_payment_charge_id,
-            "subscription_expiration_date": to_timestamp(self.subscription_expiration_date),
-        }
-        successful_payment = SuccessfulPayment.de_json(json_dict, offline_bot)
-        successful_payment_raw = SuccessfulPayment.de_json(json_dict, raw_bot)
-        successful_payment_tz = SuccessfulPayment.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        date_offset = successful_payment_tz.subscription_expiration_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            successful_payment_tz.subscription_expiration_date.replace(tzinfo=None)
-        )
-
-        assert successful_payment_raw.subscription_expiration_date.tzinfo == UTC
-        assert successful_payment.subscription_expiration_date.tzinfo == UTC
-        assert date_offset == tz_bot_offset
 
     def test_to_dict(self, successful_payment):
         successful_payment_dict = successful_payment.to_dict()

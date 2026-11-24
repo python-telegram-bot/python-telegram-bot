@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import OrderInfo, ShippingAddress
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -39,20 +40,25 @@ class OrderInfoTestBase:
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestOrderInfoWithoutRequest(OrderInfoTestBase):
-    def test_slot_behaviour(self, order_info):
-        for attr in order_info.__slots__:
-            assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(order_info)) == len(set(mro_slots(order_info))), "duplicate slot"
+class TestOrderInfoWithoutRequest(OrderInfoTestBase, DeserializationTestBase):
+    de_json_class = OrderInfo
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "name": self.name,
             "phone_number": self.phone_number,
             "email": self.email,
             "shipping_address": self.shipping_address.to_dict(),
         }
-        order_info = OrderInfo.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, order_info):
+        for attr in order_info.__slots__:
+            assert getattr(order_info, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(order_info)) == len(set(mro_slots(order_info))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        order_info = OrderInfo.de_json(de_json_dict, offline_bot)
         assert order_info.api_kwargs == {}
 
         assert order_info.name == self.name

@@ -26,6 +26,7 @@ from telegram.constants import ParseMode
 from telegram.error import BadRequest
 from telegram.request import RequestData
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -53,25 +54,28 @@ class InvoiceTestBase:
     suggested_tip_amounts = [13, 42]
 
 
-class TestInvoiceWithoutRequest(InvoiceTestBase):
+class TestInvoiceWithoutRequest(InvoiceTestBase, DeserializationTestBase):
+    de_json_class = Invoice
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "title": self.title,
+            "description": self.description,
+            "start_parameter": self.start_parameter,
+            "currency": self.currency,
+            "total_amount": self.total_amount,
+        }
+
     def test_slot_behaviour(self, invoice):
         for attr in invoice.__slots__:
             assert getattr(invoice, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(invoice)) == len(set(mro_slots(invoice))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        invoice_json = Invoice.de_json(
-            {
-                "title": self.title,
-                "description": self.description,
-                "start_parameter": self.start_parameter,
-                "currency": self.currency,
-                "total_amount": self.total_amount,
-            },
-            offline_bot,
-        )
-        assert invoice_json.api_kwargs == {}
+    def test_de_json(self, offline_bot, de_json_dict):
+        invoice_json = Invoice.de_json(de_json_dict, offline_bot)
 
+        assert invoice_json.api_kwargs == {}
         assert invoice_json.title == self.title
         assert invoice_json.description == self.description
         assert invoice_json.start_parameter == self.start_parameter
