@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import ManagedBotCreated, ManagedBotUpdated, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -39,7 +40,7 @@ def managed_bot_updated():
     return ManagedBotUpdated(
         user=User(
             id=ManagedBotTestBase.bot_creator_id,
-            is_bot=ManagedBotTestBase.is_bot,
+            is_bot=ManagedBotTestBase.bot_creator_is_bot,
             first_name=ManagedBotTestBase.bot_creator_first_name,
             username=ManagedBotTestBase.bot_creator_username,
         ),
@@ -56,24 +57,28 @@ class ManagedBotTestBase:
     bot_creator_id = 123
     bot_creator_first_name = "TestBotManager"
     bot_creator_username = "test_bot_manager"
+    bot_creator_is_bot = False
     bot_id = 321
     bot_first_name = "TestBot"
     bot_username = "test_bot"
     is_bot = True
 
 
-class TestManagedBotCreatedWithoutRequest(ManagedBotTestBase):
+class TestManagedBotCreatedWithoutRequest(ManagedBotTestBase, DeserializationTestBase):
+    de_json_class = ManagedBotCreated
+
+    @pytest.fixture
+    def de_json_dict(self, managed_bot_created):
+        return {"bot": managed_bot_created.bot.to_dict()}
+
     def test_slot_behaviour(self, managed_bot_created):
         inst = managed_bot_created
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, managed_bot_created):
-        json_dict = {
-            "bot": managed_bot_created.bot.to_dict(),
-        }
-        managed_bot_created = ManagedBotCreated.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        managed_bot_created = ManagedBotCreated.de_json(de_json_dict, offline_bot)
         assert managed_bot_created.api_kwargs == {}
         assert managed_bot_created.bot.id == self.bot_id
         assert managed_bot_created.bot.is_bot is True
@@ -126,19 +131,24 @@ class TestManagedBotCreatedWithoutRequest(ManagedBotTestBase):
         assert hash(managed_bot_created) != hash(not_a_managed_bot_created)
 
 
-class TestManagedBotUpdatedWithoutRequest(ManagedBotTestBase):
+class TestManagedBotUpdatedWithoutRequest(ManagedBotTestBase, DeserializationTestBase):
+    de_json_class = ManagedBotUpdated
+
+    @pytest.fixture
+    def de_json_dict(self, managed_bot_updated):
+        return {
+            "user": managed_bot_updated.user.to_dict(),
+            "bot": managed_bot_updated.bot.to_dict(),
+        }
+
     def test_slot_behaviour(self, managed_bot_updated):
         inst = managed_bot_updated
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, managed_bot_updated):
-        json_dict = {
-            "user": managed_bot_updated.user.to_dict(),
-            "bot": managed_bot_updated.bot.to_dict(),
-        }
-        managed_bot_updated_new = ManagedBotUpdated.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, managed_bot_updated, de_json_dict):
+        managed_bot_updated_new = ManagedBotUpdated.de_json(de_json_dict, offline_bot)
         assert managed_bot_updated_new.api_kwargs == {}
         assert managed_bot_updated_new.user == managed_bot_updated.user
         assert managed_bot_updated_new.bot == managed_bot_updated.bot
@@ -152,7 +162,7 @@ class TestManagedBotUpdatedWithoutRequest(ManagedBotTestBase):
         managed_bot_updated_2 = ManagedBotUpdated(
             user=User(
                 id=self.bot_creator_id,
-                is_bot=True,
+                is_bot=False,
                 first_name=self.bot_creator_first_name,
                 username=self.bot_creator_username,
             ),
@@ -166,7 +176,7 @@ class TestManagedBotUpdatedWithoutRequest(ManagedBotTestBase):
         managed_bot_updated_3 = ManagedBotUpdated(
             user=User(
                 id=4534,
-                is_bot=True,
+                is_bot=False,
                 first_name=self.bot_creator_first_name,
                 username=self.bot_creator_username,
             ),

@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import BotCommand, ProximityAlertTriggered, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -37,20 +38,27 @@ class ProximityAlertTriggeredTestBase:
     distance = 42
 
 
-class TestProximityAlertTriggeredWithoutRequest(ProximityAlertTriggeredTestBase):
+class TestProximityAlertTriggeredWithoutRequest(
+    ProximityAlertTriggeredTestBase, DeserializationTestBase
+):
+    de_json_class = ProximityAlertTriggered
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "traveler": self.traveler.to_dict(),
+            "watcher": self.watcher.to_dict(),
+            "distance": self.distance,
+        }
+
     def test_slot_behaviour(self, proximity_alert_triggered):
         inst = proximity_alert_triggered
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "traveler": self.traveler.to_dict(),
-            "watcher": self.watcher.to_dict(),
-            "distance": self.distance,
-        }
-        proximity_alert_triggered = ProximityAlertTriggered.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        proximity_alert_triggered = ProximityAlertTriggered.de_json(de_json_dict, offline_bot)
         assert proximity_alert_triggered.api_kwargs == {}
 
         assert proximity_alert_triggered.traveler == self.traveler
