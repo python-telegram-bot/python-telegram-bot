@@ -38,6 +38,7 @@ from telegram import (
 )
 from telegram.constants import PaidMediaType
 from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -76,7 +77,14 @@ class PaidMediaTestBase:
     )
 
 
-class TestPaidMediaWithoutRequest(PaidMediaTestBase):
+class TestPaidMediaWithoutRequest(PaidMediaTestBase, DeserializationTestBase):
+    de_json_class = PaidMedia
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that PaidMedia.de_json does not dispatch to a subclass
+        return {"type": "unknown"}
+
     def test_slot_behaviour(self, paid_media):
         inst = paid_media
         for attr in inst.__slots__:
@@ -87,9 +95,8 @@ class TestPaidMediaWithoutRequest(PaidMediaTestBase):
         assert type(PaidMedia("photo").type) is PaidMediaType
         assert PaidMedia("unknown").type == "unknown"
 
-    def test_de_json(self, offline_bot):
-        data = {"type": "unknown"}
-        paid_media = PaidMedia.de_json(data, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        paid_media = PaidMedia.de_json(de_json_dict, offline_bot)
         assert paid_media.api_kwargs == {}
         assert paid_media.type == "unknown"
 
@@ -149,8 +156,13 @@ def paid_media_photo():
     )
 
 
-class TestPaidMediaPhotoWithoutRequest(PaidMediaTestBase):
+class TestPaidMediaPhotoWithoutRequest(PaidMediaTestBase, DeserializationTestBase):
+    de_json_class = PaidMediaPhoto
     type = PaidMediaType.PHOTO
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"photo": [p.to_dict() for p in self.photo]}
 
     def test_slot_behaviour(self, paid_media_photo):
         inst = paid_media_photo
@@ -158,11 +170,8 @@ class TestPaidMediaPhotoWithoutRequest(PaidMediaTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "photo": [p.to_dict() for p in self.photo],
-        }
-        pmp = PaidMediaPhoto.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        pmp = PaidMediaPhoto.de_json(de_json_dict, offline_bot)
         assert pmp.photo == tuple(self.photo)
         assert pmp.api_kwargs == {}
 
@@ -195,8 +204,13 @@ def paid_media_video():
     )
 
 
-class TestPaidMediaVideoWithoutRequest(PaidMediaTestBase):
+class TestPaidMediaVideoWithoutRequest(PaidMediaTestBase, DeserializationTestBase):
+    de_json_class = PaidMediaVideo
     type = PaidMediaType.VIDEO
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"video": self.video.to_dict()}
 
     def test_slot_behaviour(self, paid_media_video):
         inst = paid_media_video
@@ -204,11 +218,8 @@ class TestPaidMediaVideoWithoutRequest(PaidMediaTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "video": self.video.to_dict(),
-        }
-        pmv = PaidMediaVideo.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        pmv = PaidMediaVideo.de_json(de_json_dict, offline_bot)
         assert pmv.video == self.video
         assert pmv.api_kwargs == {}
 
@@ -245,8 +256,13 @@ def paid_media_live_photo():
     )
 
 
-class TestPaidMediaLivePhotoWithoutRequest(PaidMediaTestBase):
+class TestPaidMediaLivePhotoWithoutRequest(PaidMediaTestBase, DeserializationTestBase):
+    de_json_class = PaidMediaLivePhoto
     type = PaidMediaType.LIVE_PHOTO
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"live_photo": self.live_photo.to_dict()}
 
     def test_slot_behaviour(self, paid_media_live_photo):
         inst = paid_media_live_photo
@@ -254,11 +270,8 @@ class TestPaidMediaLivePhotoWithoutRequest(PaidMediaTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "live_photo": self.live_photo.to_dict(),
-        }
-        pmlp = PaidMediaLivePhoto.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        pmlp = PaidMediaLivePhoto.de_json(de_json_dict, offline_bot)
         assert pmlp.live_photo == self.live_photo
         assert pmlp.api_kwargs == {}
 
@@ -297,8 +310,17 @@ def paid_media_preview():
     )
 
 
-class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
+class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase, DeserializationTestBase):
+    de_json_class = PaidMediaPreview
     type = PaidMediaType.PREVIEW
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "width": self.width,
+            "height": self.height,
+            "duration": int(self.duration.total_seconds()),
+        }
 
     def test_slot_behaviour(self, paid_media_preview):
         inst = paid_media_preview
@@ -306,13 +328,8 @@ class TestPaidMediaPreviewWithoutRequest(PaidMediaTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "width": self.width,
-            "height": self.height,
-            "duration": int(self.duration.total_seconds()),
-        }
-        pmp = PaidMediaPreview.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        pmp = PaidMediaPreview.de_json(de_json_dict, offline_bot)
         assert pmp.width == self.width
         assert pmp.height == self.height
         assert pmp._duration == self.duration
@@ -432,19 +449,25 @@ class PaidMediaInfoTestBase:
     ]
 
 
-class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase):
+class TestPaidMediaInfoWithoutRequest(PaidMediaInfoTestBase, DeserializationTestBase):
+    de_json_class = PaidMediaInfo
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "star_count": self.star_count,
+            "paid_media": [t.to_dict() for t in self.paid_media],
+        }
+
     def test_slot_behaviour(self, paid_media_info):
         inst = paid_media_info
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "star_count": self.star_count,
-            "paid_media": [t.to_dict() for t in self.paid_media],
-        }
-        pmi = PaidMediaInfo.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        pmi = PaidMediaInfo.de_json(de_json_dict, offline_bot)
+        assert pmi.api_kwargs == {}
         assert pmi.paid_media == tuple(self.paid_media)
         assert pmi.star_count == self.star_count
 
@@ -471,19 +494,24 @@ class PaidMediaPurchasedTestBase:
     paid_media_payload = "payload"
 
 
-class TestPaidMediaPurchasedWithoutRequest(PaidMediaPurchasedTestBase):
+class TestPaidMediaPurchasedWithoutRequest(PaidMediaPurchasedTestBase, DeserializationTestBase):
+    de_json_class = PaidMediaPurchased
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "from": self.from_user.to_dict(),
+            "paid_media_payload": self.paid_media_payload,
+        }
+
     def test_slot_behaviour(self, paid_media_purchased):
         inst = paid_media_purchased
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, bot):
-        json_dict = {
-            "from": self.from_user.to_dict(),
-            "paid_media_payload": self.paid_media_payload,
-        }
-        pmp = PaidMediaPurchased.de_json(json_dict, bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        pmp = PaidMediaPurchased.de_json(de_json_dict, offline_bot)
         assert pmp.from_user == self.from_user
         assert pmp.paid_media_payload == self.paid_media_payload
         assert pmp.api_kwargs == {}
