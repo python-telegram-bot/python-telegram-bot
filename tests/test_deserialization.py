@@ -139,11 +139,7 @@ NOT_RECEIVED_FROM_API: frozenset[type[TelegramObject]] = frozenset(
 # Classes whose tests have not yet been migrated to DeserializationTestBase.
 # This list must only ever shrink. When you migrate a test class, remove the class from here
 # TODO: Remove this list once all classes are migrated.
-PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
-    {
-        telegram.Update,
-    }
-)
+PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset()
 
 
 def _import_test_modules() -> None:

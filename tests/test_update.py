@@ -56,25 +56,26 @@ from telegram import (
 )
 from telegram._utils.datetime import from_timestamp
 from telegram.warnings import PTBUserWarning
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 message = Message(
     1,
     dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-    Chat(1, ""),
+    Chat(1, Chat.SUPERGROUP),
     from_user=User(1, "", False),
     text="Text",
-    sender_chat=Chat(1, ""),
+    sender_chat=Chat(1, Chat.SUPERGROUP),
 )
 channel_post = Message(
     1,
     dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-    Chat(1, ""),
+    Chat(1, Chat.CHANNEL),
     text="Text",
-    sender_chat=Chat(1, ""),
+    sender_chat=Chat(1, Chat.CHANNEL),
 )
 chat_member_updated = ChatMemberUpdated(
-    Chat(1, "chat"),
+    Chat(1, Chat.SUPERGROUP),
     User(1, "", False),
     from_timestamp(int(time.time())),
     ChatMemberOwner(User(1, "", False), True),
@@ -91,7 +92,7 @@ chat_join_request = ChatJoinRequest(
 )
 
 chat_boost = ChatBoostUpdated(
-    chat=Chat(1, "priv"),
+    chat=Chat(1, Chat.CHANNEL),
     boost=ChatBoost(
         "1",
         from_timestamp(int(time.time())),
@@ -108,18 +109,18 @@ removed_chat_boost = ChatBoostRemoved(
 )
 
 message_reaction = MessageReactionUpdated(
-    chat=Chat(1, "chat"),
+    chat=Chat(1, Chat.SUPERGROUP),
     message_id=1,
     date=from_timestamp(int(time.time())),
     old_reaction=(ReactionTypeEmoji("👍"),),
     new_reaction=(ReactionTypeEmoji("👍"),),
     user=User(1, "name", False),
-    actor_chat=Chat(1, ""),
+    actor_chat=Chat(1, Chat.SUPERGROUP),
 )
 
 
 message_reaction_count = MessageReactionCountUpdated(
-    chat=Chat(1, "chat"),
+    chat=Chat(1, Chat.CHANNEL),
     message_id=1,
     date=from_timestamp(int(time.time())),
     reactions=(ReactionCount(ReactionTypeEmoji("👍"), 1),),
@@ -136,14 +137,14 @@ business_connection = BusinessConnection(
 
 deleted_business_messages = BusinessMessagesDeleted(
     "1",
-    Chat(1, ""),
+    Chat(1, Chat.PRIVATE),
     (1, 2),
 )
 
 business_message = Message(
     1,
     dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-    Chat(1, ""),
+    Chat(1, Chat.PRIVATE),
     User(1, "", False),
 )
 
@@ -159,19 +160,19 @@ managed_bot = ManagedBotUpdated(
 guest_message = Message(
     1,
     dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-    Chat(1, ""),
+    Chat(1, Chat.SUPERGROUP),
     User(1, "", False),
-    sender_chat=Chat(1, ""),
+    sender_chat=Chat(1, Chat.SUPERGROUP),
 )
 
 
 params = [
     {"message": message},
     {"edited_message": message},
-    {"callback_query": CallbackQuery(1, User(1, "", False), "chat", message=message)},
+    {"callback_query": CallbackQuery("1", User(1, "", False), "chat", message=message)},
     {"channel_post": channel_post},
     {"edited_channel_post": channel_post},
-    {"inline_query": InlineQuery(1, User(1, "", False), "", "")},
+    {"inline_query": InlineQuery("1", User(1, "", False), "", "")},
     {"chosen_inline_result": ChosenInlineResult("id", User(1, "", False), "")},
     {
         "shipping_query": ShippingQuery(
@@ -184,7 +185,7 @@ params = [
             "id",
             "?",
             [PollOption(text=".", voter_count=1, persistent_id="persistent_id")],
-            False,
+            1,
             False,
             False,
             Poll.REGULAR,
@@ -203,7 +204,7 @@ params = [
                 "",
                 False,
             ),
-            voter_chat=Chat(1, ""),
+            voter_chat=Chat(1, Chat.CHANNEL),
         )
     },
     {"my_chat_member": chat_member_updated},
@@ -221,7 +222,7 @@ params = [
     {"managed_bot": managed_bot},
     {"guest_message": guest_message},
     # Must be last to conform with `ids` below!
-    {"callback_query": CallbackQuery(1, User(1, "", False), "chat")},
+    {"callback_query": CallbackQuery("1", User(1, "", False), "chat")},
 ]
 
 all_types = (
@@ -264,15 +265,37 @@ class UpdateTestBase:
     update_id = 868573637
 
 
-class TestUpdateWithoutRequest(UpdateTestBase):
+class TestUpdateWithoutRequest(UpdateTestBase, DeserializationTestBase):
+    de_json_class = Update
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # Telegram sends only one of the optional fields, but this way the generic tests cover
+        # every argument of Update. The last entry of `params` repeats `callback_query`.
+        json_dict = {"update_id": self.update_id}
+        for paramdict in params[:-1]:
+            json_dict.update({key: value.to_dict() for key, value in paramdict.items()})
+        return json_dict
+
     def test_slot_behaviour(self):
         update = Update(self.update_id)
         for attr in update.__slots__:
             assert getattr(update, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(update)) == len(set(mro_slots(update))), "duplicate slot"
 
+    def test_de_json(self, offline_bot, de_json_dict):
+        update = Update.de_json(de_json_dict, offline_bot)
+        assert update.api_kwargs == {}
+
+        assert update.update_id == self.update_id
+        for paramdict in params[:-1]:
+            for key, expected in paramdict.items():
+                value = getattr(update, key)
+                assert type(value) is type(expected), key
+                assert value.to_dict() == expected.to_dict(), key
+
     @pytest.mark.parametrize("paramdict", argvalues=params, ids=ids)
-    def test_de_json(self, offline_bot, paramdict):
+    def test_de_json_single_field(self, offline_bot, paramdict):
         json_dict = {"update_id": self.update_id}
         # Convert the single update 'item' to a dict of that item and apply it to the json_dict
         json_dict.update({k: v.to_dict() for k, v in paramdict.items()})
