@@ -1469,12 +1469,12 @@ class Message(MaybeInaccessibleMessage):
             self.left_chat_member: User | None = left_chat_member
             self.new_chat_title: str | None = new_chat_title
             self.new_chat_photo: tuple[PhotoSize, ...] = parse_sequence_arg(new_chat_photo)
-            self.delete_chat_photo: bool | None = bool(delete_chat_photo)
-            self.group_chat_created: bool | None = bool(group_chat_created)
-            self.supergroup_chat_created: bool | None = bool(supergroup_chat_created)
+            self.delete_chat_photo: bool | None = delete_chat_photo
+            self.group_chat_created: bool | None = group_chat_created
+            self.supergroup_chat_created: bool | None = supergroup_chat_created
             self.migrate_to_chat_id: int | None = migrate_to_chat_id
             self.migrate_from_chat_id: int | None = migrate_from_chat_id
-            self.channel_chat_created: bool | None = bool(channel_chat_created)
+            self.channel_chat_created: bool | None = channel_chat_created
             self.message_auto_delete_timer_changed: MessageAutoDeleteTimerChanged | None = (
                 message_auto_delete_timer_changed
             )
