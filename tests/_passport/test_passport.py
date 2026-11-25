@@ -32,10 +32,6 @@ from telegram import (
     PassportFile,
 )
 from telegram.error import PassportDecryptionError
-
-# Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
-# here, although they are implicitly tested. Testing for those classes was too much work and not
-# worth it.
 from telegram.request import RequestData
 from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.pytest_classes import make_bot
