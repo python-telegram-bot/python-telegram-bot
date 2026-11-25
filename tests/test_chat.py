@@ -36,6 +36,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -67,14 +68,12 @@ class ChatTestBase:
     is_direct_messages = True
 
 
-class TestChatWithoutRequest(ChatTestBase):
-    def test_slot_behaviour(self, chat):
-        for attr in chat.__slots__:
-            assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
+class TestChatWithoutRequest(ChatTestBase, DeserializationTestBase):
+    de_json_class = Chat
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "id": self.id_,
             "title": self.title,
             "type": self.type_,
@@ -84,11 +83,20 @@ class TestChatWithoutRequest(ChatTestBase):
             "last_name": self.last_name,
             "is_direct_messages": self.is_direct_messages,
         }
-        chat = Chat.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, chat):
+        for attr in chat.__slots__:
+            assert getattr(chat, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(chat)) == len(set(mro_slots(chat))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat = Chat.de_json(de_json_dict, offline_bot)
+        assert chat.api_kwargs == {}
 
         assert chat.id == self.id_
         assert chat.title == self.title
         assert chat.type == self.type_
+        assert chat.type is ChatType.GROUP
         assert chat.username == self.username
         assert chat.is_forum == self.is_forum
         assert chat.first_name == self.first_name
