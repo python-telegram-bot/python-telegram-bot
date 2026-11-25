@@ -147,7 +147,6 @@ PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
         telegram.DataCredentials,
         telegram.EncryptedCredentials,
         telegram.EncryptedPassportElement,
-        telegram.ExternalReplyInfo,
         telegram.FileCredentials,
         telegram.IdDocumentData,
         telegram.Message,
@@ -158,10 +157,7 @@ PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
         telegram.ResidentialAddress,
         telegram.SecureData,
         telegram.SecureValue,
-        telegram.Story,
-        telegram.TextQuote,
         telegram.Update,
-        telegram.WebhookInfo,
     }
 )
 
