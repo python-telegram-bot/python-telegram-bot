@@ -141,13 +141,6 @@ NOT_RECEIVED_FROM_API: frozenset[type[TelegramObject]] = frozenset(
 # TODO: Remove this list once all classes are migrated.
 PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
     {
-        telegram.BusinessBotRights,
-        telegram.BusinessConnection,
-        telegram.BusinessIntro,
-        telegram.BusinessLocation,
-        telegram.BusinessMessagesDeleted,
-        telegram.BusinessOpeningHours,
-        telegram.BusinessOpeningHoursInterval,
         telegram.CallbackGame,
         telegram.CallbackQuery,
         telegram.Chat,
