@@ -27,6 +27,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -49,7 +50,20 @@ class PassportFileTestBase:
     file_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
-class TestPassportFileWithoutRequest(PassportFileTestBase):
+class TestPassportFileWithoutRequest(PassportFileTestBase, DeserializationTestBase):
+    de_json_class = PassportFile
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "file_id": self.file_id,
+            "file_unique_id": self.file_unique_id,
+            "file_size": self.file_size,
+            "file_date": to_timestamp(self.file_date),
+            # Not sent by Telegram: de_json_decrypted adds the credentials to the data
+            "credentials": {"file_hash": "file_hash", "secret": "secret"},
+        }
+
     def test_slot_behaviour(self, passport_file):
         inst = passport_file
         for attr in inst.__slots__:
@@ -71,25 +85,17 @@ class TestPassportFileWithoutRequest(PassportFileTestBase):
         assert passport_file_dict["file_size"] == passport_file.file_size
         assert passport_file_dict["file_date"] == to_timestamp(passport_file.file_date)
 
-    def test_de_json_localization(self, passport_file, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "file_id": self.file_id,
-            "file_unique_id": self.file_unique_id,
-            "file_size": self.file_size,
-            "file_date": to_timestamp(self.file_date),
-        }
+    def test_de_json(self, offline_bot, de_json_dict):
+        passport_file = PassportFile.de_json(de_json_dict, offline_bot)
+        assert passport_file.api_kwargs == {}
 
-        pf = PassportFile.de_json(json_dict, offline_bot)
-        pf_raw = PassportFile.de_json(json_dict, raw_bot)
-        pf_tz = PassportFile.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        date_offset = pf_tz.file_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(pf_tz.file_date.replace(tzinfo=None))
-
-        assert pf_raw.file_date.tzinfo == UTC
-        assert pf.file_date.tzinfo == UTC
-        assert date_offset == tz_bot_offset
+        assert passport_file.file_id == self.file_id
+        assert passport_file.file_unique_id == self.file_unique_id
+        assert passport_file.file_size == self.file_size
+        assert passport_file.file_date == self.file_date
+        assert isinstance(passport_file._credentials, FileCredentials)
+        assert passport_file._credentials.file_hash == "file_hash"
+        assert passport_file._credentials.secret == "secret"
 
     def test_de_json_decrypted(self, offline_bot):
         json_dict = {

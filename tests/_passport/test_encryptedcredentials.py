@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import EncryptedCredentials, PassportElementError
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -38,7 +39,15 @@ class EncryptedCredentialsTestBase:
     secret = "secret"
 
 
-class TestEncryptedCredentialsWithoutRequest(EncryptedCredentialsTestBase):
+class TestEncryptedCredentialsWithoutRequest(
+    EncryptedCredentialsTestBase, DeserializationTestBase
+):
+    de_json_class = EncryptedCredentials
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"data": self.data, "hash": self.hash, "secret": self.secret}
+
     def test_slot_behaviour(self, encrypted_credentials):
         inst = encrypted_credentials
         for attr in inst.__slots__:
@@ -46,6 +55,14 @@ class TestEncryptedCredentialsWithoutRequest(EncryptedCredentialsTestBase):
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_expected_values(self, encrypted_credentials):
+        assert encrypted_credentials.data == self.data
+        assert encrypted_credentials.hash == self.hash
+        assert encrypted_credentials.secret == self.secret
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        encrypted_credentials = EncryptedCredentials.de_json(de_json_dict, offline_bot)
+        assert encrypted_credentials.api_kwargs == {}
+
         assert encrypted_credentials.data == self.data
         assert encrypted_credentials.hash == self.hash
         assert encrypted_credentials.secret == self.secret

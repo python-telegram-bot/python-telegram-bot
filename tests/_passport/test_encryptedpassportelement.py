@@ -17,9 +17,13 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 
+import datetime as dtm
+
 import pytest
 
 from telegram import EncryptedPassportElement, PassportElementError, PassportFile
+from telegram._utils.datetime import UTC
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -35,22 +39,51 @@ def encrypted_passport_element():
         front_side=EncryptedPassportElementTestBase.front_side,
         reverse_side=EncryptedPassportElementTestBase.reverse_side,
         selfie=EncryptedPassportElementTestBase.selfie,
+        translation=EncryptedPassportElementTestBase.translation,
     )
 
 
 class EncryptedPassportElementTestBase:
-    type_ = "type"
+    type_ = "driver_license"
     hash = "this is a hash"
     data = "data"
     phone_number = "phone_number"
     email = "email"
-    files = [PassportFile("file_id", 50, 0, 25)]
-    front_side = PassportFile("file_id", 50, 0, 25)
-    reverse_side = PassportFile("file_id", 50, 0, 25)
-    selfie = PassportFile("file_id", 50, 0, 25)
+    passport_file = PassportFile(
+        file_id="file_id",
+        file_unique_id="file_unique_id",
+        file_date=dtm.datetime(2026, 1, 1, tzinfo=UTC),
+        file_size=25,
+    )
+    files = [passport_file]
+    front_side = passport_file
+    reverse_side = passport_file
+    selfie = passport_file
+    translation = [passport_file]
 
 
-class TestEncryptedPassportElementWithoutRequest(EncryptedPassportElementTestBase):
+class TestEncryptedPassportElementWithoutRequest(
+    EncryptedPassportElementTestBase, DeserializationTestBase
+):
+    de_json_class = EncryptedPassportElement
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # Telegram only sends the fields that fit the type of the element. We set all of them
+        # so that every argument is tested.
+        return {
+            "type": self.type_,
+            "hash": self.hash,
+            "data": self.data,
+            "phone_number": self.phone_number,
+            "email": self.email,
+            "files": [passport_file.to_dict() for passport_file in self.files],
+            "front_side": self.front_side.to_dict(),
+            "reverse_side": self.reverse_side.to_dict(),
+            "selfie": self.selfie.to_dict(),
+            "translation": [passport_file.to_dict() for passport_file in self.translation],
+        }
+
     def test_slot_behaviour(self, encrypted_passport_element):
         inst = encrypted_passport_element
         for attr in inst.__slots__:
@@ -67,6 +100,22 @@ class TestEncryptedPassportElementWithoutRequest(EncryptedPassportElementTestBas
         assert encrypted_passport_element.front_side == self.front_side
         assert encrypted_passport_element.reverse_side == self.reverse_side
         assert encrypted_passport_element.selfie == self.selfie
+        assert encrypted_passport_element.translation == tuple(self.translation)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        element = EncryptedPassportElement.de_json(de_json_dict, offline_bot)
+        assert element.api_kwargs == {}
+
+        assert element.type == self.type_
+        assert element.hash == self.hash
+        assert element.data == self.data
+        assert element.phone_number == self.phone_number
+        assert element.email == self.email
+        assert element.files == tuple(self.files)
+        assert element.front_side == self.front_side
+        assert element.reverse_side == self.reverse_side
+        assert element.selfie == self.selfie
+        assert element.translation == tuple(self.translation)
 
     def test_to_dict(self, encrypted_passport_element):
         encrypted_passport_element_dict = encrypted_passport_element.to_dict()
