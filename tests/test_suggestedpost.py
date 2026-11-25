@@ -37,6 +37,7 @@ from telegram._suggestedpost import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import SuggestedPostInfoState
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -133,7 +134,17 @@ class SuggestedPostInfoTestBase:
     send_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
-class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase):
+class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase, DeserializationTestBase):
+    de_json_class = SuggestedPostInfo
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "state": self.state,
+            "price": self.price.to_dict(),
+            "send_date": to_timestamp(self.send_date),
+        }
+
     def test_slot_behaviour(self, suggested_post_info):
         for attr in suggested_post_info.__slots__:
             assert getattr(suggested_post_info, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -145,38 +156,12 @@ class TestSuggestedPostInfoWithoutRequest(SuggestedPostInfoTestBase):
         assert type(SuggestedPostInfo("pending").state) is SuggestedPostInfoState
         assert SuggestedPostInfo("unknown").state == "unknown"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "state": self.state,
-            "price": self.price.to_dict(),
-            "send_date": to_timestamp(self.send_date),
-        }
-        spi = SuggestedPostInfo.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        spi = SuggestedPostInfo.de_json(de_json_dict, offline_bot)
         assert spi.state == self.state
         assert spi.price == self.price
         assert spi.send_date == self.send_date
         assert spi.api_kwargs == {}
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "state": self.state,
-            "price": self.price.to_dict(),
-            "send_date": to_timestamp(self.send_date),
-        }
-
-        spi_bot = SuggestedPostInfo.de_json(json_dict, offline_bot)
-        spi_bot_raw = SuggestedPostInfo.de_json(json_dict, raw_bot)
-        spi_bot_tz = SuggestedPostInfo.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        send_date_offset = spi_bot_tz.send_date.utcoffset()
-        send_date_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            spi_bot_tz.send_date.replace(tzinfo=None)
-        )
-
-        assert spi_bot.send_date.tzinfo == UTC
-        assert spi_bot_raw.send_date.tzinfo == UTC
-        assert send_date_offset_tz == send_date_offset
 
     def test_to_dict(self, suggested_post_info):
         spi_dict = suggested_post_info.to_dict()
@@ -215,7 +200,16 @@ class SuggestedPostPriceTestBase:
     amount = 100
 
 
-class TestSuggestedPostPriceWithoutRequest(SuggestedPostPriceTestBase):
+class TestSuggestedPostPriceWithoutRequest(SuggestedPostPriceTestBase, DeserializationTestBase):
+    de_json_class = SuggestedPostPrice
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "currency": self.currency,
+            "amount": self.amount,
+        }
+
     def test_slot_behaviour(self, suggested_post_price):
         for attr in suggested_post_price.__slots__:
             assert getattr(suggested_post_price, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -223,12 +217,8 @@ class TestSuggestedPostPriceWithoutRequest(SuggestedPostPriceTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "currency": self.currency,
-            "amount": self.amount,
-        }
-        spp = SuggestedPostPrice.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        spp = SuggestedPostPrice.de_json(de_json_dict, offline_bot)
         assert spp.currency == self.currency
         assert spp.amount == self.amount
         assert spp.api_kwargs == {}
@@ -269,7 +259,18 @@ class SuggestedPostDeclinedTestBase:
     comment = "another time"
 
 
-class TestSuggestedPostDeclinedWithoutRequest(SuggestedPostDeclinedTestBase):
+class TestSuggestedPostDeclinedWithoutRequest(
+    SuggestedPostDeclinedTestBase, DeserializationTestBase
+):
+    de_json_class = SuggestedPostDeclined
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+            "comment": self.comment,
+        }
+
     def test_slot_behaviour(self, suggested_post_declined):
         for attr in suggested_post_declined.__slots__:
             assert getattr(suggested_post_declined, attr, "err") != "err", (
@@ -279,12 +280,8 @@ class TestSuggestedPostDeclinedWithoutRequest(SuggestedPostDeclinedTestBase):
             set(mro_slots(suggested_post_declined))
         ), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "suggested_post_message": self.suggested_post_message.to_dict(),
-            "comment": self.comment,
-        }
-        spd = SuggestedPostDeclined.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        spd = SuggestedPostDeclined.de_json(de_json_dict, offline_bot)
         assert spd.suggested_post_message == self.suggested_post_message
         assert spd.comment == self.comment
         assert spd.api_kwargs == {}
@@ -331,7 +328,18 @@ class SuggestedPostPaidTestBase:
     star_amount = StarAmount(100)
 
 
-class TestSuggestedPostPaidWithoutRequest(SuggestedPostPaidTestBase):
+class TestSuggestedPostPaidWithoutRequest(SuggestedPostPaidTestBase, DeserializationTestBase):
+    de_json_class = SuggestedPostPaid
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+            "currency": self.currency,
+            "amount": self.amount,
+            "star_amount": self.star_amount.to_dict(),
+        }
+
     def test_slot_behaviour(self, suggested_post_paid):
         for attr in suggested_post_paid.__slots__:
             assert getattr(suggested_post_paid, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -339,14 +347,8 @@ class TestSuggestedPostPaidWithoutRequest(SuggestedPostPaidTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "suggested_post_message": self.suggested_post_message.to_dict(),
-            "currency": self.currency,
-            "amount": self.amount,
-            "star_amount": self.star_amount.to_dict(),
-        }
-        spp = SuggestedPostPaid.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        spp = SuggestedPostPaid.de_json(de_json_dict, offline_bot)
         assert spp.suggested_post_message == self.suggested_post_message
         assert spp.currency == self.currency
         assert spp.amount == self.amount
@@ -401,7 +403,18 @@ class SuggestedPostRefundedTestBase:
     suggested_post_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="post this pls.")
 
 
-class TestSuggestedPostRefundedWithoutRequest(SuggestedPostRefundedTestBase):
+class TestSuggestedPostRefundedWithoutRequest(
+    SuggestedPostRefundedTestBase, DeserializationTestBase
+):
+    de_json_class = SuggestedPostRefunded
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+            "reason": self.reason,
+        }
+
     def test_slot_behaviour(self, suggested_post_refunded):
         for attr in suggested_post_refunded.__slots__:
             assert getattr(suggested_post_refunded, attr, "err") != "err", (
@@ -411,12 +424,8 @@ class TestSuggestedPostRefundedWithoutRequest(SuggestedPostRefundedTestBase):
             set(mro_slots(suggested_post_refunded))
         ), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "suggested_post_message": self.suggested_post_message.to_dict(),
-            "reason": self.reason,
-        }
-        spr = SuggestedPostRefunded.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        spr = SuggestedPostRefunded.de_json(de_json_dict, offline_bot)
         assert spr.suggested_post_message == self.suggested_post_message
         assert spr.reason == self.reason
         assert spr.api_kwargs == {}
@@ -463,7 +472,19 @@ class SuggestedPostApprovedTestBase:
     price = SuggestedPostPrice(currency="XTR", amount=100)
 
 
-class TestSuggestedPostApprovedWithoutRequest(SuggestedPostApprovedTestBase):
+class TestSuggestedPostApprovedWithoutRequest(
+    SuggestedPostApprovedTestBase, DeserializationTestBase
+):
+    de_json_class = SuggestedPostApproved
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "send_date": to_timestamp(self.send_date),
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+            "price": self.price.to_dict(),
+        }
+
     def test_slot_behaviour(self, suggested_post_approved):
         for attr in suggested_post_approved.__slots__:
             assert getattr(suggested_post_approved, attr, "err") != "err", (
@@ -473,38 +494,12 @@ class TestSuggestedPostApprovedWithoutRequest(SuggestedPostApprovedTestBase):
             set(mro_slots(suggested_post_approved))
         ), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "send_date": to_timestamp(self.send_date),
-            "suggested_post_message": self.suggested_post_message.to_dict(),
-            "price": self.price.to_dict(),
-        }
-        spa = SuggestedPostApproved.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        spa = SuggestedPostApproved.de_json(de_json_dict, offline_bot)
         assert spa.send_date == self.send_date
         assert spa.suggested_post_message == self.suggested_post_message
         assert spa.price == self.price
         assert spa.api_kwargs == {}
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "send_date": to_timestamp(self.send_date),
-            "suggested_post_message": self.suggested_post_message.to_dict(),
-            "price": self.price.to_dict(),
-        }
-
-        spa_bot = SuggestedPostApproved.de_json(json_dict, offline_bot)
-        spa_bot_raw = SuggestedPostApproved.de_json(json_dict, raw_bot)
-        spi_bot_tz = SuggestedPostApproved.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        send_date_offset = spi_bot_tz.send_date.utcoffset()
-        send_date_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            spi_bot_tz.send_date.replace(tzinfo=None)
-        )
-
-        assert spa_bot.send_date.tzinfo == UTC
-        assert spa_bot_raw.send_date.tzinfo == UTC
-        assert send_date_offset_tz == send_date_offset
 
     def test_to_dict(self, suggested_post_approved):
         spa_dict = suggested_post_approved.to_dict()
@@ -551,7 +546,18 @@ class SuggestedPostApprovalFailedTestBase:
     suggested_post_message = Message(1, dtm.datetime.now(), Chat(1, ""), text="post this pls.")
 
 
-class TestSuggestedPostApprovalFailedWithoutRequest(SuggestedPostApprovalFailedTestBase):
+class TestSuggestedPostApprovalFailedWithoutRequest(
+    SuggestedPostApprovalFailedTestBase, DeserializationTestBase
+):
+    de_json_class = SuggestedPostApprovalFailed
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "price": self.price.to_dict(),
+            "suggested_post_message": self.suggested_post_message.to_dict(),
+        }
+
     def test_slot_behaviour(self, suggested_post_approval_failed):
         for attr in suggested_post_approval_failed.__slots__:
             assert getattr(suggested_post_approval_failed, attr, "err") != "err", (
@@ -561,12 +567,8 @@ class TestSuggestedPostApprovalFailedWithoutRequest(SuggestedPostApprovalFailedT
             set(mro_slots(suggested_post_approval_failed))
         ), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "price": self.price.to_dict(),
-            "suggested_post_message": self.suggested_post_message.to_dict(),
-        }
-        spaf = SuggestedPostApprovalFailed.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        spaf = SuggestedPostApprovalFailed.de_json(de_json_dict, offline_bot)
         assert spaf.price == self.price
         assert spaf.suggested_post_message == self.suggested_post_message
         assert spaf.api_kwargs == {}
