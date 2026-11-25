@@ -33,6 +33,7 @@ from telegram import (
 )
 from telegram.error import BadRequest
 from tests.auxil.constants import TEST_MSG_TEXT, TEST_TOPIC_ICON_COLOR, TEST_TOPIC_NAME
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -61,10 +62,22 @@ async def offline_forum_topic_object(forum_group_id, offline_emoji_id):
 class ForumTopicTestBase:
     TEST_TOPIC_NAME = TEST_TOPIC_NAME
     TEST_TOPIC_ICON_COLOR = TEST_TOPIC_ICON_COLOR
-    is_name_implicit = False
+    is_name_implicit = True
 
 
-class TestForumTopicWithoutRequest(ForumTopicTestBase):
+class TestForumTopicWithoutRequest(ForumTopicTestBase, DeserializationTestBase):
+    de_json_class = ForumTopic
+
+    @pytest.fixture
+    def de_json_dict(self, offline_emoji_id, forum_group_id):
+        return {
+            "message_thread_id": forum_group_id,
+            "name": self.TEST_TOPIC_NAME,
+            "icon_color": self.TEST_TOPIC_ICON_COLOR,
+            "icon_custom_emoji_id": offline_emoji_id,
+            "is_name_implicit": self.is_name_implicit,
+        }
+
     def test_slot_behaviour(self, offline_forum_topic_object):
         inst = offline_forum_topic_object
         for attr in inst.__slots__:
@@ -80,15 +93,8 @@ class TestForumTopicWithoutRequest(ForumTopicTestBase):
         assert offline_forum_topic_object.icon_custom_emoji_id == offline_emoji_id
         assert offline_forum_topic_object.is_name_implicit == self.is_name_implicit
 
-    def test_de_json(self, offline_bot, offline_emoji_id, forum_group_id):
-        json_dict = {
-            "message_thread_id": forum_group_id,
-            "name": self.TEST_TOPIC_NAME,
-            "icon_color": self.TEST_TOPIC_ICON_COLOR,
-            "icon_custom_emoji_id": offline_emoji_id,
-            "is_name_implicit": self.is_name_implicit,
-        }
-        topic = ForumTopic.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_emoji_id, forum_group_id, de_json_dict):
+        topic = ForumTopic.de_json(de_json_dict, offline_bot)
         assert topic.api_kwargs == {}
 
         assert topic.message_thread_id == forum_group_id
@@ -323,10 +329,21 @@ def topic_created():
 class ForumTopicCreatedTestBase:
     TEST_TOPIC_NAME = TEST_TOPIC_NAME
     TEST_TOPIC_ICON_COLOR = TEST_TOPIC_ICON_COLOR
-    is_name_implicit = False
+    is_name_implicit = True
 
 
-class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
+class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase, DeserializationTestBase):
+    de_json_class = ForumTopicCreated
+
+    @pytest.fixture
+    def de_json_dict(self, offline_emoji_id):
+        return {
+            "name": self.TEST_TOPIC_NAME,
+            "icon_color": self.TEST_TOPIC_ICON_COLOR,
+            "icon_custom_emoji_id": offline_emoji_id,
+            "is_name_implicit": self.is_name_implicit,
+        }
+
     def test_slot_behaviour(self, topic_created):
         for attr in topic_created.__slots__:
             assert getattr(topic_created, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -339,17 +356,13 @@ class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
         assert topic_created.name == self.TEST_TOPIC_NAME
         assert topic_created.is_name_implicit == self.is_name_implicit
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "icon_color": self.TEST_TOPIC_ICON_COLOR,
-            "name": self.TEST_TOPIC_NAME,
-            "is_name_implicit": self.is_name_implicit,
-        }
-        action = ForumTopicCreated.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_emoji_id, de_json_dict):
+        action = ForumTopicCreated.de_json(de_json_dict, offline_bot)
         assert action.api_kwargs == {}
 
         assert action.icon_color == self.TEST_TOPIC_ICON_COLOR
         assert action.name == self.TEST_TOPIC_NAME
+        assert action.icon_custom_emoji_id == offline_emoji_id
         assert action.is_name_implicit == self.is_name_implicit
 
     def test_to_dict(self, topic_created):
@@ -380,15 +393,21 @@ class TestForumTopicCreatedWithoutRequest(ForumTopicCreatedTestBase):
         assert hash(a) != hash(d)
 
 
-class TestForumTopicClosedWithoutRequest:
+class TestForumTopicClosedWithoutRequest(DeserializationTestBase):
+    de_json_class = ForumTopicClosed
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
     def test_slot_behaviour(self):
         action = ForumTopicClosed()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        action = ForumTopicClosed.de_json({}, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        action = ForumTopicClosed.de_json(de_json_dict, offline_bot)
         assert action.api_kwargs == {}
         assert isinstance(action, ForumTopicClosed)
 
@@ -398,15 +417,21 @@ class TestForumTopicClosedWithoutRequest:
         assert action_dict == {}
 
 
-class TestForumTopicReopenedWithoutRequest:
+class TestForumTopicReopenedWithoutRequest(DeserializationTestBase):
+    de_json_class = ForumTopicReopened
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
     def test_slot_behaviour(self):
         action = ForumTopicReopened()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        action = ForumTopicReopened.de_json({}, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        action = ForumTopicReopened.de_json(de_json_dict, offline_bot)
         assert action.api_kwargs == {}
         assert isinstance(action, ForumTopicReopened)
 
@@ -417,47 +442,54 @@ class TestForumTopicReopenedWithoutRequest:
 
 
 @pytest.fixture(scope="module")
-def topic_edited(emoji_id):
-    return ForumTopicEdited(name=TEST_TOPIC_NAME, icon_custom_emoji_id=emoji_id)
+def topic_edited(offline_emoji_id):
+    return ForumTopicEdited(name=TEST_TOPIC_NAME, icon_custom_emoji_id=offline_emoji_id)
 
 
-class TestForumTopicEdited:
+class TestForumTopicEditedWithoutRequest(DeserializationTestBase):
+    de_json_class = ForumTopicEdited
+
+    @pytest.fixture
+    def de_json_dict(self, offline_emoji_id):
+        return {"name": TEST_TOPIC_NAME, "icon_custom_emoji_id": offline_emoji_id}
+
     def test_slot_behaviour(self, topic_edited):
         for attr in topic_edited.__slots__:
             assert getattr(topic_edited, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(topic_edited)) == len(set(mro_slots(topic_edited))), "duplicate slot"
 
-    def test_expected_values(self, topic_edited, emoji_id):
+    def test_expected_values(self, topic_edited, offline_emoji_id):
         assert topic_edited.name == TEST_TOPIC_NAME
-        assert topic_edited.icon_custom_emoji_id == emoji_id
+        assert topic_edited.icon_custom_emoji_id == offline_emoji_id
 
-    def test_de_json(self, bot, emoji_id):
-        json_dict = {"name": TEST_TOPIC_NAME, "icon_custom_emoji_id": emoji_id}
-        action = ForumTopicEdited.de_json(json_dict, bot)
+    def test_de_json(self, offline_bot, offline_emoji_id, de_json_dict):
+        action = ForumTopicEdited.de_json(de_json_dict, offline_bot)
         assert action.api_kwargs == {}
 
         assert action.name == TEST_TOPIC_NAME
-        assert action.icon_custom_emoji_id == emoji_id
+        assert action.icon_custom_emoji_id == offline_emoji_id
+
+    def test_de_json_empty_icon_custom_emoji_id(self, offline_bot):
         # special test since it is mentioned in the docs that icon_custom_emoji_id can be an
         # empty string
         json_dict = {"icon_custom_emoji_id": ""}
-        action = ForumTopicEdited.de_json(json_dict, bot)
+        action = ForumTopicEdited.de_json(json_dict, offline_bot)
         assert not action.icon_custom_emoji_id
 
-    def test_to_dict(self, topic_edited, emoji_id):
+    def test_to_dict(self, topic_edited, offline_emoji_id):
         action_dict = topic_edited.to_dict()
 
         assert isinstance(action_dict, dict)
         assert action_dict["name"] == TEST_TOPIC_NAME
-        assert action_dict["icon_custom_emoji_id"] == emoji_id
+        assert action_dict["icon_custom_emoji_id"] == offline_emoji_id
 
-    def test_equality(self, emoji_id):
+    def test_equality(self, offline_emoji_id):
         a = ForumTopicEdited(name=TEST_TOPIC_NAME, icon_custom_emoji_id="")
         b = ForumTopicEdited(
             name=TEST_TOPIC_NAME,
             icon_custom_emoji_id="",
         )
-        c = ForumTopicEdited(name=f"{TEST_TOPIC_NAME}!", icon_custom_emoji_id=emoji_id)
+        c = ForumTopicEdited(name=f"{TEST_TOPIC_NAME}!", icon_custom_emoji_id=offline_emoji_id)
         d = ForumTopicEdited(icon_custom_emoji_id="")
 
         assert a == b
@@ -470,15 +502,21 @@ class TestForumTopicEdited:
         assert hash(a) != hash(d)
 
 
-class TestGeneralForumTopicHidden:
+class TestGeneralForumTopicHiddenWithoutRequest(DeserializationTestBase):
+    de_json_class = GeneralForumTopicHidden
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
     def test_slot_behaviour(self):
         action = GeneralForumTopicHidden()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        action = GeneralForumTopicHidden.de_json({}, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        action = GeneralForumTopicHidden.de_json(de_json_dict, offline_bot)
         assert action.api_kwargs == {}
         assert isinstance(action, GeneralForumTopicHidden)
 
@@ -488,15 +526,21 @@ class TestGeneralForumTopicHidden:
         assert action_dict == {}
 
 
-class TestGeneralForumTopicUnhidden:
+class TestGeneralForumTopicUnhiddenWithoutRequest(DeserializationTestBase):
+    de_json_class = GeneralForumTopicUnhidden
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
     def test_slot_behaviour(self):
         action = GeneralForumTopicUnhidden()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        action = GeneralForumTopicUnhidden.de_json({}, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        action = GeneralForumTopicUnhidden.de_json(de_json_dict, offline_bot)
         assert action.api_kwargs == {}
         assert isinstance(action, GeneralForumTopicUnhidden)
 
