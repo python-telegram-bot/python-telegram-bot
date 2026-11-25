@@ -16,8 +16,9 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-"""Meta-tests making sure that every TelegramObject subclass has deserialization tests based on
-:class:`tests.auxil.deserialization.DeserializationTestBase`."""
+"""Meta-tests making sure that every TelegramObject subclass that the Bot API sends to the bot
+has deserialization tests based on :class:`tests.auxil.deserialization.DeserializationTestBase`.
+"""
 
 import functools
 import importlib
@@ -136,11 +137,6 @@ NOT_RECEIVED_FROM_API: frozenset[type[TelegramObject]] = frozenset(
     }
 )
 
-# Classes whose tests have not yet been migrated to DeserializationTestBase.
-# This list must only ever shrink. When you migrate a test class, remove the class from here
-# TODO: Remove this list once all classes are migrated.
-PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset()
-
 
 def _import_test_modules() -> None:
     for path in sorted(TESTS_DIR.rglob("test_*.py")):
@@ -197,16 +193,8 @@ def test_test_classes_are_concrete():
 
 
 def test_all_telegram_objects_have_deserialization_tests():
-    missing = (
-        _telegram_object_classes() - _tested_classes() - PENDING_MIGRATION - NOT_RECEIVED_FROM_API
-    )
+    missing = _telegram_object_classes() - _tested_classes() - NOT_RECEIVED_FROM_API
     assert not missing, (
-        f"The classes {_names(missing)} have no test class based on DeserializationTestBase"
+        f"The classes {_names(missing)} have no test class based on DeserializationTestBase. "
+        "If the Bot API never sends them to the bot, add them to NOT_RECEIVED_FROM_API instead."
     )
-
-
-def test_pending_list_is_up_to_date():
-    # Renamed or removed classes don't need a check here: `telegram.<OldName>` in
-    # PENDING_MIGRATION already raises an AttributeError when this module is imported.
-    stale = PENDING_MIGRATION & _tested_classes()
-    assert not stale, f"Please remove {_names(stale)} from PENDING_MIGRATION, they are migrated"
