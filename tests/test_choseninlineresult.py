@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ChosenInlineResult, Location, User, Voice
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -40,41 +41,38 @@ def chosen_inline_result(user):
 class ChosenInlineResultTestBase:
     result_id = "result id"
     query = "query text"
+    location = Location(-42.003, 34.004)
+    inline_message_id = "a random id"
 
 
-class TestChosenInlineResultWithoutRequest(ChosenInlineResultTestBase):
+class TestChosenInlineResultWithoutRequest(ChosenInlineResultTestBase, DeserializationTestBase):
+    de_json_class = ChosenInlineResult
+
+    @pytest.fixture
+    def de_json_dict(self, user):
+        return {
+            "result_id": self.result_id,
+            "from": user.to_dict(),
+            "query": self.query,
+            "location": self.location.to_dict(),
+            "inline_message_id": self.inline_message_id,
+        }
+
     def test_slot_behaviour(self, chosen_inline_result):
         inst = chosen_inline_result
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json_required(self, offline_bot, user):
-        json_dict = {"result_id": self.result_id, "from": user.to_dict(), "query": self.query}
-        result = ChosenInlineResult.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict, user):
+        result = ChosenInlineResult.de_json(de_json_dict, offline_bot)
         assert result.api_kwargs == {}
 
         assert result.result_id == self.result_id
         assert result.from_user == user
         assert result.query == self.query
-
-    def test_de_json_all(self, offline_bot, user):
-        loc = Location(-42.003, 34.004)
-        json_dict = {
-            "result_id": self.result_id,
-            "from": user.to_dict(),
-            "query": self.query,
-            "location": loc.to_dict(),
-            "inline_message_id": "a random id",
-        }
-        result = ChosenInlineResult.de_json(json_dict, offline_bot)
-        assert result.api_kwargs == {}
-
-        assert result.result_id == self.result_id
-        assert result.from_user == user
-        assert result.query == self.query
-        assert result.location == loc
-        assert result.inline_message_id == "a random id"
+        assert result.location == self.location
+        assert result.inline_message_id == self.inline_message_id
 
     def test_to_dict(self, chosen_inline_result):
         chosen_inline_result_dict = chosen_inline_result.to_dict()

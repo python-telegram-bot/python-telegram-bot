@@ -27,6 +27,7 @@ from telegram import (
     ReplyKeyboardRemove,
 )
 from telegram.constants import KeyboardButtonStyle
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -44,7 +45,23 @@ class InlineKeyboardMarkupTestBase:
     ]
 
 
-class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
+class TestInlineKeyboardMarkupWithoutRequest(
+    InlineKeyboardMarkupTestBase, DeserializationTestBase
+):
+    de_json_class = InlineKeyboardMarkup
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "inline_keyboard": [
+                [
+                    {"text": "start", "url": "http://google.com"},
+                    {"text": "next", "callback_data": "abcd"},
+                ],
+                [{"text": "Cancel", "callback_data": "Cancel"}],
+            ]
+        }
+
     def test_slot_behaviour(self, inline_keyboard_markup):
         inst = inline_keyboard_markup
         for attr in inst.__slots__:
@@ -59,17 +76,8 @@ class TestInlineKeyboardMarkupWithoutRequest(InlineKeyboardMarkupTestBase):
             [self.inline_keyboard[0][0].to_dict(), self.inline_keyboard[0][1].to_dict()]
         ]
 
-    def test_de_json(self):
-        json_dict = {
-            "inline_keyboard": [
-                [
-                    {"text": "start", "url": "http://google.com"},
-                    {"text": "next", "callback_data": "abcd"},
-                ],
-                [{"text": "Cancel", "callback_data": "Cancel"}],
-            ]
-        }
-        inline_keyboard_markup = InlineKeyboardMarkup.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        inline_keyboard_markup = InlineKeyboardMarkup.de_json(de_json_dict, offline_bot)
         assert inline_keyboard_markup.api_kwargs == {}
 
         assert isinstance(inline_keyboard_markup, InlineKeyboardMarkup)

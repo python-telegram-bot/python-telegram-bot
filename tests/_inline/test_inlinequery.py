@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -36,34 +37,42 @@ def inline_query(bot):
         InlineQueryTestBase.query,
         InlineQueryTestBase.offset,
         location=InlineQueryTestBase.location,
+        chat_type=InlineQueryTestBase.chat_type,
     )
     ilq.set_bot(bot)
     return ilq
 
 
 class InlineQueryTestBase:
-    id_ = 1234
+    id_ = "1234"
     from_user = User(1, "First name", False)
     query = "query text"
     offset = "offset"
     location = Location(8.8, 53.1)
+    chat_type = "sender"
 
 
-class TestInlineQueryWithoutRequest(InlineQueryTestBase):
-    def test_slot_behaviour(self, inline_query):
-        for attr in inline_query.__slots__:
-            assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inline_query)) == len(set(mro_slots(inline_query))), "duplicate slot"
+class TestInlineQueryWithoutRequest(InlineQueryTestBase, DeserializationTestBase):
+    de_json_class = InlineQuery
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "id": self.id_,
             "from": self.from_user.to_dict(),
             "query": self.query,
             "offset": self.offset,
             "location": self.location.to_dict(),
+            "chat_type": self.chat_type,
         }
-        inline_query_json = InlineQuery.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, inline_query):
+        for attr in inline_query.__slots__:
+            assert getattr(inline_query, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inline_query)) == len(set(mro_slots(inline_query))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        inline_query_json = InlineQuery.de_json(de_json_dict, offline_bot)
         assert inline_query_json.api_kwargs == {}
 
         assert inline_query_json.id == self.id_
@@ -71,6 +80,7 @@ class TestInlineQueryWithoutRequest(InlineQueryTestBase):
         assert inline_query_json.location == self.location
         assert inline_query_json.query == self.query
         assert inline_query_json.offset == self.offset
+        assert inline_query_json.chat_type == self.chat_type
 
     def test_to_dict(self, inline_query):
         inline_query_dict = inline_query.to_dict()
@@ -81,6 +91,7 @@ class TestInlineQueryWithoutRequest(InlineQueryTestBase):
         assert inline_query_dict["location"] == inline_query.location.to_dict()
         assert inline_query_dict["query"] == inline_query.query
         assert inline_query_dict["offset"] == inline_query.offset
+        assert inline_query_dict["chat_type"] == inline_query.chat_type
 
     def test_equality(self):
         a = InlineQuery(self.id_, User(1, "", False), "", "")
