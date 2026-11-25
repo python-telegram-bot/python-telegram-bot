@@ -143,11 +143,8 @@ PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
     {
         telegram.Chat,
         telegram.ChatFullInfo,
-        telegram.IdDocumentData,
         telegram.Message,
         telegram.MessageEntity,
-        telegram.PersonalDetails,
-        telegram.ResidentialAddress,
         telegram.Update,
     }
 )
