@@ -181,10 +181,6 @@ PENDING_MIGRATION: frozenset[type[TelegramObject]] = frozenset(
         telegram.Story,
         telegram.TextQuote,
         telegram.Update,
-        telegram.VideoChatEnded,
-        telegram.VideoChatParticipantsInvited,
-        telegram.VideoChatScheduled,
-        telegram.VideoChatStarted,
         telegram.WebhookInfo,
     }
 )
