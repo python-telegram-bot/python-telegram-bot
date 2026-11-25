@@ -31,7 +31,9 @@ from telegram import (
     ChatFullInfo,
     ChatLocation,
     ChatPermissions,
+    ChatPhoto,
     Location,
+    Message,
     ReactionTypeCustomEmoji,
     ReactionTypeEmoji,
     UniqueGiftColors,
@@ -41,6 +43,7 @@ from telegram._gifts import AcceptedGiftTypes
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ReactionEmoji
 from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -110,7 +113,7 @@ class ChatFullInfoTestBase:
     type_ = "group"
     username = "username"
     sticker_set_name = "stickers"
-    can_set_sticker_set = False
+    can_set_sticker_set = True
     permissions = ChatPermissions(
         can_send_messages=True,
         can_change_info=False,
@@ -172,18 +175,23 @@ class ChatFullInfoTestBase:
         file_unique_id="file_unique_id",
         duration=30,
     )
+    photo = ChatPhoto("small_file_id", "small_unique_id", "big_file_id", "big_unique_id")
+    description = "description"
+    invite_link = "https://t.me/joinchat/invite_link"
+    pinned_message = Message(
+        message_id=5,
+        date=dtm.datetime(2026, 1, 1, tzinfo=UTC),
+        chat=Chat(id_, type_),
+        text="pinned",
+    )
 
 
-class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
-    def test_slot_behaviour(self, chat_full_info):
-        cfi = chat_full_info
-        for attr in cfi.__slots__:
-            assert getattr(cfi, attr, "err") != "err", f"got extra slot '{attr}'"
+class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase, DeserializationTestBase):
+    de_json_class = ChatFullInfo
 
-        assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
-
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "id": self.id_,
             "title": self.title,
             "type": self.type_,
@@ -194,8 +202,8 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "sticker_set_name": self.sticker_set_name,
             "can_set_sticker_set": self.can_set_sticker_set,
             "permissions": self.permissions.to_dict(),
-            "slow_mode_delay": self.slow_mode_delay.total_seconds(),
-            "message_auto_delete_time": self.message_auto_delete_time.total_seconds(),
+            "slow_mode_delay": int(self.slow_mode_delay.total_seconds()),
+            "message_auto_delete_time": int(self.message_auto_delete_time.total_seconds()),
             "bio": self.bio,
             "business_intro": self.business_intro.to_dict(),
             "business_location": self.business_location.to_dict(),
@@ -233,9 +241,21 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
             "unique_gift_colors": self.unique_gift_colors.to_dict(),
             "paid_message_star_count": self.paid_message_star_count,
             "first_profile_audio": self.first_profile_audio.to_dict(),
+            "photo": self.photo.to_dict(),
+            "description": self.description,
+            "invite_link": self.invite_link,
+            "pinned_message": self.pinned_message.to_dict(),
         }
 
-        cfi = ChatFullInfo.de_json(json_dict, offline_bot)
+    def test_slot_behaviour(self, chat_full_info):
+        cfi = chat_full_info
+        for attr in cfi.__slots__:
+            assert getattr(cfi, attr, "err") != "err", f"got extra slot '{attr}'"
+
+        assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        cfi = ChatFullInfo.de_json(de_json_dict, offline_bot)
         assert cfi.api_kwargs == {}
         assert cfi.id == self.id_
         assert cfi.title == self.title
@@ -288,29 +308,12 @@ class TestChatFullInfoWithoutRequest(ChatFullInfoTestBase):
         assert cfi.unique_gift_colors == self.unique_gift_colors
         assert cfi.paid_message_star_count == self.paid_message_star_count
         assert cfi.first_profile_audio == self.first_profile_audio
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "id": self.id_,
-            "type": self.type_,
-            "accent_color_id": self.accent_color_id,
-            "max_reaction_count": self.max_reaction_count,
-            "accepted_gift_types": self.accepted_gift_types.to_dict(),
-            "emoji_status_expiration_date": to_timestamp(self.emoji_status_expiration_date),
-        }
-        cfi_bot = ChatFullInfo.de_json(json_dict, offline_bot)
-        cfi_bot_raw = ChatFullInfo.de_json(json_dict, raw_bot)
-        cfi_bot_tz = ChatFullInfo.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        emoji_expire_offset = cfi_bot_tz.emoji_status_expiration_date.utcoffset()
-        emoji_expire_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            cfi_bot_tz.emoji_status_expiration_date.replace(tzinfo=None)
-        )
-
-        assert cfi_bot.emoji_status_expiration_date.tzinfo == UTC
-        assert cfi_bot_raw.emoji_status_expiration_date.tzinfo == UTC
-        assert emoji_expire_offset_tz == emoji_expire_offset
+        assert cfi.photo == self.photo
+        assert cfi.description == self.description
+        assert cfi.invite_link == self.invite_link
+        assert isinstance(cfi.pinned_message, Message)
+        assert cfi.pinned_message == self.pinned_message
+        assert cfi.pinned_message.text == self.pinned_message.text
 
     def test_to_dict(self, chat_full_info):
         cfi = chat_full_info
