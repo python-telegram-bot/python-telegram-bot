@@ -24,6 +24,7 @@ import pytest
 from telegram import MessageEntity, User
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import MessageEntityType
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -65,23 +66,50 @@ class MessageEntityTestBase:
     offset = 1
     length = 2
     url = "url"
+    user = User(1, "test_user", False)
+    language = "python"
+    custom_emoji_id = "emoji_id"
+    date_time_format = "wDT"
+    unix_time = dtm.datetime(2026, 1, 1, 12, 30, tzinfo=UTC)
 
 
-class TestMessageEntityWithoutRequest(MessageEntityTestBase):
+class TestMessageEntityWithoutRequest(MessageEntityTestBase, DeserializationTestBase):
+    de_json_class = MessageEntity
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "type": self.type_,
+            "offset": self.offset,
+            "length": self.length,
+            "url": self.url,
+            "user": self.user.to_dict(),
+            "language": self.language,
+            "custom_emoji_id": self.custom_emoji_id,
+            "date_time_format": self.date_time_format,
+            "unix_time": to_timestamp(self.unix_time),
+        }
+
     def test_slot_behaviour(self, message_entity):
         inst = message_entity
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"type": self.type_, "offset": self.offset, "length": self.length}
-        entity = MessageEntity.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        entity = MessageEntity.de_json(de_json_dict, offline_bot)
         assert entity.api_kwargs == {}
 
         assert entity.type == self.type_
+        assert entity.type is MessageEntityType.URL
         assert entity.offset == self.offset
         assert entity.length == self.length
+        assert entity.url == self.url
+        assert entity.user == self.user
+        assert entity.language == self.language
+        assert entity.custom_emoji_id == self.custom_emoji_id
+        assert entity.date_time_format == self.date_time_format
+        assert entity.unix_time == self.unix_time
 
     def test_to_dict(self, message_entity):
         entity_dict = message_entity.to_dict()
