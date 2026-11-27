@@ -1,0 +1,5 @@
+internal = "Update dependency soupsieve to v4 [SECURITY]"
+[[pull_requests]]
+uid = "5412"
+author_uids = ["renovate[bot]"]
+closes_threads = []
