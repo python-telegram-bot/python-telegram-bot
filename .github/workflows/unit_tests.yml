@@ -24,6 +24,8 @@ concurrency:
 
 jobs:
   pytest:
+    # Same-repository PRs and master pushes run the full suite with CI credentials.
+    # Fork PRs run offline by default. The `contrib: safe for tests` label requests a live run.
     if: >-
       github.event_name != 'pull_request_target' || (
         github.event.label.name == 'contrib: safe for tests'
