@@ -25,7 +25,7 @@ Setting things up
 4. Install the package in development mode as well as optional dependencies and development dependencies.
    Note that the `--group` argument requires `pip` 25.1 or later.
    The ``all`` group includes the documentation tools and requires Python 3.13 or later.
-   
+
    Alternatively, you can use your preferred package manager (such as uv, hatch, poetry, etc.) instead of pip.
 
    .. code-block:: bash
