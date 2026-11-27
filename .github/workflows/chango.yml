@@ -10,6 +10,8 @@ permissions: {}
 
 jobs:
   create-chango-fragment:
+    # The workflow token can push only to branches in this repository.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the
       # added or changed files to the repository.
@@ -26,8 +28,10 @@ jobs:
           persist-credentials: true
       - name: Check PR Title
         id: check_title
-        run: | # zizmor: ignore[template-injection]
-          if [[ "$(echo "${{ github.event.pull_request.title }}" | tr '[:upper:]' '[:lower:]')" =~ ^bump\ version\ to\ .* ]]; then
+        env:
+          PR_TITLE: ${{ github.event.pull_request.title }}
+        run: |
+          if [[ "${PR_TITLE,,}" =~ ^bump\ version\ to\ .* ]]; then
             echo "COMMIT_AND_PUSH=false" >> $GITHUB_OUTPUT
             echo "IS_RELEASE_PR=true" >> $GITHUB_OUTPUT
           else
