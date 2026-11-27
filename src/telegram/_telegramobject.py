@@ -472,11 +472,14 @@ class TelegramObject:
 
         # Pre-resolve any string class names in the dispatch mapping so that
         # de_json() can look up the target class directly without string checks.
+        # Evaluating the name also resolves Python 3.15 lazy imports, unlike a dict lookup.
         if cls.__DE_JSON_DISPATCH__:
             _, dispatch_mapping = cls.__DE_JSON_DISPATCH__
             for key, value in dispatch_mapping.items():
                 if isinstance(value, str):
-                    dispatch_mapping[key] = tg_ns[value]  # type: ignore[assignment]
+                    dispatch_mapping[key] = resolve_annotation(  # type: ignore[assignment]
+                        value, globalns, tg_ns
+                    )
 
         return plan
 

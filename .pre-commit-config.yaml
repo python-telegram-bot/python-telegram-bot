@@ -1,6 +1,14 @@
 repos:
+-   repo: local
+    hooks:
+    -   id: sync-lazy-modules
+        name: sync lazy modules
+        entry: python .github/prek-hooks/sync_lazy_modules.py
+        language: python
+        files: '^(src/telegram/(ext/)?__init__\.py|.github/prek-hooks/sync_lazy_modules\.py)$'
+        pass_filenames: false
 -   repo: https://github.com/astral-sh/ruff-pre-commit
-    rev: 'v0.16.8'
+    rev: 'v0.17.6'
     hooks:
     # Run the linter:
     -   id: ruff-check
@@ -9,7 +17,7 @@ repos:
     -   id: ruff-format
         name: ruff format
 -   repo: https://github.com/PyCQA/pylint
-    rev: v4.1.3
+    rev: v4.1.4
     hooks:
     -   id: pylint
         # Run on the minimum supported Python; dill crashes on 3.15 in parallel mode.
@@ -18,15 +26,15 @@ repos:
         files: ^(?!(tests|docs)).*\.py$
         language: python
         additional_dependencies:
-          - httpx~=0.27
-          - tornado~=6.4
+          - httpx>=0.27,<0.29
+          - tornado~=6.5
           - APScheduler>=3.10.4,<3.12.0
-          - cachetools>=7.0.0,<8.0.0
-          - aiolimiter~=1.3,<1.4
+          - cachetools>=8.0.0,<8.1.0
+          - aiolimiter>=1.3,<1.4
           - . # this basically does `pip install -e .`
         priority: 10
 -   repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.20.2
+    rev: v2.4.1
     hooks:
     -   id: mypy
         name: mypy-ptb
@@ -36,11 +44,11 @@ repos:
           - types-pytz
           - types-cryptography
           - types-cachetools
-          - httpx~=0.27
-          - tornado~=6.4
+          - httpx>=0.27,<0.29
+          - tornado~=6.5
           - APScheduler>=3.10.4,<3.12.0
-          - cachetools>=7.0.0,<8.0.0
-          - aiolimiter~=1.3,<1.4
+          - cachetools>=8.0.0,<8.1.0
+          - aiolimiter>=1.3,<1.4
           - . # this basically does `pip install -e .`
         priority: 10
     - id: mypy
@@ -51,8 +59,8 @@ repos:
         - --no-strict-optional
         - --follow-imports=silent
       additional_dependencies:
-        - tornado~=6.4
+        - tornado~=6.5
         - APScheduler>=3.10.4,<3.12.0
-        - cachetools>=7.0.0,<8.0.0
+        - cachetools>=8.0.0,<8.1.0
         - . # this basically does `pip install -e .`
       priority: 10
