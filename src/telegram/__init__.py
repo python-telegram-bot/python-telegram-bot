@@ -351,7 +351,7 @@ import telegram.constants as constants  # noqa: PLR0402
 # pylint: enable=consider-using-from-import
 
 # lazy imports which work on Python 3.15+
-__lazy_modules__ = [
+__lazy_modules__: list[str] = [
     "telegram",
     "telegram._birthdate",
     "telegram._bot",

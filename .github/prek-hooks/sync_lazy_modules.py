@@ -31,10 +31,18 @@ def sync_lazy_modules(path: Path, package: str) -> bool:
     assignment = next(
         node
         for node in tree.body
-        if isinstance(node, ast.Assign)
-        and any(
-            isinstance(target, ast.Name) and target.id == "__lazy_modules__"
-            for target in node.targets
+        if (
+            isinstance(node, ast.Assign)
+            and any(
+                isinstance(target, ast.Name) and target.id == "__lazy_modules__"
+                for target in node.targets
+            )
+        )
+        or (
+            isinstance(node, ast.AnnAssign)
+            and isinstance(node.target, ast.Name)
+            and node.target.id == "__lazy_modules__"
+            and node.value is not None
         )
     )
     value = assignment.value

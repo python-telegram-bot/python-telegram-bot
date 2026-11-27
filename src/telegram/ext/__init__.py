@@ -65,7 +65,7 @@ __all__ = (
     "filters",
 )
 
-__lazy_modules__ = [
+__lazy_modules__: list[str] = [
     "telegram.ext",
     "telegram.ext._aioratelimiter",
     "telegram.ext._application",
