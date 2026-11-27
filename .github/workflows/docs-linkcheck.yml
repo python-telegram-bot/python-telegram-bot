@@ -15,7 +15,7 @@ jobs:
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.13']
         os: [ubuntu-latest]
       fail-fast: False
     steps:
