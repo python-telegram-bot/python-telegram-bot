@@ -8,9 +8,8 @@ from pathlib import Path
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 from sphinx.application import Sphinx
 
-if sys.version_info < (3, 12):
-    # Due to dependency on chango
-    raise RuntimeError("This documentation needs at least Python 3.12")
+if sys.version_info < (3, 13):
+    raise RuntimeError("This documentation needs at least Python 3.13")
 
 
 sys.path.insert(0, str(Path("../..").resolve().absolute()))

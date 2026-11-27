@@ -24,6 +24,7 @@ Setting things up
 
 4. Install the package in development mode as well as optional dependencies and development dependencies.
    Note that the `--group` argument requires `pip` 25.1 or later.
+   The ``all`` group includes the documentation tools and requires Python 3.13 or later.
    
    Alternatively, you can use your preferred package manager (such as uv, hatch, poetry, etc.) instead of pip.
 
@@ -216,7 +217,7 @@ doc strings don't have a separate documentation site they generate, instead, the
 
 User facing documentation
 -------------------------
-We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.12 or above and have the required dependencies installed as explained above.
+We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.13 or above and have the required dependencies installed as explained above.
 Then, run the following from the PTB root directory:
 
 .. code-block:: bash
