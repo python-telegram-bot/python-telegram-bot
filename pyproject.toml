@@ -153,8 +153,6 @@ packages = ["src/telegram"]
 # uv
 [tool.uv]
 exclude-newer = "7 days"
-# Ruff 0.17.0 supplies the stable lazy-import checks and is newer than the holdback.
-exclude-newer-package = { ruff = false }
 
 [tool.uv.dependency-groups]
 docs = { requires-python = ">=3.13" }
