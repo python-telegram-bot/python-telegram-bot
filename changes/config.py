@@ -35,6 +35,13 @@ class ChangoSectionChangeNote(
     REPOSITORY = "python-telegram-bot"
 
     @classmethod
+    def get_author_url(cls, author_uid: str) -> str:
+        """Resolve the Copilot app's display name to its documentation."""
+        if author_uid == "Copilot":
+            return "https://docs.github.com/en/copilot/concepts/copilot-surfaces/copilot-on-github"
+        return super().get_author_url(author_uid)
+
+    @classmethod
     def get_sections(
         cls,
         labels: Collection[str],

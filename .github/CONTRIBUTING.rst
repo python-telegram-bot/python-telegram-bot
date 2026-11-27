@@ -168,7 +168,7 @@ Feel free to copy (parts of) the checklist to the PR description to remind you o
 
     - [ ] Added `.. versionadded:: NEXT.VERSION`, ``.. versionchanged:: NEXT.VERSION``, ``.. deprecated:: NEXT.VERSION`` or ``.. versionremoved:: NEXT.VERSION` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
     - [ ] Created new or adapted existing unit tests
-    - [ ] Documented code changes according to the [CSI standard](https://standards.mousepawmedia.com/en/stable/csi.html)
+    - [ ] Documented code changes according to the [CSI standard](https://raw.githubusercontent.com/mousepawmedia/standards/devel/source/csi.rst)
     - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
     - [ ] Added new classes & modules to the docs and all suitable ``__all__`` s
     - [ ] Checked the [Stability Policy](https://docs.python-telegram-bot.org/stability_policy.html) in case of deprecations or changes to documented behavior
@@ -292,7 +292,7 @@ to add new required arguments. It's also more explicit and easier to read.
 .. _`Ruff`: https://docs.astral.sh/ruff/
 .. _`RTD`: https://docs.python-telegram-bot.org/
 .. _`RTD build`: https://docs.python-telegram-bot.org/en/doc-fixes
-.. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
+.. _`CSI`: https://raw.githubusercontent.com/mousepawmedia/standards/devel/source/csi.rst
 .. _`section`: #documenting
 .. _`testing page`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/README.rst
 .. _`below`: #check-list-for-prs
