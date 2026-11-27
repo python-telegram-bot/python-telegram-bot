@@ -21,8 +21,10 @@
 import datetime as dtm
 import json
 from collections.abc import Sequence
+from copy import copy
 from dataclasses import dataclass
 from typing import final
+from uuid import uuid4
 
 from telegram._files.inputfile import InputFile
 from telegram._files.inputmedia import InputMedia, InputMediaSticker, InputPaidMedia
@@ -130,34 +132,7 @@ class RequestParameter:
         if isinstance(value, StringEnum):
             return value.value, []
         if isinstance(value, InputFile):
-            if value.attach_uri:
-                return value.attach_uri, [value]
-            return None, [value]
-
-        if isinstance(value, InputMedia | InputMediaSticker | InputPaidMedia):
-            # We call to_dict and change the returned dict instead of overriding
-            # the attributes in case the same value is reused for another request
-            data = value.to_dict()
-            input_files: list[InputFile] = []
-            # All fields of the InputMedia* and InputPaidMedia* classes that accept file uploads
-            for key in ("media", "thumbnail", "cover", "photo"):
-                input_file = data.get(key)
-                if not isinstance(input_file, InputFile):
-                    continue
-                if input_file.attach_uri:
-                    data[key] = input_file.attach_uri
-                else:
-                    data.pop(key)
-                input_files.append(input_file)
-
-            return data, input_files
-
-        if isinstance(value, InputPollOption) and value.media is not None:
-            data = value.to_dict()
-            data["media"], input_files = RequestParameter._value_and_input_files_from_input(
-                value.media
-            )
-            return data, input_files
+            return value.attach_uri or None, [value]
 
         if isinstance(value, InputProfilePhoto):
             attr = "photo" if isinstance(value, InputProfilePhotoStatic) else "animation"
@@ -191,8 +166,32 @@ class RequestParameter:
             return data, [value.sticker]
 
         if isinstance(value, TelegramObject):
-            # Needs to be last, because InputMedia is a subclass of TelegramObject
-            return value.to_dict(), []
+            data = value.to_dict()
+            if isinstance(value, InputPollOption) and "media" not in value.api_kwargs:
+                media_data = data.get("media") if isinstance(value.media, TelegramObject) else None
+            elif isinstance(value, InputMedia | InputMediaSticker | InputPaidMedia):
+                media_data = data
+            else:
+                return data, []
+            if not isinstance(media_data, dict):
+                return data, []
+
+            if isinstance(value, InputMedia | InputPaidMedia) and isinstance(
+                value.media, InputFile
+            ):
+                # Historically, an explicit main upload takes precedence over api_kwargs.
+                media_data["media"] = value.media
+            input_files = []
+            for key in ("media", "thumbnail", "cover", "photo"):
+                if not isinstance(input_file := media_data.get(key), InputFile):
+                    continue
+                if not input_file.attach_name:
+                    # Files inside JSON need a named part. Keep the caller's InputFile reusable.
+                    input_file = copy(input_file)
+                    input_file.attach_name = uuid4().hex
+                media_data[key] = input_file.attach_uri
+                input_files.append(input_file)
+            return data, input_files
         return value, []
 
     @classmethod

@@ -1,0 +1,5 @@
+bugfixes = "Fix uploads of video covers and live photo stills in regular and paid media, and media attached to poll options."
+[[pull_requests]]
+uid = "5403"
+author_uids = ["Dv2Corn", "harshil21"]
+closes_threads = []
