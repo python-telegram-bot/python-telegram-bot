@@ -123,6 +123,15 @@ Here's how to make a one-off code change.
 
    - Click "Create pull request". An admin will assign a reviewer to your commit.
 
+   - You need to create a changelog fragment for your PR. To do this, run the following command in the root of the repository:
+
+     .. code-block:: bash
+
+        $ chango new --slug <pr-number>
+
+     Keep the relevant changelog section and fill in the pull request details in the generated
+     file under ``changes/unreleased/``. Commit the fragment and push it to your fork.
+
 5. **Address review comments until all reviewers give LGTM ('looks good to me').**
 
    - When your reviewer has reviewed the code, you'll get a notification. You'll need to respond in two ways:
