@@ -16,7 +16,7 @@
 #
 #  You should have received a copy of the GNU Lesser Public License
 #  along with this program.  If not, see [http://www.gnu.org/licenses/].
-import asyncio
+import inspect
 from collections.abc import Callable
 
 
@@ -36,11 +36,11 @@ def call_after(function: Callable, after: Callable):
         monkeypatch.setattr(bot, 'send_message', call_after(bot.send_message, after)
 
     """
-    if asyncio.iscoroutinefunction(function):
+    if inspect.iscoroutinefunction(function):
 
         async def wrapped(*args, **kwargs):
             out = await function(*args, **kwargs)
-            if asyncio.iscoroutinefunction(after):
+            if inspect.iscoroutinefunction(after):
                 await after(out)
             else:
                 after(out)

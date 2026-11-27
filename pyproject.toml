@@ -65,7 +65,7 @@ all = [
 ]
 callback-data = [
     # Cachetools doesn't have a strict stability policy. Let's be cautious for now.
-    "cachetools>=7.0.0,<8.0.0",
+    "cachetools>=8.0.0,<8.1.0",
 ]
 ext = [
     "python-telegram-bot[callback-data,job-queue,rate-limiter,webhooks]",
@@ -98,9 +98,9 @@ tests = [
     # required for building the wheels for releases
     "build",
     # For the test suite
-    "pytest==9.1.1",
+    "pytest==9.2.0",
     # needed because pytest doesn't come with native support for coroutines as tests
-    "pytest-asyncio==1.4.0",
+    "pytest-asyncio==1.5.0",
     # xdist runs tests in parallel
     "pytest-xdist==3.8.0",
     # no_req tests must be fully offline, including during higher-scoped fixture setup
@@ -118,8 +118,8 @@ tests = [
     "pytest-cov"
 ]
 docs = [
-    "chango~=0.6.0; python_version >= '3.12'",
-    "sphinx==9.1.0; python_version >= '3.12'",
+    "chango~=0.6.0",
+    "sphinx==9.2.0",
     "furo==2025.12.19",
     "sphinx-paramlinks==0.6.0",
     "sphinxcontrib-mermaid==2.1.1",
@@ -127,17 +127,12 @@ docs = [
     "sphinx-inline-tabs==2025.12.21.14",
     # Temporary. See #4387
     "sphinx-build-compatibility @ git+https://github.com/readthedocs/sphinx-build-compatibility.git@58aabc5f207c6c2421f23d3578adc0b14af57047",
-    # For python 3.14 support, we need a version of pydantic-core >= 2.35.0, since it upgrades the
-    # rust toolchain, required for building the project.
-    # This should ideally be done in `chango`'s dependencies. We can remove this once a new
-    # stable pydantic version is released.
-    "pydantic >= 2.12.0a1 ; python_version >= '3.14'"
 ]
 linting = [
     "prek",
-    "ruff==0.17.0",
-    "mypy==1.20.2",
-    "pylint==4.1.2"
+    "ruff==0.17.6",
+    "mypy==2.4.1",
+    "pylint==4.1.4"
 ]
 all = [{ include-group = "tests" }, { include-group = "docs" }, { include-group = "linting"}]
 
@@ -160,6 +155,10 @@ packages = ["src/telegram"]
 exclude-newer = "7 days"
 # Ruff 0.17.0 supplies the stable lazy-import checks and is newer than the holdback.
 exclude-newer-package = { ruff = false }
+
+[tool.uv.dependency-groups]
+docs = { requires-python = ">=3.13" }
+all = { requires-python = ">=3.13" }  # Includes docs.
 
 # CHANGO
 [tool.chango]

@@ -1,0 +1,6 @@
+dependencies = "Update pre-commit hook cachetools to v8"
+internal = "Update pre-commit hook cachetools to v8"
+[[pull_requests]]
+uid = "5406"
+author_uids = ["renovate[bot]"]
+closes_threads = []

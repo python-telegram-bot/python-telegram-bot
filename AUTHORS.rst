@@ -89,6 +89,7 @@ The following wonderful people contributed directly or indirectly to this projec
 - `Lucas Molinari <https://github.com/lucasmolinari>`_
 - `Luis Pérez <https://github.com/nemacysts>`_
 - `macrojames <https://github.com/macrojames>`_
+- `mao <https://github.com/maoxor>`_
 - `Matheus Lemos <https://github.com/mlemosf>`_
 - `Michael Dix <https://github.com/Eisberge>`_
 - `Michael Elovskikh <https://github.com/wronglink>`_
