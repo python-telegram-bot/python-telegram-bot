@@ -918,7 +918,8 @@ class InputMediaVenue(_BaseInputMedia):
             or ``“food/icecream”``).
         google_place_id (:obj:`str`, optional): Google Places identifier of the venue.
         google_place_type (:obj:`str`, optional): Google Places type of the venue. (See\
-        `supported types <https://developers.google.com/places/web-service/supported_types>`__)
+            `supported types <https://developers.google.com/maps/documentation/places/web-service\
+            /legacy/supported_types>`__)
 
     Attributes:
         type (:obj:`str`): :tg-const:`telegram.constants.BaseInputMediaType.VENUE`.
@@ -932,7 +933,8 @@ class InputMediaVenue(_BaseInputMedia):
             or ``“food/icecream”``).
         google_place_id (:obj:`str`): Optional. Google Places identifier of the venue.
         google_place_type (:obj:`str`): Optional. Google Places type of the venue. (See\
-        `supported types <https://developers.google.com/places/web-service/supported_types>`__)
+            `supported types <https://developers.google.com/maps/documentation/places/web-service\
+            /legacy/supported_types>`__)
     """
 
     __slots__ = (

@@ -143,7 +143,7 @@ class NetworkError(TelegramError):
         used by :class:`~telegram.request.HTTPXRequest`, or a custom implementation of
         :class:`~telegram.request.BaseRequest`. In this case, the original exception can be
         accessed via the ``__cause__``
-        `attribute <https://docs.python.org/3/library/exceptions.html#exception-context>`_.
+        `attribute <https://docs.python.org/3/builtins/exceptions.html#exception-context>`_.
 
     Examples:
         :any:`Raw API Bot <examples.rawapibot>`
