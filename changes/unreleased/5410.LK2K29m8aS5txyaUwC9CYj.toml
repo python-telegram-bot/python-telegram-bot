@@ -1,0 +1,5 @@
+internal = "Bump dependencies and require Python 3.13+ for library development"
+[[pull_requests]]
+uid = "5410"
+author_uids = ["harshil21"]
+closes_threads = []
