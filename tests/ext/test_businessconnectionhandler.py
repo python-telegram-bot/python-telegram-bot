@@ -37,6 +37,7 @@ from telegram import (
 from telegram._utils.datetime import UTC
 from telegram.ext import BusinessConnectionHandler, CallbackContext, JobQueue
 from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 message = Message(1, None, Chat(1, ""), from_user=User(1, "", False), text="Text")
 
@@ -156,9 +157,9 @@ class TestBusinessConnectionHandler:
         handler = BusinessConnectionHandler(self.callback, username=["@user_b"])
         assert not handler.check_update(business_connection_update)
 
-        business_connection_update.business_connection.user._unfreeze()
-        business_connection_update.business_connection.user.username = None
-        assert not handler.check_update(business_connection_update)
+        with unfrozen(business_connection_update.business_connection.user):
+            business_connection_update.business_connection.user.username = None
+            assert not handler.check_update(business_connection_update)
 
     def test_other_update_types(self, false_update):
         handler = BusinessConnectionHandler(self.callback)

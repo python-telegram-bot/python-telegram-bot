@@ -18,15 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an objects that are related to Telegram input checklists."""
 
-from collections.abc import Sequence
-
 from telegram._messageentity import MessageEntity
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.defaultvalue import DEFAULT_NONE
-from telegram._utils.types import JSONDict, ODVInput
+from telegram._utils.types import ODVInput
 
 
+@tg_dataclass()
 class InputChecklistTask(TelegramObject):
     """
     Describes a task to add to a checklist.
@@ -70,33 +70,13 @@ class InputChecklistTask(TelegramObject):
 
     """
 
-    __slots__ = (
-        "id",
-        "parse_mode",
-        "text",
-        "text_entities",
-    )
-
-    def __init__(
-        self,
-        id: int,  # pylint: disable=redefined-builtin
-        text: str,
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        text_entities: Sequence[MessageEntity] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.id: int = id
-        self.text: str = text
-        self.parse_mode: ODVInput[str] = parse_mode
-        self.text_entities: tuple[MessageEntity, ...] = parse_sequence_arg(text_entities)
-
-        self._id_attrs = (self.id,)
-
-        self._freeze()
+    id: int = tg_field(compare=True)
+    text: str = tg_field()
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    text_entities: tuple[MessageEntity, ...] = tg_field(default=None, converter=parse_sequence_arg)
 
 
+@tg_dataclass()
 class InputChecklist(TelegramObject):
     """
     Describes a checklist to create.
@@ -153,34 +133,11 @@ class InputChecklist(TelegramObject):
 
     """
 
-    __slots__ = (
-        "others_can_add_tasks",
-        "others_can_mark_tasks_as_done",
-        "parse_mode",
-        "tasks",
-        "title",
-        "title_entities",
+    title: str = tg_field()
+    tasks: tuple[InputChecklistTask, ...] = tg_field(compare=True, converter=parse_sequence_arg)
+    parse_mode: ODVInput[str] = tg_field(default=DEFAULT_NONE)
+    title_entities: tuple[MessageEntity, ...] = tg_field(
+        default=None, converter=parse_sequence_arg
     )
-
-    def __init__(
-        self,
-        title: str,
-        tasks: Sequence[InputChecklistTask],
-        parse_mode: ODVInput[str] = DEFAULT_NONE,
-        title_entities: Sequence[MessageEntity] | None = None,
-        others_can_add_tasks: bool | None = None,
-        others_can_mark_tasks_as_done: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.title: str = title
-        self.tasks: tuple[InputChecklistTask, ...] = parse_sequence_arg(tasks)
-        self.parse_mode: ODVInput[str] = parse_mode
-        self.title_entities: tuple[MessageEntity, ...] = parse_sequence_arg(title_entities)
-        self.others_can_add_tasks: bool | None = others_can_add_tasks
-        self.others_can_mark_tasks_as_done: bool | None = others_can_mark_tasks_as_done
-
-        self._id_attrs = (self.tasks,)
-
-        self._freeze()
+    others_can_add_tasks: bool | None = tg_field(default=None)
+    others_can_mark_tasks_as_done: bool | None = tg_field(default=None)

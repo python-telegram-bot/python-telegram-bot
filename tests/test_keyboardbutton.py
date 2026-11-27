@@ -27,7 +27,6 @@ from telegram import (
     KeyboardButtonRequestUsers,
     WebAppInfo,
 )
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -60,12 +59,6 @@ class KeyboardButtonTestBase:
 
 
 class TestKeyboardButtonWithoutRequest(KeyboardButtonTestBase):
-    def test_slot_behaviour(self, keyboard_button):
-        inst = keyboard_button
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, keyboard_button):
         assert keyboard_button.text == self.text
         assert keyboard_button.request_location == self.request_location

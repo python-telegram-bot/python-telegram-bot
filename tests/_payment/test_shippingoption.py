@@ -19,7 +19,6 @@
 import pytest
 
 from telegram import LabeledPrice, ShippingOption, Voice
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -36,12 +35,6 @@ class ShippingOptionTestBase:
 
 
 class TestShippingOptionWithoutRequest(ShippingOptionTestBase):
-    def test_slot_behaviour(self, shipping_option):
-        inst = shipping_option
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_expected_values(self, shipping_option):
         assert shipping_option.id == self.id_
         assert shipping_option.title == self.title

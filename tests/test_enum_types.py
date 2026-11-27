@@ -21,7 +21,7 @@ from pathlib import Path
 
 from telegram._utils.strings import TextEncoding
 
-telegram_root = Path(__file__).parent.parent / "telegram"
+telegram_root = Path(__file__).parent.parent / "src" / "telegram"
 telegram_ext_root = telegram_root / "ext"
 exclude_dirs = {
     # We touch passport stuff only if strictly necessary.
@@ -29,17 +29,17 @@ exclude_dirs = {
 }
 
 exclude_patterns = {
-    re.compile(re.escape("self.type: ReactionType = type")),
-    re.compile(re.escape("self.type: BackgroundType = type")),
-    re.compile(re.escape("self.type: StoryAreaType = type")),
+    re.compile(re.escape("type: ReactionType = tg_field(")),
+    re.compile(re.escape("type: BackgroundType = tg_field(")),
+    re.compile(re.escape("type: StoryAreaType = tg_field(")),
 }
 
 
 def test_types_are_converted_to_enum():
-    """We want to convert all attributes of name "type" to an enum from telegram.constants.
+    """We want to convert all fields of name "type" to an enum from telegram.constants.
     Since we don't necessarily document this as type hint, we simply check this with a regex.
     """
-    pattern = re.compile(r"self\.type: [^=]+ = ([^\n]+)\n", re.MULTILINE)
+    pattern = re.compile(r"^\s+type: [^=]+ = tg_field\(([^)]*)\)", re.MULTILINE)
 
     for path in telegram_root.rglob("*.py"):
         if telegram_ext_root in path.parents or any(
@@ -50,13 +50,11 @@ def test_types_are_converted_to_enum():
 
         text = path.read_text(encoding=TextEncoding.UTF_8)
         for match in re.finditer(pattern, text):
-            if any(exclude_pattern.match(match.group(0)) for exclude_pattern in exclude_patterns):
+            if any(exclude_pattern.search(match.group(0)) for exclude_pattern in exclude_patterns):
                 continue
 
-            assert match.group(1).startswith("enum.get_member") or match.group(1).startswith(
-                "get_member"
-            ), (
-                f"`{match.group(1)}` in `{path}` does not seem to convert the type to an enum. "
-                f"Please fix this and also make sure to add a separate test to the classes test "
-                f"file."
+            assert "enum=" in match.group(1) or "init=False" in match.group(1), (
+                f"`{match.group(0).strip()}` in `{path}` does not seem to convert the type to an "
+                f"enum. Please fix this and also make sure to add a separate test to the classes "
+                f"test file."
             )

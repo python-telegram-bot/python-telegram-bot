@@ -31,7 +31,6 @@ from telegram import (
     Dice,
 )
 from telegram.constants import BotCommandScopeType
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture
@@ -46,12 +45,6 @@ class BotCommandScopeTestBase:
 
 
 class TestBotCommandScopeWithoutRequest(BotCommandScopeTestBase):
-    def test_slot_behaviour(self, bot_command_scope):
-        inst = bot_command_scope
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_type_enum_conversion(self, bot_command_scope):
         assert type(BotCommandScope("default").type) is BotCommandScopeType
         assert BotCommandScope("unknown").type == "unknown"
@@ -116,12 +109,6 @@ def bot_command_scope_all_private_chats():
 class TestBotCommandScopeAllPrivateChatsWithoutRequest(BotCommandScopeTestBase):
     type = BotCommandScopeType.ALL_PRIVATE_CHATS
 
-    def test_slot_behaviour(self, bot_command_scope_all_private_chats):
-        inst = bot_command_scope_all_private_chats
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         transaction_partner = BotCommandScopeAllPrivateChats.de_json({}, offline_bot)
         assert transaction_partner.api_kwargs == {}
@@ -155,12 +142,6 @@ def bot_command_scope_all_chat_administrators():
 
 class TestBotCommandScopeAllChatAdministratorsWithoutRequest(BotCommandScopeTestBase):
     type = BotCommandScopeType.ALL_CHAT_ADMINISTRATORS
-
-    def test_slot_behaviour(self, bot_command_scope_all_chat_administrators):
-        inst = bot_command_scope_all_chat_administrators
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         transaction_partner = BotCommandScopeAllChatAdministrators.de_json({}, offline_bot)
@@ -196,12 +177,6 @@ def bot_command_scope_all_group_chats():
 class TestBotCommandScopeAllGroupChatsWithoutRequest(BotCommandScopeTestBase):
     type = BotCommandScopeType.ALL_GROUP_CHATS
 
-    def test_slot_behaviour(self, bot_command_scope_all_group_chats):
-        inst = bot_command_scope_all_group_chats
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         transaction_partner = BotCommandScopeAllGroupChats.de_json({}, offline_bot)
         assert transaction_partner.api_kwargs == {}
@@ -235,12 +210,6 @@ def bot_command_scope_chat():
 
 class TestBotCommandScopeChatWithoutRequest(BotCommandScopeTestBase):
     type = BotCommandScopeType.CHAT
-
-    def test_slot_behaviour(self, bot_command_scope_chat):
-        inst = bot_command_scope_chat
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         transaction_partner = BotCommandScopeChat.de_json({"chat_id": self.chat_id}, offline_bot)
@@ -283,12 +252,6 @@ def bot_command_scope_chat_administrators():
 
 class TestBotCommandScopeChatAdministratorsWithoutRequest(BotCommandScopeTestBase):
     type = BotCommandScopeType.CHAT_ADMINISTRATORS
-
-    def test_slot_behaviour(self, bot_command_scope_chat_administrators):
-        inst = bot_command_scope_chat_administrators
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         transaction_partner = BotCommandScopeChatAdministrators.de_json(
@@ -334,12 +297,6 @@ def bot_command_scope_chat_member():
 
 class TestBotCommandScopeChatMemberWithoutRequest(BotCommandScopeTestBase):
     type = BotCommandScopeType.CHAT_MEMBER
-
-    def test_slot_behaviour(self, bot_command_scope_chat_member):
-        inst = bot_command_scope_chat_member
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         transaction_partner = BotCommandScopeChatMember.de_json(
@@ -388,12 +345,6 @@ def bot_command_scope_default():
 
 class TestBotCommandScopeDefaultWithoutRequest(BotCommandScopeTestBase):
     type = BotCommandScopeType.DEFAULT
-
-    def test_slot_behaviour(self, bot_command_scope_default):
-        inst = bot_command_scope_default
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
     def test_de_json(self, offline_bot):
         transaction_partner = BotCommandScopeDefault.de_json({}, offline_bot)

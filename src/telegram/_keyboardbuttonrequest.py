@@ -20,9 +20,10 @@
 
 from telegram._chatadministratorrights import ChatAdministratorRights
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class KeyboardButtonRequestUsers(TelegramObject):
     """This object defines the criteria used to request a suitable user. The identifier of the
     selected user will be shared with the bot when the corresponding button is pressed. `More
@@ -87,45 +88,19 @@ class KeyboardButtonRequestUsers(TelegramObject):
 
     """
 
-    __slots__ = (
-        "max_quantity",
-        "request_id",
-        "request_name",
-        "request_photo",
-        "request_username",
-        "user_is_bot",
-        "user_is_premium",
-    )
+    # Required
+    request_id: int = tg_field(compare=True)
 
-    def __init__(
-        self,
-        request_id: int,
-        user_is_bot: bool | None = None,
-        user_is_premium: bool | None = None,
-        max_quantity: int | None = None,
-        request_name: bool | None = None,
-        request_username: bool | None = None,
-        request_photo: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.request_id: int = request_id
-
-        # Optionals
-        self.user_is_bot: bool | None = user_is_bot
-        self.user_is_premium: bool | None = user_is_premium
-        self.max_quantity: int | None = max_quantity
-        self.request_name: bool | None = request_name
-        self.request_username: bool | None = request_username
-        self.request_photo: bool | None = request_photo
-
-        self._id_attrs = (self.request_id,)
-
-        self._freeze()
+    # Optionals
+    user_is_bot: bool | None = tg_field(default=None)
+    user_is_premium: bool | None = tg_field(default=None)
+    max_quantity: int | None = tg_field(default=None)
+    request_name: bool | None = tg_field(default=None)
+    request_username: bool | None = tg_field(default=None)
+    request_photo: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class KeyboardButtonRequestChat(TelegramObject):
     """This object defines the criteria used to request a suitable chat. The identifier of the
     selected user will be shared with the bot when the corresponding button is pressed. `More
@@ -199,57 +174,23 @@ class KeyboardButtonRequestChat(TelegramObject):
             .. versionadded:: 21.1
     """
 
-    __slots__ = (
-        "bot_administrator_rights",
-        "bot_is_member",
-        "chat_has_username",
-        "chat_is_channel",
-        "chat_is_created",
-        "chat_is_forum",
-        "request_id",
-        "request_photo",
-        "request_title",
-        "request_username",
-        "user_administrator_rights",
-    )
+    # required
+    request_id: int = tg_field(compare=True)
+    chat_is_channel: bool = tg_field()
 
-    def __init__(
-        self,
-        request_id: int,
-        chat_is_channel: bool,
-        chat_is_forum: bool | None = None,
-        chat_has_username: bool | None = None,
-        chat_is_created: bool | None = None,
-        user_administrator_rights: ChatAdministratorRights | None = None,
-        bot_administrator_rights: ChatAdministratorRights | None = None,
-        bot_is_member: bool | None = None,
-        request_title: bool | None = None,
-        request_username: bool | None = None,
-        request_photo: bool | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # required
-        self.request_id: int = request_id
-        self.chat_is_channel: bool = chat_is_channel
-
-        # optional
-        self.chat_is_forum: bool | None = chat_is_forum
-        self.chat_has_username: bool | None = chat_has_username
-        self.chat_is_created: bool | None = chat_is_created
-        self.user_administrator_rights: ChatAdministratorRights | None = user_administrator_rights
-        self.bot_administrator_rights: ChatAdministratorRights | None = bot_administrator_rights
-        self.bot_is_member: bool | None = bot_is_member
-        self.request_title: bool | None = request_title
-        self.request_username: bool | None = request_username
-        self.request_photo: bool | None = request_photo
-
-        self._id_attrs = (self.request_id,)
-
-        self._freeze()
+    # optional
+    chat_is_forum: bool | None = tg_field(default=None)
+    chat_has_username: bool | None = tg_field(default=None)
+    chat_is_created: bool | None = tg_field(default=None)
+    user_administrator_rights: ChatAdministratorRights | None = tg_field(default=None)
+    bot_administrator_rights: ChatAdministratorRights | None = tg_field(default=None)
+    bot_is_member: bool | None = tg_field(default=None)
+    request_title: bool | None = tg_field(default=None)
+    request_username: bool | None = tg_field(default=None)
+    request_photo: bool | None = tg_field(default=None)
 
 
+@tg_dataclass()
 class KeyboardButtonRequestManagedBot(TelegramObject):
     """
     This object defines the parameters for the creation of a managed bot.
@@ -275,26 +216,9 @@ class KeyboardButtonRequestManagedBot(TelegramObject):
         suggested_username (:obj:`str`): Optional. Suggested username for the bot.
     """
 
-    __slots__ = (
-        "request_id",
-        "suggested_name",
-        "suggested_username",
-    )
+    # Required
+    request_id: int = tg_field(compare=True)
 
-    def __init__(
-        self,
-        request_id: int,
-        suggested_name: str | None = None,
-        suggested_username: str | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        # Required
-        self.request_id: int = request_id
-        # Optional
-        self.suggested_name: str | None = suggested_name
-        self.suggested_username: str | None = suggested_username
-
-        self._id_attrs = (self.request_id,)
-        self._freeze()
+    # Optional
+    suggested_name: str | None = tg_field(default=None)
+    suggested_username: str | None = tg_field(default=None)

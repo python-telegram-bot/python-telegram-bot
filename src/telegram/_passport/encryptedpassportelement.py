@@ -26,6 +26,7 @@ from telegram._passport.data import IdDocumentData, PersonalDetails, Residential
 from telegram._passport.passportfile import PassportFile, with_file_credentials
 from telegram._telegramobject import TelegramObject
 from telegram._utils.argumentparsing import parse_sequence_arg
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram._utils.types import JSONDict
 
 if TYPE_CHECKING:
@@ -53,6 +54,7 @@ def _add_file_credentials_to_list(
     ]
 
 
+@tg_dataclass()
 class EncryptedPassportElement(TelegramObject):
     """
     Contains information about documents or other Telegram Passport elements shared with the bot
@@ -154,61 +156,22 @@ class EncryptedPassportElement(TelegramObject):
 
     """
 
-    __slots__ = (
-        "data",
-        "email",
-        "files",
-        "front_side",
-        "hash",
-        "phone_number",
-        "reverse_side",
-        "selfie",
-        "translation",
-        "type",
+    # Required
+    type: str = tg_field(compare=True)
+    hash: str = tg_field()
+    # Optional
+    data: PersonalDetails | IdDocumentData | ResidentialAddress | None = tg_field(
+        compare=True, default=None
     )
-
-    def __init__(
-        self,
-        type: str,  # pylint: disable=redefined-builtin
-        hash: str,  # pylint: disable=redefined-builtin
-        data: PersonalDetails | IdDocumentData | ResidentialAddress | None = None,
-        phone_number: str | None = None,
-        email: str | None = None,
-        files: Sequence[PassportFile] | None = None,
-        front_side: PassportFile | None = None,
-        reverse_side: PassportFile | None = None,
-        selfie: PassportFile | None = None,
-        translation: Sequence[PassportFile] | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-
-        # Required
-        self.type: str = type
-        # Optionals
-        self.data: PersonalDetails | IdDocumentData | ResidentialAddress | None = data
-        self.phone_number: str | None = phone_number
-        self.email: str | None = email
-        self.files: tuple[PassportFile, ...] = parse_sequence_arg(files)
-        self.front_side: PassportFile | None = front_side
-        self.reverse_side: PassportFile | None = reverse_side
-        self.selfie: PassportFile | None = selfie
-        self.translation: tuple[PassportFile, ...] = parse_sequence_arg(translation)
-        self.hash: str = hash
-
-        self._id_attrs = (
-            self.type,
-            self.data,
-            self.phone_number,
-            self.email,
-            self.files,
-            self.front_side,
-            self.reverse_side,
-            self.selfie,
-        )
-
-        self._freeze()
+    phone_number: str | None = tg_field(compare=True, default=None)
+    email: str | None = tg_field(compare=True, default=None)
+    files: tuple[PassportFile, ...] = tg_field(
+        compare=True, default=None, converter=parse_sequence_arg
+    )
+    front_side: PassportFile | None = tg_field(compare=True, default=None)
+    reverse_side: PassportFile | None = tg_field(compare=True, default=None)
+    selfie: PassportFile | None = tg_field(compare=True, default=None)
+    translation: tuple[PassportFile, ...] = tg_field(default=None, converter=parse_sequence_arg)
 
     @classmethod
     def de_json_decrypted(
@@ -271,4 +234,4 @@ class EncryptedPassportElement(TelegramObject):
                 data.get("translation"), secure_data.translation
             )
 
-        return super().de_json(data=data, bot=bot)
+        return super(EncryptedPassportElement, cls).de_json(data=data, bot=bot)  # noqa: UP008

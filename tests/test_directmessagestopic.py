@@ -21,7 +21,7 @@
 import pytest
 
 from telegram import DirectMessagesTopic, User
-from tests.auxil.slots import mro_slots
+from tests.conftest import unfrozen
 
 
 @pytest.fixture(scope="module")
@@ -31,8 +31,8 @@ def direct_messages_topic(offline_bot):
         user=DirectMessagesTopicTestBase.user,
     )
     dmt.set_bot(offline_bot)
-    dmt._unfreeze()
-    return dmt
+    with unfrozen(dmt):
+        yield dmt
 
 
 class DirectMessagesTopicTestBase:
@@ -41,13 +41,6 @@ class DirectMessagesTopicTestBase:
 
 
 class TestDirectMessagesTopicWithoutRequest(DirectMessagesTopicTestBase):
-    def test_slot_behaviour(self, direct_messages_topic):
-        cfi = direct_messages_topic
-        for attr in cfi.__slots__:
-            assert getattr(cfi, attr, "err") != "err", f"got extra slot '{attr}'"
-
-        assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
-
     def test_de_json(self, offline_bot):
         json_dict = {
             "topic_id": self.topic_id,

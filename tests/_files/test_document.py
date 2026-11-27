@@ -34,7 +34,6 @@ from tests.auxil.bot_method_checks import (
 )
 from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
-from tests.auxil.slots import mro_slots
 
 
 class DocumentTestBase:
@@ -51,13 +50,6 @@ class DocumentTestBase:
 
 
 class TestDocumentWithoutRequest(DocumentTestBase):
-    def test_slot_behaviour(self, offline_document):
-        for attr in offline_document.__slots__:
-            assert getattr(offline_document, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(offline_document)) == len(set(mro_slots(offline_document))), (
-            "duplicate slot"
-        )
-
     def test_creation(self, offline_document):
         assert isinstance(offline_document, Document)
         assert isinstance(offline_document.file_id, str)

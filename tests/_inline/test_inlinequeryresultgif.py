@@ -29,7 +29,6 @@ from telegram import (
     MessageEntity,
 )
 from telegram.warnings import PTBDeprecationWarning
-from tests.auxil.slots import mro_slots
 
 
 @pytest.fixture(scope="module")
@@ -71,12 +70,6 @@ class InlineQueryResultGifTestBase:
 
 
 class TestInlineQueryResultGifWithoutRequest(InlineQueryResultGifTestBase):
-    def test_slot_behaviour(self, inline_query_result_gif):
-        inst = inline_query_result_gif
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
     def test_caption_entities_always_tuple(self):
         result = InlineQueryResultGif(self.id_, self.gif_url, self.thumbnail_url)
         assert result.caption_entities == ()

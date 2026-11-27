@@ -18,14 +18,15 @@
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 """This module contains an object that represents a location to which a chat is connected."""
 
-from typing import Final
+from typing import ClassVar
 
 from telegram import constants
 from telegram._files.location import Location
 from telegram._telegramobject import TelegramObject
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 
 
+@tg_dataclass()
 class ChatLocation(TelegramObject):
     """This object represents a location to which a chat is connected.
 
@@ -47,29 +48,15 @@ class ChatLocation(TelegramObject):
 
     """
 
-    __slots__ = ("address", "location")
+    location: Location = tg_field(compare=True)
+    address: str = tg_field()
 
-    def __init__(
-        self,
-        location: Location,
-        address: str,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        super().__init__(api_kwargs=api_kwargs)
-        self.location: Location = location
-        self.address: str = address
-
-        self._id_attrs = (self.location,)
-
-        self._freeze()
-
-    MIN_ADDRESS: Final[int] = constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS
+    MIN_ADDRESS: ClassVar[int] = constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS
     """:const:`telegram.constants.LocationLimit.MIN_CHAT_LOCATION_ADDRESS`
 
     .. versionadded:: 20.0
     """
-    MAX_ADDRESS: Final[int] = constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS
+    MAX_ADDRESS: ClassVar[int] = constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS
     """:const:`telegram.constants.LocationLimit.MAX_CHAT_LOCATION_ADDRESS`
 
     .. versionadded:: 20.0

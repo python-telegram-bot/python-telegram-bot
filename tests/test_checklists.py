@@ -33,7 +33,6 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
 from tests.auxil.build_messages import make_message
-from tests.auxil.slots import mro_slots
 
 
 class ChecklistTaskTestBase:
@@ -61,13 +60,6 @@ def checklist_task():
 
 
 class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
-    def test_slot_behaviour(self, checklist_task):
-        for attr in checklist_task.__slots__:
-            assert getattr(checklist_task, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(checklist_task)) == len(set(mro_slots(checklist_task))), (
-            "duplicate slot"
-        )
-
     def test_to_dict(self, checklist_task):
         clt_dict = checklist_task.to_dict()
         assert isinstance(clt_dict, dict)
@@ -215,11 +207,6 @@ def checklist():
 
 
 class TestChecklistWithoutRequest(ChecklistTestBase):
-    def test_slot_behaviour(self, checklist):
-        for attr in checklist.__slots__:
-            assert getattr(checklist, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(checklist)) == len(set(mro_slots(checklist))), "duplicate slot"
-
     def test_to_dict(self, checklist):
         cl_dict = checklist.to_dict()
         assert isinstance(cl_dict, dict)
@@ -310,13 +297,6 @@ def checklist_tasks_done():
 
 
 class TestChecklistTasksDoneWithoutRequest(ChecklistTasksDoneTestBase):
-    def test_slot_behaviour(self, checklist_tasks_done):
-        for attr in checklist_tasks_done.__slots__:
-            assert getattr(checklist_tasks_done, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(checklist_tasks_done)) == len(set(mro_slots(checklist_tasks_done))), (
-            "duplicate slot"
-        )
-
     def test_to_dict(self, checklist_tasks_done):
         cltd_dict = checklist_tasks_done.to_dict()
         assert isinstance(cltd_dict, dict)
@@ -386,13 +366,6 @@ def checklist_tasks_added():
 
 
 class TestChecklistTasksAddedWithoutRequest(ChecklistTasksAddedTestBase):
-    def test_slot_behaviour(self, checklist_tasks_added):
-        for attr in checklist_tasks_added.__slots__:
-            assert getattr(checklist_tasks_added, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(checklist_tasks_added)) == len(
-            set(mro_slots(checklist_tasks_added))
-        ), "duplicate slot"
-
     def test_to_dict(self, checklist_tasks_added):
         clta_dict = checklist_tasks_added.to_dict()
         assert isinstance(clta_dict, dict)

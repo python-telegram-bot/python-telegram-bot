@@ -22,13 +22,14 @@ from typing import TYPE_CHECKING
 
 from telegram._inline.inlinekeyboardmarkup import InlineKeyboardMarkup
 from telegram._inline.inlinequeryresult import InlineQueryResult
-from telegram._utils.types import JSONDict
+from telegram._utils.dataclass import tg_dataclass, tg_field
 from telegram.constants import InlineQueryResultType
 
 if TYPE_CHECKING:
     from telegram import InputMessageContent
 
 
+@tg_dataclass()
 class InlineQueryResultContact(InlineQueryResult):
     """
     Represents a contact with a phone number. By default, this contact will be sent by the user.
@@ -87,44 +88,16 @@ class InlineQueryResultContact(InlineQueryResult):
 
     """
 
-    __slots__ = (
-        "first_name",
-        "input_message_content",
-        "last_name",
-        "phone_number",
-        "reply_markup",
-        "thumbnail_height",
-        "thumbnail_url",
-        "thumbnail_width",
-        "vcard",
-    )
-
-    def __init__(
-        self,
-        id: str,  # pylint: disable=redefined-builtin
-        phone_number: str,
-        first_name: str,
-        last_name: str | None = None,
-        reply_markup: InlineKeyboardMarkup | None = None,
-        input_message_content: "InputMessageContent | None" = None,
-        vcard: str | None = None,
-        thumbnail_url: str | None = None,
-        thumbnail_width: int | None = None,
-        thumbnail_height: int | None = None,
-        *,
-        api_kwargs: JSONDict | None = None,
-    ):
-        # Required
-        super().__init__(InlineQueryResultType.CONTACT, id, api_kwargs=api_kwargs)
-        with self._unfrozen():
-            self.phone_number: str = phone_number
-            self.first_name: str = first_name
-
-            # Optionals
-            self.last_name: str | None = last_name
-            self.vcard: str | None = vcard
-            self.reply_markup: InlineKeyboardMarkup | None = reply_markup
-            self.input_message_content: InputMessageContent | None = input_message_content
-            self.thumbnail_url: str | None = thumbnail_url
-            self.thumbnail_width: int | None = thumbnail_width
-            self.thumbnail_height: int | None = thumbnail_height
+    # Attribute only (init=False)
+    type: str = tg_field(init=False, default=InlineQueryResultType.CONTACT)
+    # Required
+    phone_number: str = tg_field()
+    first_name: str = tg_field()
+    # Optional
+    last_name: str | None = tg_field(default=None)
+    reply_markup: InlineKeyboardMarkup | None = tg_field(default=None)
+    input_message_content: "InputMessageContent | None" = tg_field(default=None)
+    vcard: str | None = tg_field(default=None)
+    thumbnail_url: str | None = tg_field(default=None)
+    thumbnail_width: int | None = tg_field(default=None)
+    thumbnail_height: int | None = tg_field(default=None)
