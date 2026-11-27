@@ -20,6 +20,7 @@
 implementations for SimpleUpdateProcessor and we want to test SimpleUpdateProcessor anyway."""
 
 import asyncio
+import inspect
 
 import pytest
 
@@ -124,6 +125,96 @@ class TestSimpleUpdateProcessor:
 
         # Sanity check: we expect that all tasks are completed.
         await asyncio.gather(*tasks)
+
+    @pytest.mark.parametrize("awaitable_type", ["coroutine", "future", "custom"])
+    async def test_cancel_while_waiting_for_capacity(self, awaitable_type):
+        processor = SimpleUpdateProcessor(1)
+        entered = asyncio.Event()
+        release = asyncio.Event()
+        waiting = asyncio.Event()
+        effects = []
+
+        async def first():
+            entered.set()
+            await release.wait()
+
+        async def second():
+            effects.append("awaited")
+
+        class CustomAwaitable:
+            def __await__(self):
+                effects.append("awaited")
+                return iter(())
+
+            def close(self):
+                effects.append("closed")
+
+        if awaitable_type == "coroutine":
+            coroutine = second()
+        elif awaitable_type == "future":
+            coroutine = asyncio.get_running_loop().create_future()
+        else:
+            coroutine = CustomAwaitable()
+
+        async def queued():
+            waiting.set()
+            await processor.process_update(Update(2), coroutine)
+
+        first_task = asyncio.create_task(processor.process_update(Update(1), first()))
+        queued_task = None
+        try:
+            await entered.wait()
+            queued_task = asyncio.create_task(queued())
+            await waiting.wait()
+            queued_task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await queued_task
+
+            assert effects == []
+            assert processor.current_concurrent_updates == 1
+            assert not first_task.done()
+            if awaitable_type == "coroutine":
+                assert inspect.getcoroutinestate(coroutine) == inspect.CORO_CLOSED
+            elif awaitable_type == "future":
+                assert not coroutine.done()
+        finally:
+            if inspect.iscoroutine(coroutine):
+                coroutine.close()
+            release.set()
+            if queued_task is not None:
+                queued_task.cancel()
+                await asyncio.gather(queued_task, return_exceptions=True)
+            await first_task
+
+        assert processor.current_concurrent_updates == 0
+        await processor.process_update(Update(3), second())
+        assert effects == ["awaited"]
+
+    async def test_cancel_after_admission_preserves_processor_ownership(self):
+        entered = asyncio.Event()
+
+        class DeferredProcessor(SimpleUpdateProcessor):
+            async def do_process_update(self, update, coroutine):
+                entered.set()
+                await asyncio.Event().wait()
+
+        async def callback():
+            pass
+
+        processor = DeferredProcessor(1)
+        coroutine = callback()
+        task = asyncio.create_task(processor.process_update(Update(1), coroutine))
+        try:
+            await entered.wait()
+            task.cancel()
+            with pytest.raises(asyncio.CancelledError):
+                await task
+            assert inspect.getcoroutinestate(coroutine) == inspect.CORO_CREATED
+            assert processor.current_concurrent_updates == 0
+        finally:
+            task.cancel()
+            await asyncio.gather(task, return_exceptions=True)
+            coroutine.close()
 
     async def test_context_manager(self, monkeypatch, mock_processor):
         self.test_flag = set()
