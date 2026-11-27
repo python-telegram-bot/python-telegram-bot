@@ -17,14 +17,20 @@
 # You should have received a copy of the GNU Lesser Public License
 # along with this program.  If not, see [http://www.gnu.org/licenses/].
 import datetime as dtm
+import json
 from collections.abc import Sequence
 
 import pytest
 
 from telegram import (
     InputFile,
+    InputMediaLivePhoto,
     InputMediaPhoto,
+    InputMediaSticker,
     InputMediaVideo,
+    InputPaidMediaLivePhoto,
+    InputPaidMediaVideo,
+    InputPollOption,
     InputProfilePhotoAnimated,
     InputProfilePhotoStatic,
     InputSticker,
@@ -34,6 +40,7 @@ from telegram import (
 )
 from telegram.constants import ChatType
 from telegram.request._requestparameter import RequestParameter
+from tests.auxil.build_messages import make_message
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -140,51 +147,92 @@ class TestRequestParameterWithoutRequest:
         assert request_parameter.value == [inputfile_1.attach_uri]
         assert request_parameter.input_files == [inputfile_1, inputfile_2]
 
-    def test_from_input_input_media(self):
-        input_media_no_thumb = InputMediaPhoto(media=data_file("telegram.jpg").read_bytes())
-        input_media_thumb = InputMediaVideo(
-            media=data_file("telegram.mp4").read_bytes(),
-            thumbnail=data_file("telegram.jpg").read_bytes(),
-        )
-
-        request_parameter = RequestParameter.from_input("key", input_media_no_thumb)
-        expected_no_thumb = input_media_no_thumb.to_dict()
-        expected_no_thumb.update({"media": input_media_no_thumb.media.attach_uri})
-        assert request_parameter.value == expected_no_thumb
-        assert request_parameter.input_files == [input_media_no_thumb.media]
-
-        request_parameter = RequestParameter.from_input("key", input_media_thumb)
-        expected_thumb = input_media_thumb.to_dict()
-        expected_thumb.update({"media": input_media_thumb.media.attach_uri})
-        expected_thumb.update({"thumbnail": input_media_thumb.thumbnail.attach_uri})
-        assert request_parameter.value == expected_thumb
-        assert request_parameter.input_files == [
-            input_media_thumb.media,
-            input_media_thumb.thumbnail,
-        ]
-
-        request_parameter = RequestParameter.from_input(
-            "key", [input_media_thumb, input_media_no_thumb]
-        )
-        assert request_parameter.value == [expected_thumb, expected_no_thumb]
-        assert request_parameter.input_files == [
-            input_media_thumb.media,
-            input_media_thumb.thumbnail,
-            input_media_no_thumb.media,
-        ]
-
-    def test_from_input_inputmedia_without_attach(self):
-        """This case will never happen, but we test it for completeness"""
-        input_media = InputMediaVideo(
-            data_file("telegram.png").read_bytes(),
-            thumbnail=data_file("telegram.png").read_bytes(),
-            parse_mode=None,
-        )
-        input_media.media.attach_name = None
-        input_media.thumbnail.attach_name = None
+    @pytest.mark.parametrize(
+        "input_media",
+        [
+            InputMediaPhoto(b"photo"),
+            InputMediaVideo(b"video", thumbnail=b"thumbnail", cover=b"cover"),
+            InputMediaVideo("file_id", thumbnail=b"thumbnail", cover=b"cover"),
+            InputPaidMediaVideo(b"video", thumbnail=b"thumbnail", cover=b"cover"),
+            InputMediaLivePhoto(b"video", b"photo"),
+            InputMediaLivePhoto("file_id", InputFile(b"photo")),
+            InputPaidMediaLivePhoto(b"video", b"photo"),
+        ],
+        ids=lambda media: type(media).__name__,
+    )
+    def test_from_input_media_files(self, input_media):
+        expected = input_media.to_dict()
         request_parameter = RequestParameter.from_input("key", input_media)
-        assert request_parameter.value == {"type": "video"}
-        assert request_parameter.input_files == [input_media.media, input_media.thumbnail]
+        payload = json.loads(request_parameter.json_value)
+        files = request_parameter.multipart_data
+        assert len(files) == sum(isinstance(field, InputFile) for field in expected.values())
+        for key, field in expected.items():
+            if isinstance(field, InputFile):
+                uri = payload[key]
+                assert uri.startswith("attach://")
+                if field.attach_uri:
+                    assert uri == field.attach_uri
+                assert files[uri.removeprefix("attach://")] == field.field_tuple
+                expected[key] = uri
+        assert payload == expected
+
+    @pytest.mark.parametrize("media_type", [InputMediaVideo, InputPaidMediaVideo])
+    @pytest.mark.parametrize("media", ["typed_id", InputFile(b"video", attach=True)])
+    def test_from_input_media_api_kwargs(self, media_type, media):
+        api_kwargs = {
+            "media": "override_id",
+            "cover": "cover_id",
+            "future_field": {"enabled": True},
+        }
+        video = media_type(media, cover=b"unused", api_kwargs=api_kwargs)
+        parameter = RequestParameter.from_input("media", video)
+        expected = {"type": "video", **api_kwargs}
+        if isinstance(media, InputFile):
+            expected["media"] = media.attach_uri
+            assert parameter.multipart_data == {media.attach_name: media.field_tuple}
+        else:
+            assert parameter.multipart_data is None
+        assert json.loads(parameter.json_value) == expected
+
+    async def test_send_poll_with_uploaded_options(self, offline_bot, monkeypatch):
+        photo = InputFile(b"photo", filename="photo.jpg")
+        sticker = InputFile(b"sticker", filename="sticker.webp")
+        raw_media = {"type": "photo", "media": "file_id"}
+        extra = {"future_field": True}
+
+        async def check_request(url, request_data, **kwargs):
+            photo_option, sticker_option, overridden, raw_only, plain = json.loads(
+                request_data.json_parameters["options"]
+            )
+            assert overridden["media"] == raw_media
+            assert raw_only["media"] == raw_media
+            assert photo_option["media"]["future_field"] is True
+            assert sticker_option["future_field"] is True
+            assert "media" not in plain
+            files = request_data.multipart_data
+            assert len(files) == 2
+            for option, source in ((photo_option, photo), (sticker_option, sticker)):
+                uri = option["media"]["media"]
+                assert uri.startswith("attach://")
+                assert files[uri.removeprefix("attach://")] == source.field_tuple
+            return make_message("poll").to_dict()
+
+        monkeypatch.setattr(offline_bot.request, "post", check_request)
+        await offline_bot.send_poll(
+            1,
+            "question",
+            [
+                InputPollOption("photo", media=InputMediaPhoto(photo, api_kwargs=extra)),
+                InputPollOption("sticker", media=InputMediaSticker(sticker), api_kwargs=extra),
+                InputPollOption(
+                    "override", media=InputMediaPhoto(b"unused"), api_kwargs={"media": raw_media}
+                ),
+                InputPollOption("raw", api_kwargs={"media": raw_media}),
+                "plain",
+            ],
+        )
+        assert photo.attach_name is None
+        assert sticker.attach_name is None
 
     def test_from_input_profile_photo_static(self):
         input_profile_photo = InputProfilePhotoStatic(data_file("telegram.jpg").read_bytes())

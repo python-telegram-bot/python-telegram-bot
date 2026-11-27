@@ -24,6 +24,7 @@ Setting things up
 
 4. Install the package in development mode as well as optional dependencies and development dependencies.
    Note that the `--group` argument requires `pip` 25.1 or later.
+   The ``all`` group includes the documentation tools and requires Python 3.13 or later.
    
    Alternatively, you can use your preferred package manager (such as uv, hatch, poetry, etc.) instead of pip.
 
@@ -122,6 +123,15 @@ Here's how to make a one-off code change.
 
    - Click "Create pull request". An admin will assign a reviewer to your commit.
 
+   - You need to create a changelog fragment for your PR. To do this, run the following command in the root of the repository:
+
+     .. code-block:: bash
+
+        $ chango new --slug <pr-number>
+
+     Keep the relevant changelog section and fill in the pull request details in the generated
+     file under ``changes/unreleased/``. Commit the fragment and push it to your fork.
+
 5. **Address review comments until all reviewers give LGTM ('looks good to me').**
 
    - When your reviewer has reviewed the code, you'll get a notification. You'll need to respond in two ways:
@@ -167,7 +177,7 @@ Feel free to copy (parts of) the checklist to the PR description to remind you o
 
     - [ ] Added `.. versionadded:: NEXT.VERSION`, ``.. versionchanged:: NEXT.VERSION``, ``.. deprecated:: NEXT.VERSION`` or ``.. versionremoved:: NEXT.VERSION` to the docstrings for user facing changes (for methods/class descriptions, arguments and attributes)
     - [ ] Created new or adapted existing unit tests
-    - [ ] Documented code changes according to the [CSI standard](https://standards.mousepawmedia.com/en/stable/csi.html)
+    - [ ] Documented code changes according to the [CSI standard](https://raw.githubusercontent.com/mousepawmedia/standards/devel/source/csi.rst)
     - [ ] Added myself alphabetically to `AUTHORS.rst` (optional)
     - [ ] Added new classes & modules to the docs and all suitable ``__all__`` s
     - [ ] Checked the [Stability Policy](https://docs.python-telegram-bot.org/stability_policy.html) in case of deprecations or changes to documented behavior
@@ -216,7 +226,7 @@ doc strings don't have a separate documentation site they generate, instead, the
 
 User facing documentation
 -------------------------
-We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.12 or above and have the required dependencies installed as explained above.
+We use `sphinx`_ to generate static HTML docs. To build them, first make sure you're running Python 3.13 or above and have the required dependencies installed as explained above.
 Then, run the following from the PTB root directory:
 
 .. code-block:: bash
@@ -291,7 +301,7 @@ to add new required arguments. It's also more explicit and easier to read.
 .. _`Ruff`: https://docs.astral.sh/ruff/
 .. _`RTD`: https://docs.python-telegram-bot.org/
 .. _`RTD build`: https://docs.python-telegram-bot.org/en/doc-fixes
-.. _`CSI`: https://standards.mousepawmedia.com/en/stable/csi.html
+.. _`CSI`: https://raw.githubusercontent.com/mousepawmedia/standards/devel/source/csi.rst
 .. _`section`: #documenting
 .. _`testing page`: https://github.com/python-telegram-bot/python-telegram-bot/blob/master/tests/README.rst
 .. _`below`: #check-list-for-prs

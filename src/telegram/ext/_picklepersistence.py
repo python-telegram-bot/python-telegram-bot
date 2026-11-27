@@ -22,6 +22,7 @@ import pickle
 from collections.abc import Callable
 from copy import deepcopy
 from pathlib import Path
+from types import NotImplementedType
 from typing import Any, TypeVar, cast, overload
 
 from telegram import Bot, TelegramObject
@@ -77,8 +78,8 @@ class _BotPickler(pickle.Pickler):
         super().__init__(*args, **kwargs)
 
     def reducer_override(
-        self, obj: TelegramObj
-    ) -> tuple[Callable, tuple[type[TelegramObj], dict]]:
+        self, obj: object, /
+    ) -> tuple[Callable, tuple[type[TelegramObject], dict]] | NotImplementedType:
         """
         This method is used for pickling. The bot attribute is preserved so
         _BotPickler().persistent_id works as intended.

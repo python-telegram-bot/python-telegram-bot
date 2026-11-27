@@ -466,7 +466,7 @@ class Message(MaybeInaccessibleMessage):
             :ref:`More about payments >> <payments-tree>`.
         connected_website (:obj:`str`, optional): The domain name of the website on which the user
             has logged in.
-            `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
+            `More about Telegram Login >> <https://core.telegram.org/bots/telegram-login>`_.
         author_signature (:obj:`str`, optional): Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         paid_star_count (:obj:`int`, optional): The number of Telegram Stars that were paid by the
@@ -918,7 +918,7 @@ class Message(MaybeInaccessibleMessage):
             :ref:`More about payments >> <payments-tree>`.
         connected_website (:obj:`str`): Optional. The domain name of the website on which the user
             has logged in.
-            `More about Telegram Login >> <https://core.telegram.org/widgets/login>`_.
+            `More about Telegram Login >> <https://core.telegram.org/bots/telegram-login>`_.
         author_signature (:obj:`str`): Optional. Signature of the post author for messages in
             channels, or the custom title of an anonymous group administrator.
         paid_star_count (:obj:`int`): Optional. The number of Telegram Stars that were paid by the
