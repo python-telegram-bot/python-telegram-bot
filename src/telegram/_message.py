@@ -1742,6 +1742,8 @@ class Message(MaybeInaccessibleMessage):
                 message.compute_quote_position_and_entities("Hello, world!", 1)
 
         .. versionadded:: 20.8
+        .. versionchanged:: NEXT.VERSION
+            Quote matching now respects Unicode character boundaries.
 
         Args:
             quote (:obj:`str`): Part of the message which is to be quoted. This is
@@ -1760,20 +1762,19 @@ class Message(MaybeInaccessibleMessage):
         if not (text := (self.text or self.caption)):
             raise RuntimeError("This message has neither text nor caption.")
 
-        # Telegram wants the position in UTF-16 code units, so we have to calculate in that space
-        utf16_text = text.encode(TextEncoding.UTF_16_LE)
-        utf16_quote = quote.encode(TextEncoding.UTF_16_LE)
         effective_index = index or 0
 
-        matches = list(re.finditer(re.escape(utf16_quote), utf16_text))
+        matches = list(re.finditer(re.escape(quote), text))
         if (length := len(matches)) < effective_index + 1:
             raise ValueError(
                 f"You requested the {index}-th occurrence of '{quote}', but this text appears "
                 f"only {length} times."
             )
 
-        position = len(utf16_text[: matches[effective_index].start()]) // 2
-        length = len(utf16_quote) // 2
+        # Telegram uses UTF-16 code units for quote positions and entity ranges.
+        start = matches[effective_index].start()
+        position = len(text[:start].encode(TextEncoding.UTF_16_LE)) // 2
+        length = len(quote.encode(TextEncoding.UTF_16_LE)) // 2
         end_position = position + length
 
         entities = []
