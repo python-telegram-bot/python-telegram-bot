@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -44,7 +45,7 @@ def pre_checkout_query(bot):
 
 
 class PreCheckoutQueryTestBase:
-    id_ = 5
+    id_ = "5"
     invoice_payload = "invoice_payload"
     shipping_option_id = "shipping_option_id"
     currency = "EUR"
@@ -53,15 +54,12 @@ class PreCheckoutQueryTestBase:
     order_info = OrderInfo()
 
 
-class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase):
-    def test_slot_behaviour(self, pre_checkout_query):
-        inst = pre_checkout_query
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase, DeserializationTestBase):
+    de_json_class = PreCheckoutQuery
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "id": self.id_,
             "invoice_payload": self.invoice_payload,
             "shipping_option_id": self.shipping_option_id,
@@ -70,7 +68,15 @@ class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase):
             "from": self.from_user.to_dict(),
             "order_info": self.order_info.to_dict(),
         }
-        pre_checkout_query = PreCheckoutQuery.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, pre_checkout_query):
+        inst = pre_checkout_query
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        pre_checkout_query = PreCheckoutQuery.de_json(de_json_dict, offline_bot)
         assert pre_checkout_query.api_kwargs == {}
 
         assert pre_checkout_query.get_bot() is offline_bot
@@ -78,6 +84,7 @@ class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase):
         assert pre_checkout_query.invoice_payload == self.invoice_payload
         assert pre_checkout_query.shipping_option_id == self.shipping_option_id
         assert pre_checkout_query.currency == self.currency
+        assert pre_checkout_query.total_amount == self.total_amount
         assert pre_checkout_query.from_user == self.from_user
         assert pre_checkout_query.order_info == self.order_info
 
@@ -105,7 +112,7 @@ class TestPreCheckoutQueryWithoutRequest(PreCheckoutQueryTestBase):
         d = PreCheckoutQuery(
             0, self.from_user, self.currency, self.total_amount, self.invoice_payload
         )
-        e = Update(self.id_)
+        e = Update(5)
 
         assert a == b
         assert hash(a) == hash(b)

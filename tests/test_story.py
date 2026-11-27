@@ -24,6 +24,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -35,19 +36,24 @@ def story(bot):
 
 
 class StoryTestBase:
-    chat = Chat(1, "")
+    chat = Chat(1, Chat.CHANNEL)
     id = 0
 
 
-class TestStoryWithoutRequest(StoryTestBase):
+class TestStoryWithoutRequest(StoryTestBase, DeserializationTestBase):
+    de_json_class = Story
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"chat": self.chat.to_dict(), "id": self.id}
+
     def test_slot_behaviour(self, story):
         for attr in story.__slots__:
             assert getattr(story, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(story)) == len(set(mro_slots(story))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"chat": self.chat.to_dict(), "id": self.id}
-        story = Story.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        story = Story.de_json(de_json_dict, offline_bot)
         assert story.api_kwargs == {}
         assert story.chat == self.chat
         assert story.id == self.id

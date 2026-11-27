@@ -18,6 +18,7 @@
 import pytest
 
 from telegram import MessageId, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -26,17 +27,21 @@ def message_id():
     return MessageId(message_id=TestMessageIdWithoutRequest.m_id)
 
 
-class TestMessageIdWithoutRequest:
+class TestMessageIdWithoutRequest(DeserializationTestBase):
+    de_json_class = MessageId
     m_id = 1234
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"message_id": self.m_id}
 
     def test_slot_behaviour(self, message_id):
         for attr in message_id.__slots__:
             assert getattr(message_id, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message_id)) == len(set(mro_slots(message_id))), "duplicate slot"
 
-    def test_de_json(self):
-        json_dict = {"message_id": self.m_id}
-        message_id = MessageId.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        message_id = MessageId.de_json(de_json_dict, offline_bot)
         assert message_id.api_kwargs == {}
 
         assert message_id.message_id == self.m_id

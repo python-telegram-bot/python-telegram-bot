@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import SentGuestMessage
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -32,7 +33,13 @@ class SentGuestMessageTestBase:
     inline_message_id = "123"
 
 
-class TestSentGuestMessageWithoutRequest(SentGuestMessageTestBase):
+class TestSentGuestMessageWithoutRequest(SentGuestMessageTestBase, DeserializationTestBase):
+    de_json_class = SentGuestMessage
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"inline_message_id": self.inline_message_id}
+
     def test_slot_behaviour(self, sent_guest_message):
         inst = sent_guest_message
         for attr in inst.__slots__:
@@ -45,9 +52,8 @@ class TestSentGuestMessageWithoutRequest(SentGuestMessageTestBase):
         assert isinstance(sent_guest_message_dict, dict)
         assert sent_guest_message_dict["inline_message_id"] == self.inline_message_id
 
-    def test_de_json(self, offline_bot):
-        data = {"inline_message_id": self.inline_message_id}
-        m = SentGuestMessage.de_json(data, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        m = SentGuestMessage.de_json(de_json_dict, offline_bot)
         assert m.api_kwargs == {}
         assert m.inline_message_id == self.inline_message_id
 

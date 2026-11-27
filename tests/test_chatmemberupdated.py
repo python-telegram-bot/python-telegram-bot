@@ -32,6 +32,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, to_timestamp
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -92,40 +93,12 @@ class ChatMemberUpdatedTestBase:
     new_status = ChatMember.ADMINISTRATOR
 
 
-class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
-    def test_slot_behaviour(self, chat_member_updated):
-        action = chat_member_updated
-        for attr in action.__slots__:
-            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberUpdated
 
-    def test_de_json_required_args(
-        self, offline_bot, user, chat, old_chat_member, new_chat_member, time
-    ):
-        json_dict = {
-            "chat": chat.to_dict(),
-            "from": user.to_dict(),
-            "date": to_timestamp(time),
-            "old_chat_member": old_chat_member.to_dict(),
-            "new_chat_member": new_chat_member.to_dict(),
-        }
-
-        chat_member_updated = ChatMemberUpdated.de_json(json_dict, offline_bot)
-        assert chat_member_updated.api_kwargs == {}
-
-        assert chat_member_updated.chat == chat
-        assert chat_member_updated.from_user == user
-        assert abs(chat_member_updated.date - time) < dtm.timedelta(seconds=1)
-        assert to_timestamp(chat_member_updated.date) == to_timestamp(time)
-        assert chat_member_updated.old_chat_member == old_chat_member
-        assert chat_member_updated.new_chat_member == new_chat_member
-        assert chat_member_updated.invite_link is None
-        assert chat_member_updated.via_chat_folder_invite_link is None
-
-    def test_de_json_all_args(
-        self, offline_bot, user, time, invite_link, chat, old_chat_member, new_chat_member
-    ):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self, user, chat, old_chat_member, new_chat_member, invite_link, time):
+        return {
             "chat": chat.to_dict(),
             "from": user.to_dict(),
             "date": to_timestamp(time),
@@ -136,7 +109,24 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
             "via_join_request": True,
         }
 
-        chat_member_updated = ChatMemberUpdated.de_json(json_dict, offline_bot)
+    def test_slot_behaviour(self, chat_member_updated):
+        action = chat_member_updated
+        for attr in action.__slots__:
+            assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
+
+    def test_de_json(
+        self,
+        offline_bot,
+        user,
+        time,
+        invite_link,
+        chat,
+        old_chat_member,
+        new_chat_member,
+        de_json_dict,
+    ):
+        chat_member_updated = ChatMemberUpdated.de_json(de_json_dict, offline_bot)
         assert chat_member_updated.api_kwargs == {}
 
         assert chat_member_updated.chat == chat
@@ -148,41 +138,6 @@ class TestChatMemberUpdatedWithoutRequest(ChatMemberUpdatedTestBase):
         assert chat_member_updated.invite_link == invite_link
         assert chat_member_updated.via_chat_folder_invite_link is True
         assert chat_member_updated.via_join_request is True
-
-    def test_de_json_localization(
-        self,
-        offline_bot,
-        raw_bot,
-        tz_bot,
-        user,
-        chat,
-        old_chat_member,
-        new_chat_member,
-        time,
-        invite_link,
-    ):
-        json_dict = {
-            "chat": chat.to_dict(),
-            "from": user.to_dict(),
-            "date": to_timestamp(time),
-            "old_chat_member": old_chat_member.to_dict(),
-            "new_chat_member": new_chat_member.to_dict(),
-            "invite_link": invite_link.to_dict(),
-        }
-
-        chat_member_updated_bot = ChatMemberUpdated.de_json(json_dict, offline_bot)
-        chat_member_updated_raw = ChatMemberUpdated.de_json(json_dict, raw_bot)
-        chat_member_updated_tz = ChatMemberUpdated.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        message_offset = chat_member_updated_tz.date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            chat_member_updated_tz.date.replace(tzinfo=None)
-        )
-
-        assert chat_member_updated_raw.date.tzinfo == UTC
-        assert chat_member_updated_bot.date.tzinfo == UTC
-        assert message_offset == tz_bot_offset
 
     def test_to_dict(self, chat_member_updated):
         chat_member_updated_dict = chat_member_updated.to_dict()

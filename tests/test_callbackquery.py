@@ -37,6 +37,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -79,7 +80,21 @@ class CallbackQueryTestBase:
     game_short_name = "the_game"
 
 
-class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
+class TestCallbackQueryWithoutRequest(CallbackQueryTestBase, DeserializationTestBase):
+    de_json_class = CallbackQuery
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "id": self.id_,
+            "from": self.from_user.to_dict(),
+            "chat_instance": self.chat_instance,
+            "message": self.message.to_dict(),
+            "data": self.data,
+            "inline_message_id": self.inline_message_id,
+            "game_short_name": self.game_short_name,
+        }
+
     @staticmethod
     def skip_params(callback_query: CallbackQuery):
         if callback_query.inline_message_id:
@@ -109,17 +124,8 @@ class TestCallbackQueryWithoutRequest(CallbackQueryTestBase):
             assert getattr(callback_query, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(callback_query)) == len(set(mro_slots(callback_query))), "same slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "id": self.id_,
-            "from": self.from_user.to_dict(),
-            "chat_instance": self.chat_instance,
-            "message": self.message.to_dict(),
-            "data": self.data,
-            "inline_message_id": self.inline_message_id,
-            "game_short_name": self.game_short_name,
-        }
-        callback_query = CallbackQuery.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        callback_query = CallbackQuery.de_json(de_json_dict, offline_bot)
         assert callback_query.api_kwargs == {}
 
         assert callback_query.id == self.id_

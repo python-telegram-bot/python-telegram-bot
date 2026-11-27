@@ -22,6 +22,7 @@ import pytest
 
 from telegram import Location, PreparedInlineMessage
 from telegram._utils.datetime import UTC, to_timestamp
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -38,7 +39,18 @@ class PreparedInlineMessageTestBase:
     expiration_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
-class TestPreparedInlineMessageWithoutRequest(PreparedInlineMessageTestBase):
+class TestPreparedInlineMessageWithoutRequest(
+    PreparedInlineMessageTestBase, DeserializationTestBase
+):
+    de_json_class = PreparedInlineMessage
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "id": self.id,
+            "expiration_date": to_timestamp(self.expiration_date),
+        }
+
     def test_slot_behaviour(self, prepared_inline_message):
         inst = prepared_inline_message
         for attr in inst.__slots__:
@@ -49,35 +61,15 @@ class TestPreparedInlineMessageWithoutRequest(PreparedInlineMessageTestBase):
         assert prepared_inline_message.id == self.id
         assert prepared_inline_message.expiration_date == self.expiration_date
 
-    def test_de_json(self, prepared_inline_message):
-        json_dict = {
-            "id": self.id,
-            "expiration_date": to_timestamp(self.expiration_date),
-        }
-        new_prepared_inline_message = PreparedInlineMessage.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict, prepared_inline_message):
+        new_prepared_inline_message = PreparedInlineMessage.de_json(de_json_dict, offline_bot)
+        assert new_prepared_inline_message.api_kwargs == {}
 
         assert isinstance(new_prepared_inline_message, PreparedInlineMessage)
         assert new_prepared_inline_message.id == prepared_inline_message.id
         assert (
             new_prepared_inline_message.expiration_date == prepared_inline_message.expiration_date
         )
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "id": "some_uid",
-            "expiration_date": to_timestamp(self.expiration_date),
-        }
-        pim = PreparedInlineMessage.de_json(json_dict, offline_bot)
-        pim_raw = PreparedInlineMessage.de_json(json_dict, raw_bot)
-        pim_tz = PreparedInlineMessage.de_json(json_dict, tz_bot)
-
-        # comparing utcoffset because comparing tzinfo objects is not reliable
-        offset = pim_tz.expiration_date.utcoffset()
-        offset_tz = tz_bot.defaults.tzinfo.utcoffset(pim_tz.expiration_date.replace(tzinfo=None))
-
-        assert pim.expiration_date.tzinfo == UTC
-        assert pim_raw.expiration_date.tzinfo == UTC
-        assert offset_tz == offset
 
     def test_to_dict(self, prepared_inline_message):
         prepared_inline_message_dict = prepared_inline_message.to_dict()

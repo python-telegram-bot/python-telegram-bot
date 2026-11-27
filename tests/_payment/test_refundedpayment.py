@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import RefundedPayment
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -41,22 +42,27 @@ class RefundedPaymentTestBase:
     provider_payment_charge_id = "provider_payment_charge_id"
 
 
-class TestRefundedPaymentWithoutRequest(RefundedPaymentTestBase):
-    def test_slot_behaviour(self, refunded_payment):
-        inst = refunded_payment
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+class TestRefundedPaymentWithoutRequest(RefundedPaymentTestBase, DeserializationTestBase):
+    de_json_class = RefundedPayment
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "invoice_payload": self.invoice_payload,
             "currency": self.currency,
             "total_amount": self.total_amount,
             "telegram_payment_charge_id": self.telegram_payment_charge_id,
             "provider_payment_charge_id": self.provider_payment_charge_id,
         }
-        refunded_payment = RefundedPayment.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, refunded_payment):
+        inst = refunded_payment
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        refunded_payment = RefundedPayment.de_json(de_json_dict, offline_bot)
         assert refunded_payment.api_kwargs == {}
 
         assert refunded_payment.invoice_payload == self.invoice_payload

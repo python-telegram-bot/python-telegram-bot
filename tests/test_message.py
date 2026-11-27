@@ -43,13 +43,21 @@ from telegram import (
     DirectMessagePriceChanged,
     Document,
     ExternalReplyInfo,
+    ForumTopicClosed,
+    ForumTopicCreated,
+    ForumTopicEdited,
+    ForumTopicReopened,
     Game,
+    GeneralForumTopicHidden,
+    GeneralForumTopicUnhidden,
     Gift,
     GiftInfo,
     Giveaway,
     GiveawayCompleted,
     GiveawayCreated,
     GiveawayWinners,
+    InlineKeyboardButton,
+    InlineKeyboardMarkup,
     InlineQueryResultArticle,
     InputChecklist,
     InputChecklistTask,
@@ -86,6 +94,7 @@ from telegram import (
     SuggestedPostPaid,
     SuggestedPostPrice,
     SuggestedPostRefunded,
+    TelegramObject,
     TextQuote,
     UniqueGift,
     UniqueGiftBackdrop,
@@ -105,10 +114,11 @@ from telegram import (
     VideoNote,
     Voice,
     WebAppData,
+    WriteAccessAllowed,
 )
 from telegram._directmessagestopic import DirectMessagesTopic
 from telegram._poll import PollOptionDeleted
-from telegram._utils.datetime import UTC
+from telegram._utils.datetime import to_timestamp
 from telegram._utils.defaultvalue import DEFAULT_NONE
 from telegram._utils.types import ODVInput
 from telegram.constants import ChatAction, ParseMode
@@ -121,7 +131,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
-from tests.auxil.dummy_objects import get_dummy_object_json_dict
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.pytest_classes import PytestExtBot, PytestMessage
 from tests.auxil.slots import mro_slots
 
@@ -143,355 +153,377 @@ def message(bot):
     return message
 
 
-@pytest.fixture(
-    params=[
-        {
-            "reply_to_message": Message(
-                50,
-                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-                Chat(13, "channel"),
-                User(9, "i", False),
-            )
-        },
-        {"edit_date": dtm.datetime.now(dtm.UTC).replace(tzinfo=None)},
-        {
-            "text": "a text message",
-            "entities": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
-        },
-        {
-            "caption": "A message caption",
-            "caption_entities": [MessageEntity("bold", 1, 1), MessageEntity("text_link", 4, 3)],
-        },
-        {"audio": Audio("audio_id", "unique_id", 12), "caption": "audio_file"},
-        {"document": Document("document_id", "unique_id"), "caption": "document_file"},
-        {
-            "animation": Animation("animation_id", "unique_id", 30, 30, 1),
-            "caption": "animation_file",
-        },
-        {
-            "game": Game(
-                "my_game",
-                "just my game",
+# Every entry sets one or a few related fields of a message. de_json_dict combines all of them
+# into one message that has every field set. If a field appears in several entries, the last one
+# wins.
+MESSAGE_PARAMS = [
+    {
+        "reply_to_message": Message(
+            50,
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+            Chat(13, "channel"),
+            User(9, "i", False),
+        )
+    },
+    {"edit_date": dtm.datetime.now(dtm.UTC).replace(tzinfo=None)},
+    {
+        "text": "a text message",
+        "entities": [MessageEntity("bold", 10, 4), MessageEntity("italic", 16, 7)],
+    },
+    {
+        "caption": "A message caption",
+        "caption_entities": [MessageEntity("bold", 1, 1), MessageEntity("text_link", 4, 3)],
+    },
+    {"audio": Audio("audio_id", "unique_id", 12), "caption": "audio_file"},
+    {"document": Document("document_id", "unique_id"), "caption": "document_file"},
+    {
+        "animation": Animation("animation_id", "unique_id", 30, 30, 1),
+        "caption": "animation_file",
+    },
+    {
+        "game": Game(
+            "my_game",
+            "just my game",
+            [
+                PhotoSize("game_photo_id", "unique_id", 30, 30),
+            ],
+        )
+    },
+    {"photo": [PhotoSize("photo_id", "unique_id", 50, 50)], "caption": "photo_file"},
+    {"sticker": Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)},
+    {"story": Story(Chat(1, Chat.PRIVATE), 0)},
+    {"video": Video("video_id", "unique_id", 12, 12, 12), "caption": "video_file"},
+    {"voice": Voice("voice_id", "unique_id", 5)},
+    {"video_note": VideoNote("video_note_id", "unique_id", 20, 12)},
+    {"new_chat_members": [User(55, "new_user", False)]},
+    {"contact": Contact("phone_numner", "contact_name")},
+    {"location": Location(-23.691288, 46.788279)},
+    {"venue": Venue(Location(-23.691288, 46.788279), "some place", "right here")},
+    {"left_chat_member": User(33, "kicked", False)},
+    {"new_chat_title": "new title"},
+    {"new_chat_photo": [PhotoSize("photo_id", "unique_id", 50, 50)]},
+    {"delete_chat_photo": True},
+    {"group_chat_created": True},
+    {"supergroup_chat_created": True},
+    {"channel_chat_created": True},
+    {"message_auto_delete_timer_changed": MessageAutoDeleteTimerChanged(42)},
+    {"migrate_to_chat_id": -12345},
+    {"migrate_from_chat_id": -54321},
+    {
+        "pinned_message": Message(
+            7,
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+            Chat(13, "channel"),
+            User(9, "i", False),
+        )
+    },
+    {"invoice": Invoice("my invoice", "invoice", "start", "EUR", 243)},
+    {
+        "successful_payment": SuccessfulPayment(
+            "EUR", 243, "payload", "charge_id", "provider_id", order_info={}
+        )
+    },
+    {"connected_website": "http://example.com/"},
+    {"author_signature": "some_author_sign"},
+    {
+        "photo": [PhotoSize("photo_id", "unique_id", 50, 50)],
+        "caption": "photo_file",
+        "media_group_id": "1234443322222",
+    },
+    {"passport_data": PassportData.de_json(RAW_PASSPORT_DATA, None)},
+    {
+        "poll": Poll(
+            id="abc",
+            question="What is this?",
+            options=[
+                PollOption(text="a", voter_count=1, persistent_id="persistent_id_a"),
+                PollOption(text="b", voter_count=2, persistent_id="persistent_id_b"),
+            ],
+            is_closed=False,
+            total_voter_count=0,
+            is_anonymous=False,
+            type=Poll.REGULAR,
+            allows_multiple_answers=True,
+            explanation_entities=[],
+            allows_revoting=True,
+            members_only=True,
+        )
+    },
+    {
+        "text": "a text message",
+        "reply_markup": InlineKeyboardMarkup(
+            [
                 [
-                    PhotoSize("game_photo_id", "unique_id", 30, 30),
+                    InlineKeyboardButton("start", url="http://google.com"),
+                    InlineKeyboardButton("next", callback_data="abcd"),
                 ],
+                [InlineKeyboardButton("Cancel", callback_data="Cancel")],
+            ]
+        ),
+    },
+    {"dice": Dice(4, "🎲")},
+    {"via_bot": User(9, "A_Bot", True)},
+    {
+        "proximity_alert_triggered": ProximityAlertTriggered(
+            User(1, "John", False), User(2, "Doe", False), 42
+        )
+    },
+    {"video_chat_scheduled": VideoChatScheduled(dtm.datetime.now(dtm.UTC).replace(tzinfo=None))},
+    {"video_chat_started": VideoChatStarted()},
+    {"video_chat_ended": VideoChatEnded(100)},
+    {
+        "video_chat_participants_invited": VideoChatParticipantsInvited(
+            [User(1, "Rem", False), User(2, "Emilia", False)]
+        )
+    },
+    {"sender_chat": Chat(-123, Chat.CHANNEL, "discussion_channel")},
+    {"is_automatic_forward": True},
+    {"has_protected_content": True},
+    {
+        "entities": [
+            MessageEntity(MessageEntity.BOLD, 0, 1),
+            MessageEntity(MessageEntity.TEXT_LINK, 2, 3, url="https://ptb.org"),
+        ]
+    },
+    {"web_app_data": WebAppData("some_data", "some_button_text")},
+    {"message_thread_id": 123},
+    {"users_shared": UsersShared(1, users=[SharedUser(2, "user2"), SharedUser(3, "user3")])},
+    {"chat_shared": ChatShared(3, 4)},
+    {
+        "gift": GiftInfo(
+            gift=Gift(
+                "gift_id",
+                Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+                5,
             )
-        },
-        {"photo": [PhotoSize("photo_id", "unique_id", 50, 50)], "caption": "photo_file"},
-        {"sticker": Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)},
-        {"story": Story(Chat(1, Chat.PRIVATE), 0)},
-        {"video": Video("video_id", "unique_id", 12, 12, 12), "caption": "video_file"},
-        {"voice": Voice("voice_id", "unique_id", 5)},
-        {"video_note": VideoNote("video_note_id", "unique_id", 20, 12)},
-        {"new_chat_members": [User(55, "new_user", False)]},
-        {"contact": Contact("phone_numner", "contact_name")},
-        {"location": Location(-23.691288, 46.788279)},
-        {"venue": Venue(Location(-23.691288, 46.788279), "some place", "right here")},
-        {"left_chat_member": User(33, "kicked", False)},
-        {"new_chat_title": "new title"},
-        {"new_chat_photo": [PhotoSize("photo_id", "unique_id", 50, 50)]},
-        {"delete_chat_photo": True},
-        {"group_chat_created": True},
-        {"supergroup_chat_created": True},
-        {"channel_chat_created": True},
-        {"message_auto_delete_timer_changed": MessageAutoDeleteTimerChanged(42)},
-        {"migrate_to_chat_id": -12345},
-        {"migrate_from_chat_id": -54321},
-        {
-            "pinned_message": Message(
+        )
+    },
+    {
+        "unique_gift": UniqueGiftInfo(
+            gift=UniqueGift(
+                gift_id="gift_id",
+                base_name="human_readable_name",
+                name="unique_name",
+                number=2,
+                model=UniqueGiftModel(
+                    "model_name",
+                    Sticker("file_id1", "file_unique_id1", 512, 512, False, False, "regular"),
+                    10,
+                ),
+                symbol=UniqueGiftSymbol(
+                    "symbol_name",
+                    Sticker("file_id2", "file_unique_id2", 512, 512, True, True, "mask"),
+                    20,
+                ),
+                backdrop=UniqueGiftBackdrop(
+                    "backdrop_name",
+                    UniqueGiftBackdropColors(0x00FF00, 0xEE00FF, 0xAA22BB, 0x20FE8F),
+                    30,
+                ),
+            ),
+            origin=UniqueGiftInfo.UPGRADE,
+            owned_gift_id="id",
+            transfer_star_count=10,
+        )
+    },
+    {
+        "giveaway": Giveaway(
+            chats=[Chat(1, Chat.SUPERGROUP)],
+            winners_selection_date=dtm.datetime.now(dtm.UTC)
+            .replace(tzinfo=None)
+            .replace(microsecond=0),
+            winner_count=5,
+        )
+    },
+    {"giveaway_created": GiveawayCreated(prize_star_count=99)},
+    {
+        "giveaway_winners": GiveawayWinners(
+            chat=Chat(1, Chat.CHANNEL),
+            giveaway_message_id=123456789,
+            winners_selection_date=dtm.datetime.now(dtm.UTC)
+            .replace(tzinfo=None)
+            .replace(microsecond=0),
+            winner_count=42,
+            winners=[User(1, "user1", False), User(2, "user2", False)],
+        )
+    },
+    {
+        "giveaway_completed": GiveawayCompleted(
+            winner_count=42,
+            unclaimed_prize_count=4,
+            giveaway_message=make_message(text="giveaway_message"),
+        )
+    },
+    {
+        "link_preview_options": LinkPreviewOptions(
+            is_disabled=True,
+            url="https://python-telegram-bot.org",
+            prefer_small_media=True,
+            prefer_large_media=True,
+            show_above_text=True,
+        )
+    },
+    {
+        "external_reply": ExternalReplyInfo(
+            MessageOriginChat(
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None), Chat(1, Chat.PRIVATE)
+            )
+        )
+    },
+    {"quote": TextQuote("a text quote", 1)},
+    {
+        "forward_origin": MessageOriginChat(
+            dtm.datetime.now(dtm.UTC).replace(tzinfo=None), Chat(1, Chat.PRIVATE)
+        )
+    },
+    {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
+    {"boost_added": ChatBoostAdded(100)},
+    {"sender_boost_count": 1},
+    {"is_from_offline": True},
+    {"sender_business_bot": User(1, "BusinessBot", True)},
+    {"business_connection_id": "123456789"},
+    {"chat_background_set": ChatBackground(type=BackgroundTypeChatTheme("ice"))},
+    {"effect_id": "123456789"},
+    {"show_caption_above_media": True},
+    {"paid_media": PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])},
+    {"refunded_payment": RefundedPayment("EUR", 243, "payload", "charge_id", "provider_id")},
+    {"paid_star_count": 291},
+    {"paid_message_price_changed": PaidMessagePriceChanged(291)},
+    {"direct_message_price_changed": DirectMessagePriceChanged(True, 100)},
+    {
+        "checklist": Checklist(
+            "checklist_id",
+            tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
+        )
+    },
+    {
+        "checklist_tasks_done": ChecklistTasksDone(
+            marked_as_done_task_ids=[1, 2, 3],
+            marked_as_not_done_task_ids=[4, 5],
+        )
+    },
+    {
+        "checklist_tasks_added": ChecklistTasksAdded(
+            tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
+        )
+    },
+    {"is_paid_post": True},
+    {
+        "direct_messages_topic": DirectMessagesTopic(
+            topic_id=1234,
+            user=User(id=5678, first_name="TestUser", is_bot=False),
+        )
+    },
+    {"reply_to_checklist_task_id": 11},
+    {
+        "suggested_post_declined": SuggestedPostDeclined(
+            suggested_post_message=Message(
                 7,
                 dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
                 Chat(13, "channel"),
                 User(9, "i", False),
+            ),
+            comment="comment",
+        )
+    },
+    {
+        "suggested_post_paid": SuggestedPostPaid(
+            currency="XTR",
+            suggested_post_message=Message(
+                7,
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                Chat(13, "channel"),
+                User(9, "i", False),
+            ),
+            amount=100,
+        )
+    },
+    {
+        "suggested_post_refunded": SuggestedPostRefunded(
+            reason="post_deleted",
+            suggested_post_message=Message(
+                7,
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                Chat(13, "channel"),
+                User(9, "i", False),
+            ),
+        )
+    },
+    {
+        "suggested_post_approved": SuggestedPostApproved(
+            send_date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+            price=SuggestedPostPrice(currency="XTR", amount=100),
+            suggested_post_message=Message(
+                7,
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                Chat(13, "channel"),
+                User(9, "i", False),
+            ),
+        )
+    },
+    {
+        "suggested_post_approval_failed": SuggestedPostApprovalFailed(
+            price=SuggestedPostPrice(currency="XTR", amount=100),
+            suggested_post_message=Message(
+                7,
+                dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+                Chat(13, "channel"),
+                User(9, "i", False),
+            ),
+        )
+    },
+    {
+        "suggested_post_info": SuggestedPostInfo(
+            state="pending",
+            price=SuggestedPostPrice(currency="XTR", amount=100),
+            send_date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
+        )
+    },
+    {
+        "gift_upgrade_sent": GiftInfo(
+            gift=Gift(
+                "gift_id",
+                Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
+                5,
             )
-        },
-        {"invoice": Invoice("my invoice", "invoice", "start", "EUR", 243)},
-        {
-            "successful_payment": SuccessfulPayment(
-                "EUR", 243, "payload", "charge_id", "provider_id", order_info={}
-            )
-        },
-        {"connected_website": "http://example.com/"},
-        {"author_signature": "some_author_sign"},
-        {
-            "photo": [PhotoSize("photo_id", "unique_id", 50, 50)],
-            "caption": "photo_file",
-            "media_group_id": 1234443322222,
-        },
-        {"passport_data": PassportData.de_json(RAW_PASSPORT_DATA, None)},
-        {
-            "poll": Poll(
-                id="abc",
-                question="What is this?",
-                options=[
-                    PollOption(text="a", voter_count=1, persistent_id="persistent_id_a"),
-                    PollOption(text="b", voter_count=2, persistent_id="persistent_id_b"),
-                ],
-                is_closed=False,
-                total_voter_count=0,
-                is_anonymous=False,
-                type=Poll.REGULAR,
-                allows_multiple_answers=True,
-                explanation_entities=[],
-                allows_revoting=True,
-                members_only=True,
-            )
-        },
-        {
-            "text": "a text message",
-            "reply_markup": {
-                "inline_keyboard": [
-                    [
-                        {"text": "start", "url": "http://google.com"},
-                        {"text": "next", "callback_data": "abcd"},
-                    ],
-                    [{"text": "Cancel", "callback_data": "Cancel"}],
-                ]
-            },
-        },
-        {"dice": Dice(4, "🎲")},
-        {"via_bot": User(9, "A_Bot", True)},
-        {
-            "proximity_alert_triggered": ProximityAlertTriggered(
-                User(1, "John", False), User(2, "Doe", False), 42
-            )
-        },
-        {
-            "video_chat_scheduled": VideoChatScheduled(
-                dtm.datetime.now(dtm.UTC).replace(tzinfo=None)
-            )
-        },
-        {"video_chat_started": VideoChatStarted()},
-        {"video_chat_ended": VideoChatEnded(100)},
-        {
-            "video_chat_participants_invited": VideoChatParticipantsInvited(
-                [User(1, "Rem", False), User(2, "Emilia", False)]
-            )
-        },
-        {"sender_chat": Chat(-123, "discussion_channel")},
-        {"is_automatic_forward": True},
-        {"has_protected_content": True},
-        {
-            "entities": [
-                MessageEntity(MessageEntity.BOLD, 0, 1),
-                MessageEntity(MessageEntity.TEXT_LINK, 2, 3, url="https://ptb.org"),
-            ]
-        },
-        {"web_app_data": WebAppData("some_data", "some_button_text")},
-        {"message_thread_id": 123},
-        {"users_shared": UsersShared(1, users=[SharedUser(2, "user2"), SharedUser(3, "user3")])},
-        {"chat_shared": ChatShared(3, 4)},
-        {
-            "gift": GiftInfo(
-                gift=Gift(
-                    "gift_id",
-                    Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
-                    5,
-                )
-            )
-        },
-        {
-            "unique_gift": UniqueGiftInfo(
-                gift=UniqueGift(
-                    gift_id="gift_id",
-                    base_name="human_readable_name",
-                    name="unique_name",
-                    number=2,
-                    model=UniqueGiftModel(
-                        "model_name",
-                        Sticker("file_id1", "file_unique_id1", 512, 512, False, False, "regular"),
-                        10,
-                    ),
-                    symbol=UniqueGiftSymbol(
-                        "symbol_name",
-                        Sticker("file_id2", "file_unique_id2", 512, 512, True, True, "mask"),
-                        20,
-                    ),
-                    backdrop=UniqueGiftBackdrop(
-                        "backdrop_name",
-                        UniqueGiftBackdropColors(0x00FF00, 0xEE00FF, 0xAA22BB, 0x20FE8F),
-                        30,
-                    ),
-                ),
-                origin=UniqueGiftInfo.UPGRADE,
-                owned_gift_id="id",
-                transfer_star_count=10,
-            )
-        },
-        {
-            "giveaway": Giveaway(
-                chats=[Chat(1, Chat.SUPERGROUP)],
-                winners_selection_date=dtm.datetime.now(dtm.UTC)
-                .replace(tzinfo=None)
-                .replace(microsecond=0),
-                winner_count=5,
-            )
-        },
-        {"giveaway_created": GiveawayCreated(prize_star_count=99)},
-        {
-            "giveaway_winners": GiveawayWinners(
-                chat=Chat(1, Chat.CHANNEL),
-                giveaway_message_id=123456789,
-                winners_selection_date=dtm.datetime.now(dtm.UTC)
-                .replace(tzinfo=None)
-                .replace(microsecond=0),
-                winner_count=42,
-                winners=[User(1, "user1", False), User(2, "user2", False)],
-            )
-        },
-        {
-            "giveaway_completed": GiveawayCompleted(
-                winner_count=42,
-                unclaimed_prize_count=4,
-                giveaway_message=make_message(text="giveaway_message"),
-            )
-        },
-        {
-            "link_preview_options": LinkPreviewOptions(
-                is_disabled=True,
-                url="https://python-telegram-bot.org",
-                prefer_small_media=True,
-                prefer_large_media=True,
-                show_above_text=True,
-            )
-        },
-        {
-            "external_reply": ExternalReplyInfo(
-                MessageOriginChat(
-                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None), Chat(1, Chat.PRIVATE)
-                )
-            )
-        },
-        {"quote": TextQuote("a text quote", 1)},
-        {
-            "forward_origin": MessageOriginChat(
-                dtm.datetime.now(dtm.UTC).replace(tzinfo=None), Chat(1, Chat.PRIVATE)
-            )
-        },
-        {"reply_to_story": Story(Chat(1, Chat.PRIVATE), 0)},
-        {"boost_added": ChatBoostAdded(100)},
-        {"sender_boost_count": 1},
-        {"is_from_offline": True},
-        {"sender_business_bot": User(1, "BusinessBot", True)},
-        {"business_connection_id": "123456789"},
-        {"chat_background_set": ChatBackground(type=BackgroundTypeChatTheme("ice"))},
-        {"effect_id": "123456789"},
-        {"show_caption_above_media": True},
-        {"paid_media": PaidMediaInfo(5, [PaidMediaPreview(10, 10, 10)])},
-        {"refunded_payment": RefundedPayment("EUR", 243, "payload", "charge_id", "provider_id")},
-        {"paid_star_count": 291},
-        {"paid_message_price_changed": PaidMessagePriceChanged(291)},
-        {"direct_message_price_changed": DirectMessagePriceChanged(True, 100)},
-        {
-            "checklist": Checklist(
-                "checklist_id",
-                tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
-            )
-        },
-        {
-            "checklist_tasks_done": ChecklistTasksDone(
-                marked_as_done_task_ids=[1, 2, 3],
-                marked_as_not_done_task_ids=[4, 5],
-            )
-        },
-        {
-            "checklist_tasks_added": ChecklistTasksAdded(
-                tasks=[ChecklistTask(id=42, text="task 1"), ChecklistTask(id=43, text="task 2")],
-            )
-        },
-        {"is_paid_post": True},
-        {
-            "direct_messages_topic": DirectMessagesTopic(
-                topic_id=1234,
-                user=User(id=5678, first_name="TestUser", is_bot=False),
-            )
-        },
-        {"reply_to_checklist_task_id": 11},
-        {
-            "suggested_post_declined": SuggestedPostDeclined(
-                suggested_post_message=Message(
-                    7,
-                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-                    Chat(13, "channel"),
-                    User(9, "i", False),
-                ),
-                comment="comment",
-            )
-        },
-        {
-            "suggested_post_paid": SuggestedPostPaid(
-                currency="XTR",
-                suggested_post_message=Message(
-                    7,
-                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-                    Chat(13, "channel"),
-                    User(9, "i", False),
-                ),
-                amount=100,
-            )
-        },
-        {
-            "suggested_post_refunded": SuggestedPostRefunded(
-                reason="post_deleted",
-                suggested_post_message=Message(
-                    7,
-                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-                    Chat(13, "channel"),
-                    User(9, "i", False),
-                ),
-            )
-        },
-        {
-            "suggested_post_approved": SuggestedPostApproved(
-                send_date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-                price=SuggestedPostPrice(currency="XTR", amount=100),
-                suggested_post_message=Message(
-                    7,
-                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-                    Chat(13, "channel"),
-                    User(9, "i", False),
-                ),
-            )
-        },
-        {
-            "suggested_post_approval_failed": SuggestedPostApprovalFailed(
-                price=SuggestedPostPrice(currency="XTR", amount=100),
-                suggested_post_message=Message(
-                    7,
-                    dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-                    Chat(13, "channel"),
-                    User(9, "i", False),
-                ),
-            )
-        },
-        {
-            "suggested_post_info": SuggestedPostInfo(
-                state="pending",
-                price=SuggestedPostPrice(currency="XTR", amount=100),
-                send_date=dtm.datetime.now(dtm.UTC).replace(tzinfo=None),
-            )
-        },
-        {
-            "gift_upgrade_sent": GiftInfo(
-                gift=Gift(
-                    "gift_id",
-                    Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular"),
-                    5,
-                )
-            )
-        },
-        {"chat_owner_changed": ChatOwnerChanged(new_owner=User(4, "Snow", False))},
-        {"chat_owner_left": ChatOwnerLeft(new_owner=User(5, "Crash", False))},
-        {"sender_tag": "This is a tag"},
-        {"poll_option_added": PollOptionAdded(option_persistent_id="abc", option_text="this")},
-        {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
-        {"reply_to_poll_option_id": "3123"},
-        {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
-        {"guest_bot_caller_user": User(10, "hm", False)},
-        {"guest_bot_caller_chat": Chat(14, "om")},
-        {"guest_query_id": "This is a guest_query_id"},
-        {"live_photo": LivePhoto("file_id", "file_unique_id", 12, 12, 5)},
-    ],
+        )
+    },
+    {"chat_owner_changed": ChatOwnerChanged(new_owner=User(4, "Snow", False))},
+    {"chat_owner_left": ChatOwnerLeft(new_owner=User(5, "Crash", False))},
+    {"sender_tag": "This is a tag"},
+    {"poll_option_added": PollOptionAdded(option_persistent_id="abc", option_text="this")},
+    {"poll_option_deleted": PollOptionDeleted(option_persistent_id="abc", option_text="this")},
+    {"reply_to_poll_option_id": "3123"},
+    {"managed_bot_created": ManagedBotCreated(bot=User(6, "ManagedBot", True))},
+    {"guest_bot_caller_user": User(10, "hm", False)},
+    {"guest_bot_caller_chat": Chat(14, Chat.GROUP, "om")},
+    {"guest_query_id": "This is a guest_query_id"},
+    {"live_photo": LivePhoto("file_id", "file_unique_id", 12, 12, 5)},
+    {"is_topic_message": True},
+    {
+        "forum_topic_created": ForumTopicCreated(
+            "topic", 0x6FB9F0, icon_custom_emoji_id="emoji_id", is_name_implicit=True
+        )
+    },
+    {"forum_topic_closed": ForumTopicClosed()},
+    {"forum_topic_reopened": ForumTopicReopened()},
+    {"forum_topic_edited": ForumTopicEdited(name="new name", icon_custom_emoji_id="emoji_id")},
+    {"general_forum_topic_hidden": GeneralForumTopicHidden()},
+    {"general_forum_topic_unhidden": GeneralForumTopicUnhidden()},
+    {
+        "write_access_allowed": WriteAccessAllowed(
+            web_app_name="web_app", from_request=True, from_attachment_menu=False
+        )
+    },
+    {
+        "photo": [PhotoSize("photo_id", "unique_id", 50, 50)],
+        "has_media_spoiler": True,
+    },
+]
+
+
+@pytest.fixture(
+    params=MESSAGE_PARAMS,
     ids=[
         "reply",
         "edited",
@@ -593,6 +625,15 @@ def message(bot):
         "guest_bot_caller_chat",
         "guest_query_id",
         "live_photo",
+        "is_topic_message",
+        "forum_topic_created",
+        "forum_topic_closed",
+        "forum_topic_reopened",
+        "forum_topic_edited",
+        "general_forum_topic_hidden",
+        "general_forum_topic_unhidden",
+        "write_access_allowed",
+        "photo_with_spoiler",
     ],
 )
 def message_params(bot, request):
@@ -688,7 +729,37 @@ class MessageTestBase:
     )
 
 
-class TestMessageWithoutRequest(MessageTestBase):
+def _to_json(value: object) -> object:
+    if isinstance(value, TelegramObject):
+        return value.to_dict()
+    if isinstance(value, list | tuple):
+        return [_to_json(item) for item in value]
+    if isinstance(value, dtm.datetime):
+        return to_timestamp(value)
+    return value
+
+
+class TestMessageWithoutRequest(MessageTestBase, DeserializationTestBase):
+    de_json_class = Message
+
+    @classmethod
+    def all_fields(cls) -> dict[str, object]:
+        fields = {
+            "message_id": cls.id_,
+            "from_user": cls.from_user,
+            "date": cls.date,
+            "chat": cls.chat,
+        }
+        for params in MESSAGE_PARAMS:
+            fields.update(params)
+        return fields
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # Telegram never sends a message with all fields set, but this way the generic tests
+        # cover every argument of Message
+        return Message(**self.all_fields()).to_dict()
+
     async def check_quote_parsing(
         self, message: Message, method, bot_method_name: str, args, monkeypatch
     ):
@@ -859,6 +930,19 @@ class TestMessageWithoutRequest(MessageTestBase):
             assert getattr(message, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(message)) == len(set(mro_slots(message))), "duplicate slot"
 
+    def test_de_json(self, offline_bot, de_json_dict):
+        message = Message.de_json(de_json_dict, offline_bot)
+        assert message.api_kwargs == {}
+
+        for name, expected in self.all_fields().items():
+            value = getattr(message, name)
+            if isinstance(expected, list):
+                assert isinstance(value, tuple), name
+                assert [type(item) for item in value] == [type(item) for item in expected], name
+            else:
+                assert type(value) is type(expected), name
+            assert _to_json(value) == _to_json(expected), name
+
     def test_all_possibilities_de_json_and_to_dict(self, offline_bot, message_params):
         new = Message.de_json(message_params.to_dict(), offline_bot)
         assert new.api_kwargs == {}
@@ -869,36 +953,6 @@ class TestMessageWithoutRequest(MessageTestBase):
         # every single case
         for slot in new.__slots__:
             assert not isinstance(new[slot], dict)
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "message_id": 12,
-            "from_user": get_dummy_object_json_dict("User"),
-            "date": int(dtm.datetime.now().timestamp()),
-            "chat": get_dummy_object_json_dict("Chat"),
-            "edit_date": int(dtm.datetime.now().timestamp()),
-        }
-
-        message_raw = Message.de_json(json_dict, raw_bot)
-        message_bot = Message.de_json(json_dict, offline_bot)
-        message_tz = Message.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        date_offset = message_tz.date.utcoffset()
-        date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(message_tz.date.replace(tzinfo=None))
-
-        edit_date_offset = message_tz.edit_date.utcoffset()
-        edit_date_tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            message_tz.edit_date.replace(tzinfo=None)
-        )
-
-        assert message_raw.date.tzinfo == UTC
-        assert message_bot.date.tzinfo == UTC
-        assert date_offset == date_tz_bot_offset
-
-        assert message_raw.edit_date.tzinfo == UTC
-        assert message_bot.edit_date.tzinfo == UTC
-        assert edit_date_offset == edit_date_tz_bot_offset
 
     def test_de_json_api_kwargs_backward_compatibility(self, offline_bot, message_params):
         message_dict = message_params.to_dict()

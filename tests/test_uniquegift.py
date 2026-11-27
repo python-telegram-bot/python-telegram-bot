@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import UniqueGiftInfoOrigin, UniqueGiftModelRarity
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -59,16 +60,12 @@ class UniqueGiftColorsTestBase:
     dark_theme_other_colors = [0x111111, 0x222222]
 
 
-class TestUniqueGiftColorsWithoutRequest(UniqueGiftColorsTestBase):
-    def test_slot_behaviour(self, unique_gift_colors):
-        for attr in unique_gift_colors.__slots__:
-            assert getattr(unique_gift_colors, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_colors)) == len(set(mro_slots(unique_gift_colors))), (
-            "duplicate slot"
-        )
+class TestUniqueGiftColorsWithoutRequest(UniqueGiftColorsTestBase, DeserializationTestBase):
+    de_json_class = UniqueGiftColors
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "model_custom_emoji_id": self.model_custom_emoji_id,
             "symbol_custom_emoji_id": self.symbol_custom_emoji_id,
             "light_theme_main_color": self.light_theme_main_color,
@@ -76,7 +73,16 @@ class TestUniqueGiftColorsWithoutRequest(UniqueGiftColorsTestBase):
             "dark_theme_main_color": self.dark_theme_main_color,
             "dark_theme_other_colors": self.dark_theme_other_colors,
         }
-        unique_gift_colors = UniqueGiftColors.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, unique_gift_colors):
+        for attr in unique_gift_colors.__slots__:
+            assert getattr(unique_gift_colors, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(unique_gift_colors)) == len(set(mro_slots(unique_gift_colors))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        unique_gift_colors = UniqueGiftColors.de_json(de_json_dict, offline_bot)
         assert unique_gift_colors.api_kwargs == {}
         assert unique_gift_colors.model_custom_emoji_id == self.model_custom_emoji_id
         assert unique_gift_colors.symbol_custom_emoji_id == self.symbol_custom_emoji_id
@@ -163,7 +169,7 @@ class UniqueGiftTestBase:
         rarity_per_mille=30,
     )
     publisher_chat = Chat(1, Chat.PRIVATE)
-    is_premium = False
+    is_premium = True
     is_from_blockchain = True
     colors = UniqueGiftColors(
         model_custom_emoji_id="M",
@@ -176,14 +182,12 @@ class UniqueGiftTestBase:
     is_burned = True
 
 
-class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
-    def test_slot_behaviour(self, unique_gift):
-        for attr in unique_gift.__slots__:
-            assert getattr(unique_gift, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift)) == len(set(mro_slots(unique_gift))), "duplicate slot"
+class TestUniqueGiftWithoutRequest(UniqueGiftTestBase, DeserializationTestBase):
+    de_json_class = UniqueGift
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "gift_id": self.gift_id,
             "base_name": self.base_name,
             "name": self.name,
@@ -197,7 +201,14 @@ class TestUniqueGiftWithoutRequest(UniqueGiftTestBase):
             "colors": self.colors.to_dict(),
             "is_burned": self.is_burned,
         }
-        unique_gift = UniqueGift.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, unique_gift):
+        for attr in unique_gift.__slots__:
+            assert getattr(unique_gift, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(unique_gift)) == len(set(mro_slots(unique_gift))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        unique_gift = UniqueGift.de_json(de_json_dict, offline_bot)
         assert unique_gift.api_kwargs == {}
 
         assert unique_gift.base_name == self.base_name
@@ -281,7 +292,18 @@ class UniqueGiftModelTestBase:
     rarity = UniqueGiftModelRarity.UNCOMMON
 
 
-class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase):
+class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase, DeserializationTestBase):
+    de_json_class = UniqueGiftModel
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "name": self.name,
+            "sticker": self.sticker.to_dict(),
+            "rarity_per_mille": self.rarity_per_mille,
+            "rarity": self.rarity,
+        }
+
     def test_slot_behaviour(self, unique_gift_model):
         for attr in unique_gift_model.__slots__:
             assert getattr(unique_gift_model, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -289,14 +311,8 @@ class TestUniqueGiftModelWithoutRequest(UniqueGiftModelTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "name": self.name,
-            "sticker": self.sticker.to_dict(),
-            "rarity_per_mille": self.rarity_per_mille,
-            "rarity": self.rarity,
-        }
-        unique_gift_model = UniqueGiftModel.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        unique_gift_model = UniqueGiftModel.de_json(de_json_dict, offline_bot)
         assert unique_gift_model.api_kwargs == {}
         assert unique_gift_model.name == self.name
         assert unique_gift_model.sticker == self.sticker
@@ -345,7 +361,17 @@ class UniqueGiftSymbolTestBase:
     rarity_per_mille = 20
 
 
-class TestUniqueGiftSymbolWithoutRequest(UniqueGiftSymbolTestBase):
+class TestUniqueGiftSymbolWithoutRequest(UniqueGiftSymbolTestBase, DeserializationTestBase):
+    de_json_class = UniqueGiftSymbol
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "name": self.name,
+            "sticker": self.sticker.to_dict(),
+            "rarity_per_mille": self.rarity_per_mille,
+        }
+
     def test_slot_behaviour(self, unique_gift_symbol):
         for attr in unique_gift_symbol.__slots__:
             assert getattr(unique_gift_symbol, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -353,13 +379,8 @@ class TestUniqueGiftSymbolWithoutRequest(UniqueGiftSymbolTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "name": self.name,
-            "sticker": self.sticker.to_dict(),
-            "rarity_per_mille": self.rarity_per_mille,
-        }
-        unique_gift_symbol = UniqueGiftSymbol.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        unique_gift_symbol = UniqueGiftSymbol.de_json(de_json_dict, offline_bot)
         assert unique_gift_symbol.api_kwargs == {}
         assert unique_gift_symbol.name == self.name
         assert unique_gift_symbol.sticker == self.sticker
@@ -402,7 +423,17 @@ class UniqueGiftBackdropTestBase:
     rarity_per_mille = 30
 
 
-class TestUniqueGiftBackdropWithoutRequest(UniqueGiftBackdropTestBase):
+class TestUniqueGiftBackdropWithoutRequest(UniqueGiftBackdropTestBase, DeserializationTestBase):
+    de_json_class = UniqueGiftBackdrop
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "name": self.name,
+            "colors": self.colors.to_dict(),
+            "rarity_per_mille": self.rarity_per_mille,
+        }
+
     def test_slot_behaviour(self, unique_gift_backdrop):
         for attr in unique_gift_backdrop.__slots__:
             assert getattr(unique_gift_backdrop, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -410,13 +441,8 @@ class TestUniqueGiftBackdropWithoutRequest(UniqueGiftBackdropTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "name": self.name,
-            "colors": self.colors.to_dict(),
-            "rarity_per_mille": self.rarity_per_mille,
-        }
-        unique_gift_backdrop = UniqueGiftBackdrop.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        unique_gift_backdrop = UniqueGiftBackdrop.de_json(de_json_dict, offline_bot)
         assert unique_gift_backdrop.api_kwargs == {}
         assert unique_gift_backdrop.name == self.name
         assert unique_gift_backdrop.colors == self.colors
@@ -461,7 +487,20 @@ class UniqueGiftBackdropColorsTestBase:
     text_color = 0x20FE8F
 
 
-class TestUniqueGiftBackdropColorsWithoutRequest(UniqueGiftBackdropColorsTestBase):
+class TestUniqueGiftBackdropColorsWithoutRequest(
+    UniqueGiftBackdropColorsTestBase, DeserializationTestBase
+):
+    de_json_class = UniqueGiftBackdropColors
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "center_color": self.center_color,
+            "edge_color": self.edge_color,
+            "symbol_color": self.symbol_color,
+            "text_color": self.text_color,
+        }
+
     def test_slot_behaviour(self, unique_gift_backdrop_colors):
         for attr in unique_gift_backdrop_colors.__slots__:
             assert getattr(unique_gift_backdrop_colors, attr, "err") != "err", (
@@ -471,14 +510,8 @@ class TestUniqueGiftBackdropColorsWithoutRequest(UniqueGiftBackdropColorsTestBas
             set(mro_slots(unique_gift_backdrop_colors))
         ), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "center_color": self.center_color,
-            "edge_color": self.edge_color,
-            "symbol_color": self.symbol_color,
-            "text_color": self.text_color,
-        }
-        unique_gift_backdrop_colors = UniqueGiftBackdropColors.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        unique_gift_backdrop_colors = UniqueGiftBackdropColors.de_json(de_json_dict, offline_bot)
         assert unique_gift_backdrop_colors.api_kwargs == {}
         assert unique_gift_backdrop_colors.center_color == self.center_color
         assert unique_gift_backdrop_colors.edge_color == self.edge_color
@@ -561,16 +594,12 @@ class UniqueGiftInfoTestBase:
     next_transfer_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
 
 
-class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
-    def test_slot_behaviour(self, unique_gift_info):
-        for attr in unique_gift_info.__slots__:
-            assert getattr(unique_gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(unique_gift_info)) == len(set(mro_slots(unique_gift_info))), (
-            "duplicate slot"
-        )
+class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase, DeserializationTestBase):
+    de_json_class = UniqueGiftInfo
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "gift": self.gift.to_dict(),
             "origin": self.origin,
             "owned_gift_id": self.owned_gift_id,
@@ -579,7 +608,16 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
             "last_resale_amount": self.last_resale_amount,
             "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
-        unique_gift_info = UniqueGiftInfo.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, unique_gift_info):
+        for attr in unique_gift_info.__slots__:
+            assert getattr(unique_gift_info, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(unique_gift_info)) == len(set(mro_slots(unique_gift_info))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        unique_gift_info = UniqueGiftInfo.de_json(de_json_dict, offline_bot)
         assert unique_gift_info.api_kwargs == {}
         assert unique_gift_info.gift == self.gift
         assert unique_gift_info.origin == self.origin
@@ -588,31 +626,6 @@ class TestUniqueGiftInfoWithoutRequest(UniqueGiftInfoTestBase):
         assert unique_gift_info.last_resale_currency == self.last_resale_currency
         assert unique_gift_info.last_resale_amount == self.last_resale_amount
         assert unique_gift_info.next_transfer_date == self.next_transfer_date
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "gift": self.gift.to_dict(),
-            "origin": self.origin,
-            "owned_gift_id": self.owned_gift_id,
-            "transfer_star_count": self.transfer_star_count,
-            "last_resale_currency": self.last_resale_currency,
-            "last_resale_amount": self.last_resale_amount,
-            "next_transfer_date": to_timestamp(self.next_transfer_date),
-        }
-
-        unique_gift_info_raw = UniqueGiftInfo.de_json(json_dict, raw_bot)
-        unique_gift_info_offline = UniqueGiftInfo.de_json(json_dict, offline_bot)
-        unique_gift_info_tz = UniqueGiftInfo.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        unique_gift_info_tz_offset = unique_gift_info_tz.next_transfer_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            unique_gift_info_tz.next_transfer_date.replace(tzinfo=None)
-        )
-
-        assert unique_gift_info_raw.next_transfer_date.tzinfo == UTC
-        assert unique_gift_info_offline.next_transfer_date.tzinfo == UTC
-        assert unique_gift_info_tz_offset == tz_bot_offset
 
     def test_to_dict(self, unique_gift_info):
         json_dict = unique_gift_info.to_dict()

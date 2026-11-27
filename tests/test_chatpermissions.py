@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import ChatPermissions, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -51,36 +52,33 @@ class ChatPermissionsTestBase:
     can_send_other_messages = False
     can_add_web_page_previews = False
     can_change_info = False
-    can_invite_users = None
-    can_pin_messages = None
-    can_manage_topics = None
+    can_invite_users = True
+    can_pin_messages = False
+    can_manage_topics = True
     can_send_audios = True
     can_send_documents = False
-    can_send_photos = None
+    can_send_photos = False
     can_send_videos = True
     can_send_video_notes = False
-    can_send_voice_notes = None
-    can_edit_tag = None
+    can_send_voice_notes = True
+    can_edit_tag = False
     can_react_to_messages = True
 
 
-class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
-    def test_slot_behaviour(self, chat_permissions):
-        inst = chat_permissions
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase, DeserializationTestBase):
+    de_json_class = ChatPermissions
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "can_send_messages": self.can_send_messages,
-            "can_send_media_messages": "can_send_media_messages",
             "can_send_polls": self.can_send_polls,
             "can_send_other_messages": self.can_send_other_messages,
             "can_add_web_page_previews": self.can_add_web_page_previews,
             "can_change_info": self.can_change_info,
             "can_invite_users": self.can_invite_users,
             "can_pin_messages": self.can_pin_messages,
+            "can_manage_topics": self.can_manage_topics,
             "can_send_audios": self.can_send_audios,
             "can_send_documents": self.can_send_documents,
             "can_send_photos": self.can_send_photos,
@@ -90,8 +88,16 @@ class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
             "can_edit_tag": self.can_edit_tag,
             "can_react_to_messages": self.can_react_to_messages,
         }
-        permissions = ChatPermissions.de_json(json_dict, offline_bot)
-        assert permissions.api_kwargs == {"can_send_media_messages": "can_send_media_messages"}
+
+    def test_slot_behaviour(self, chat_permissions):
+        inst = chat_permissions
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        permissions = ChatPermissions.de_json(de_json_dict, offline_bot)
+        assert permissions.api_kwargs == {}
 
         assert permissions.can_send_messages == self.can_send_messages
         assert permissions.can_send_polls == self.can_send_polls
@@ -109,6 +115,12 @@ class TestChatPermissionsWithoutRequest(ChatPermissionsTestBase):
         assert permissions.can_send_voice_notes == self.can_send_voice_notes
         assert permissions.can_edit_tag == self.can_edit_tag
         assert permissions.can_react_to_messages == self.can_react_to_messages
+
+    def test_de_json_can_send_media_messages(self, offline_bot, de_json_dict):
+        # can_send_media_messages was removed from the Bot API, but Telegram may still send it
+        json_dict = de_json_dict | {"can_send_media_messages": True}
+        permissions = ChatPermissions.de_json(json_dict, offline_bot)
+        assert permissions.api_kwargs == {"can_send_media_messages": True}
 
     def test_to_dict(self, chat_permissions):
         permissions_dict = chat_permissions.to_dict()

@@ -29,6 +29,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import RevenueWithdrawalStateType
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -60,7 +61,16 @@ class RevenueWithdrawalStateTestBase:
     url = "url"
 
 
-class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
+class TestRevenueWithdrawalStateWithoutRequest(
+    RevenueWithdrawalStateTestBase, DeserializationTestBase
+):
+    de_json_class = RevenueWithdrawalState
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that RevenueWithdrawalState.de_json does not dispatch to a subclass
+        return {"type": "unknown"}
+
     def test_slot_behaviour(self, revenue_withdrawal_state):
         inst = revenue_withdrawal_state
         for attr in inst.__slots__:
@@ -71,9 +81,8 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         assert type(RevenueWithdrawalState("failed").type) is RevenueWithdrawalStateType
         assert RevenueWithdrawalState("unknown").type == "unknown"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"type": "unknown"}
-        rws = RevenueWithdrawalState.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        rws = RevenueWithdrawalState.de_json(de_json_dict, offline_bot)
         assert rws.api_kwargs == {}
         assert rws.type == "unknown"
 
@@ -113,16 +122,23 @@ class TestRevenueWithdrawalStateWithoutRequest(RevenueWithdrawalStateTestBase):
         assert hash(a) != hash(d)
 
 
-class TestRevenueWithdrawalStatePendingWithoutRequest(RevenueWithdrawalStateTestBase):
+class TestRevenueWithdrawalStatePendingWithoutRequest(
+    RevenueWithdrawalStateTestBase, DeserializationTestBase
+):
+    de_json_class = RevenueWithdrawalStatePending
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
     def test_slot_behaviour(self, revenue_withdrawal_state_pending):
         inst = revenue_withdrawal_state_pending
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {}
-        rws = RevenueWithdrawalStatePending.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        rws = RevenueWithdrawalStatePending.de_json(de_json_dict, offline_bot)
         assert rws.api_kwargs == {}
         assert rws.type == "pending"
 
@@ -146,8 +162,15 @@ class TestRevenueWithdrawalStatePendingWithoutRequest(RevenueWithdrawalStateTest
         assert hash(a) != hash(d)
 
 
-class TestRevenueWithdrawalStateSucceededWithoutRequest(RevenueWithdrawalStateTestBase):
+class TestRevenueWithdrawalStateSucceededWithoutRequest(
+    RevenueWithdrawalStateTestBase, DeserializationTestBase
+):
+    de_json_class = RevenueWithdrawalStateSucceeded
     state = RevenueWithdrawalStateType.SUCCEEDED
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"date": to_timestamp(self.date), "url": self.url}
 
     def test_slot_behaviour(self, revenue_withdrawal_state_succeeded):
         inst = revenue_withdrawal_state_succeeded
@@ -155,9 +178,8 @@ class TestRevenueWithdrawalStateSucceededWithoutRequest(RevenueWithdrawalStateTe
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"date": to_timestamp(self.date), "url": self.url}
-        rws = RevenueWithdrawalStateSucceeded.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        rws = RevenueWithdrawalStateSucceeded.de_json(de_json_dict, offline_bot)
         assert rws.api_kwargs == {}
         assert rws.type == "succeeded"
         assert rws.date == self.date
@@ -191,8 +213,15 @@ class TestRevenueWithdrawalStateSucceededWithoutRequest(RevenueWithdrawalStateTe
         assert hash(a) != hash(e)
 
 
-class TestRevenueWithdrawalStateFailedWithoutRequest(RevenueWithdrawalStateTestBase):
+class TestRevenueWithdrawalStateFailedWithoutRequest(
+    RevenueWithdrawalStateTestBase, DeserializationTestBase
+):
+    de_json_class = RevenueWithdrawalStateFailed
     state = RevenueWithdrawalStateType.FAILED
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
 
     def test_slot_behaviour(self, revenue_withdrawal_state_failed):
         inst = revenue_withdrawal_state_failed
@@ -200,9 +229,8 @@ class TestRevenueWithdrawalStateFailedWithoutRequest(RevenueWithdrawalStateTestB
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {}
-        rws = RevenueWithdrawalStateFailed.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        rws = RevenueWithdrawalStateFailed.de_json(de_json_dict, offline_bot)
         assert rws.api_kwargs == {}
         assert rws.type == "failed"
 

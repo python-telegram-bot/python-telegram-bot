@@ -23,6 +23,8 @@ import pytest
 from telegram import (
     Bot,
     Credentials,
+    EncryptedCredentials,
+    EncryptedPassportElement,
     File,
     PassportData,
     PassportElementErrorDataField,
@@ -30,11 +32,8 @@ from telegram import (
     PassportFile,
 )
 from telegram.error import PassportDecryptionError
-
-# Note: All classes in telegram.credentials (except EncryptedCredentials) aren't directly tested
-# here, although they are implicitly tested. Testing for those classes was too much work and not
-# worth it.
 from telegram.request import RequestData
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.pytest_classes import make_bot
 from tests.auxil.slots import mro_slots
 
@@ -243,7 +242,13 @@ class PassportTestBase:
     driver_license_selfie_credentials_secret = "tivdId6RNYNsvXYPppdzrbxOBuBOr9wXRPDcCvnXU7E="
 
 
-class TestPassportWithoutRequest(PassportTestBase):
+class TestPassportWithoutRequest(PassportTestBase, DeserializationTestBase):
+    de_json_class = PassportData
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return deepcopy(RAW_PASSPORT_DATA)
+
     def test_slot_behaviour(self, passport_data):
         inst = passport_data
         for attr in inst.__slots__:
@@ -389,6 +394,29 @@ class TestPassportWithoutRequest(PassportTestBase):
 
         assert email.type == "email"
         assert email.email == "fb3e3i47zt@dispostable.com"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        passport_data = PassportData.de_json(de_json_dict, offline_bot)
+        assert passport_data.api_kwargs == {}
+
+        for element, raw_element in zip(
+            passport_data.data, RAW_PASSPORT_DATA["data"], strict=True
+        ):
+            assert isinstance(element, EncryptedPassportElement)
+            assert element.type == raw_element["type"]
+            assert element.hash == raw_element["hash"]
+        assert isinstance(passport_data.credentials, EncryptedCredentials)
+        assert passport_data.credentials.data == RAW_PASSPORT_DATA["credentials"]["data"]
+        assert passport_data.credentials.hash == RAW_PASSPORT_DATA["credentials"]["hash"]
+        assert passport_data.credentials.secret == RAW_PASSPORT_DATA["credentials"]["secret"]
+
+    @pytest.mark.xfail(
+        strict=True,
+        reason="`_id_attrs` uses `credentials.hash`, so a missing `credentials` raises an "
+        "AttributeError",
+    )
+    def test_de_json_missing_required_args(self, offline_bot, de_json_dict):
+        super().test_de_json_missing_required_args(offline_bot, de_json_dict)
 
     def test_de_json_and_to_dict(self, offline_bot):
         passport_data = PassportData.de_json(RAW_PASSPORT_DATA, offline_bot)

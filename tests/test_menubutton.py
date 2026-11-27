@@ -27,6 +27,7 @@ from telegram import (
     WebAppInfo,
 )
 from telegram.constants import MenuButtonType
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -41,7 +42,14 @@ class MenuButtonTestBase:
     web_app = WebAppInfo(url="https://python-telegram-bot.org")
 
 
-class TestMenuButtonWithoutRequest(MenuButtonTestBase):
+class TestMenuButtonWithoutRequest(MenuButtonTestBase, DeserializationTestBase):
+    de_json_class = MenuButton
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that MenuButton.de_json does not dispatch to a subclass
+        return {"type": "unknown"}
+
     def test_slot_behaviour(self, menu_button):
         inst = menu_button
         for attr in inst.__slots__:
@@ -52,11 +60,11 @@ class TestMenuButtonWithoutRequest(MenuButtonTestBase):
         assert type(MenuButton("default").type) is MenuButtonType
         assert MenuButton("unknown").type == "unknown"
 
-    def test_de_json(self, offline_bot):
-        data = {"type": "unknown"}
-        transaction_partner = MenuButton.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "unknown"
+    def test_de_json(self, offline_bot, de_json_dict):
+        menu_button = MenuButton.de_json(de_json_dict, offline_bot)
+        assert type(menu_button) is MenuButton
+        assert menu_button.api_kwargs == {}
+        assert menu_button.type == "unknown"
 
     @pytest.mark.parametrize(
         ("mb_type", "subclass"),
@@ -104,7 +112,8 @@ def menu_button_commands():
     return MenuButtonCommands()
 
 
-class TestMenuButtonCommandsWithoutRequest(MenuButtonTestBase):
+class TestMenuButtonCommandsWithoutRequest(MenuButtonTestBase, DeserializationTestBase):
+    de_json_class = MenuButtonCommands
     type = MenuButtonType.COMMANDS
 
     def test_slot_behaviour(self, menu_button_commands):
@@ -113,10 +122,15 @@ class TestMenuButtonCommandsWithoutRequest(MenuButtonTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        transaction_partner = MenuButtonCommands.de_json({}, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "commands"
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        menu_button = MenuButtonCommands.de_json(de_json_dict, offline_bot)
+        assert type(menu_button) is MenuButtonCommands
+        assert menu_button.api_kwargs == {}
+        assert menu_button.type == "commands"
 
     def test_to_dict(self, menu_button_commands):
         assert menu_button_commands.to_dict() == {"type": menu_button_commands.type}
@@ -142,7 +156,8 @@ def menu_button_default():
     return MenuButtonDefault()
 
 
-class TestMenuButtonDefaultWithoutRequest(MenuButtonTestBase):
+class TestMenuButtonDefaultWithoutRequest(MenuButtonTestBase, DeserializationTestBase):
+    de_json_class = MenuButtonDefault
     type = MenuButtonType.DEFAULT
 
     def test_slot_behaviour(self, menu_button_default):
@@ -151,10 +166,15 @@ class TestMenuButtonDefaultWithoutRequest(MenuButtonTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        transaction_partner = MenuButtonDefault.de_json({}, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "default"
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        menu_button = MenuButtonDefault.de_json(de_json_dict, offline_bot)
+        assert type(menu_button) is MenuButtonDefault
+        assert menu_button.api_kwargs == {}
+        assert menu_button.type == "default"
 
     def test_to_dict(self, menu_button_default):
         assert menu_button_default.to_dict() == {"type": menu_button_default.type}
@@ -183,7 +203,8 @@ def menu_button_web_app():
     )
 
 
-class TestMenuButtonWebAppWithoutRequest(MenuButtonTestBase):
+class TestMenuButtonWebAppWithoutRequest(MenuButtonTestBase, DeserializationTestBase):
+    de_json_class = MenuButtonWebApp
     type = MenuButtonType.WEB_APP
 
     def test_slot_behaviour(self, menu_button_web_app):
@@ -192,13 +213,17 @@ class TestMenuButtonWebAppWithoutRequest(MenuButtonTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"web_app": self.web_app.to_dict(), "text": self.text}
-        transaction_partner = MenuButtonWebApp.de_json(json_dict, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "web_app"
-        assert transaction_partner.web_app == self.web_app
-        assert transaction_partner.text == self.text
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"text": self.text, "web_app": self.web_app.to_dict()}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        menu_button = MenuButtonWebApp.de_json(de_json_dict, offline_bot)
+        assert type(menu_button) is MenuButtonWebApp
+        assert menu_button.api_kwargs == {}
+        assert menu_button.type == "web_app"
+        assert menu_button.web_app == self.web_app
+        assert menu_button.text == self.text
 
     def test_to_dict(self, menu_button_web_app):
         assert menu_button_web_app.to_dict() == {

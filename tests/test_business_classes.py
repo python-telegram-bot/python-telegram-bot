@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram._business import BusinessBotRights
 from telegram._utils.datetime import UTC, to_timestamp
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -60,7 +61,7 @@ class BusinessTestBase:
     is_enabled = True
     message_ids = (123, 321)
     business_connection_id = "123"
-    chat = Chat(123, "test_chat")
+    chat = Chat(123, Chat.PRIVATE)
     title = "Business Title"
     message = "Business description"
     sticker = Sticker("sticker_id", "unique_id", 50, 50, True, False, Sticker.REGULAR)
@@ -148,7 +149,28 @@ def business_opening_hours():
     )
 
 
-class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
+class TestBusinessBotRightsWithoutRequest(BusinessTestBase, DeserializationTestBase):
+    de_json_class = BusinessBotRights
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "can_reply": self.can_reply,
+            "can_read_messages": self.can_read_messages,
+            "can_delete_sent_messages": self.can_delete_sent_messages,
+            "can_delete_all_messages": self.can_delete_all_messages,
+            "can_edit_name": self.can_edit_name,
+            "can_edit_bio": self.can_edit_bio,
+            "can_edit_profile_photo": self.can_edit_profile_photo,
+            "can_edit_username": self.can_edit_username,
+            "can_change_gift_settings": self.can_change_gift_settings,
+            "can_view_gifts_and_stars": self.can_view_gifts_and_stars,
+            "can_convert_gifts_to_stars": self.can_convert_gifts_to_stars,
+            "can_transfer_and_upgrade_gifts": self.can_transfer_and_upgrade_gifts,
+            "can_transfer_stars": self.can_transfer_stars,
+            "can_manage_stories": self.can_manage_stories,
+        }
+
     def test_slot_behaviour(self, business_bot_rights):
         inst = business_bot_rights
         for attr in inst.__slots__:
@@ -174,25 +196,8 @@ class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
         assert rights_dict["can_transfer_stars"] is self.can_transfer_stars
         assert rights_dict["can_manage_stories"] is self.can_manage_stories
 
-    def test_de_json(self):
-        json_dict = {
-            "can_reply": self.can_reply,
-            "can_read_messages": self.can_read_messages,
-            "can_delete_sent_messages": self.can_delete_sent_messages,
-            "can_delete_all_messages": self.can_delete_all_messages,
-            "can_edit_name": self.can_edit_name,
-            "can_edit_bio": self.can_edit_bio,
-            "can_edit_profile_photo": self.can_edit_profile_photo,
-            "can_edit_username": self.can_edit_username,
-            "can_change_gift_settings": self.can_change_gift_settings,
-            "can_view_gifts_and_stars": self.can_view_gifts_and_stars,
-            "can_convert_gifts_to_stars": self.can_convert_gifts_to_stars,
-            "can_transfer_and_upgrade_gifts": self.can_transfer_and_upgrade_gifts,
-            "can_transfer_stars": self.can_transfer_stars,
-            "can_manage_stories": self.can_manage_stories,
-        }
-
-        rights = BusinessBotRights.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        rights = BusinessBotRights.de_json(de_json_dict, offline_bot)
         assert rights.can_reply is self.can_reply
         assert rights.can_read_messages is self.can_read_messages
         assert rights.can_delete_sent_messages is self.can_delete_sent_messages
@@ -232,15 +237,12 @@ class TestBusinessBotRightsWithoutRequest(BusinessTestBase):
         assert hash(rights1) != hash(rights3)
 
 
-class TestBusinessConnectionWithoutRequest(BusinessTestBase):
-    def test_slots(self, business_connection):
-        bc = business_connection
-        for attr in bc.__slots__:
-            assert getattr(bc, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(bc)) == len(set(mro_slots(bc))), "duplicate slot"
+class TestBusinessConnectionWithoutRequest(BusinessTestBase, DeserializationTestBase):
+    de_json_class = BusinessConnection
 
-    def test_de_json(self, business_bot_rights):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self, business_bot_rights):
+        return {
             "id": self.id_,
             "user": self.user.to_dict(),
             "user_chat_id": self.user_chat_id,
@@ -248,7 +250,15 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
             "is_enabled": self.is_enabled,
             "rights": business_bot_rights.to_dict(),
         }
-        bc = BusinessConnection.de_json(json_dict, None)
+
+    def test_slots(self, business_connection):
+        bc = business_connection
+        for attr in bc.__slots__:
+            assert getattr(bc, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(bc)) == len(set(mro_slots(bc))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, business_bot_rights, de_json_dict):
+        bc = BusinessConnection.de_json(de_json_dict, offline_bot)
         assert bc.id == self.id_
         assert bc.user == self.user
         assert bc.user_chat_id == self.user_chat_id
@@ -257,27 +267,6 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
         assert bc.rights == business_bot_rights
         assert bc.api_kwargs == {}
         assert isinstance(bc, BusinessConnection)
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot, business_bot_rights):
-        json_dict = {
-            "id": self.id_,
-            "user": self.user.to_dict(),
-            "user_chat_id": self.user_chat_id,
-            "date": to_timestamp(self.date),
-            "is_enabled": self.is_enabled,
-            "rights": business_bot_rights.to_dict(),
-        }
-        chat_bot = BusinessConnection.de_json(json_dict, offline_bot)
-        chat_bot_raw = BusinessConnection.de_json(json_dict, raw_bot)
-        chat_bot_tz = BusinessConnection.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        date_offset = chat_bot_tz.date.utcoffset()
-        date_offset_tz = tz_bot.defaults.tzinfo.utcoffset(chat_bot_tz.date.replace(tzinfo=None))
-
-        assert chat_bot.date.tzinfo == UTC
-        assert chat_bot_raw.date.tzinfo == UTC
-        assert date_offset_tz == date_offset
 
     def test_to_dict(self, business_connection, business_bot_rights):
         bc_dict = business_connection.to_dict()
@@ -333,7 +322,17 @@ class TestBusinessConnectionWithoutRequest(BusinessTestBase):
         assert hash(bc1) != hash(bc4)
 
 
-class TestBusinessMessagesDeleted(BusinessTestBase):
+class TestBusinessMessagesDeletedWithoutRequest(BusinessTestBase, DeserializationTestBase):
+    de_json_class = BusinessMessagesDeleted
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "business_connection_id": self.business_connection_id,
+            "chat": self.chat.to_dict(),
+            "message_ids": list(self.message_ids),
+        }
+
     def test_slots(self, business_messages_deleted):
         bmd = business_messages_deleted
         for attr in bmd.__slots__:
@@ -347,13 +346,8 @@ class TestBusinessMessagesDeleted(BusinessTestBase):
         assert bmd_dict["business_connection_id"] == self.business_connection_id
         assert bmd_dict["chat"] == self.chat.to_dict()
 
-    def test_de_json(self):
-        json_dict = {
-            "business_connection_id": self.business_connection_id,
-            "chat": self.chat.to_dict(),
-            "message_ids": self.message_ids,
-        }
-        bmd = BusinessMessagesDeleted.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        bmd = BusinessMessagesDeleted.de_json(de_json_dict, offline_bot)
         assert bmd.business_connection_id == self.business_connection_id
         assert bmd.chat == self.chat
         assert bmd.message_ids == self.message_ids
@@ -372,7 +366,17 @@ class TestBusinessMessagesDeleted(BusinessTestBase):
         assert hash(bmd1) != hash(bmd3)
 
 
-class TestBusinessIntroWithoutRequest(BusinessTestBase):
+class TestBusinessIntroWithoutRequest(BusinessTestBase, DeserializationTestBase):
+    de_json_class = BusinessIntro
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "title": self.title,
+            "message": self.message,
+            "sticker": self.sticker.to_dict(),
+        }
+
     def test_slot_behaviour(self, business_intro):
         intro = business_intro
         for attr in intro.__slots__:
@@ -386,13 +390,8 @@ class TestBusinessIntroWithoutRequest(BusinessTestBase):
         assert intro_dict["message"] == self.message
         assert intro_dict["sticker"] == self.sticker.to_dict()
 
-    def test_de_json(self):
-        json_dict = {
-            "title": self.title,
-            "message": self.message,
-            "sticker": self.sticker.to_dict(),
-        }
-        intro = BusinessIntro.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        intro = BusinessIntro.de_json(de_json_dict, offline_bot)
         assert intro.title == self.title
         assert intro.message == self.message
         assert intro.sticker == self.sticker
@@ -412,7 +411,16 @@ class TestBusinessIntroWithoutRequest(BusinessTestBase):
         assert hash(intro1) != hash(intro3)
 
 
-class TestBusinessLocationWithoutRequest(BusinessTestBase):
+class TestBusinessLocationWithoutRequest(BusinessTestBase, DeserializationTestBase):
+    de_json_class = BusinessLocation
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "address": self.address,
+            "location": self.location.to_dict(),
+        }
+
     def test_slot_behaviour(self, business_location):
         inst = business_location
         for attr in inst.__slots__:
@@ -425,12 +433,8 @@ class TestBusinessLocationWithoutRequest(BusinessTestBase):
         assert blc_dict["address"] == self.address
         assert blc_dict["location"] == self.location.to_dict()
 
-    def test_de_json(self):
-        json_dict = {
-            "address": self.address,
-            "location": self.location.to_dict(),
-        }
-        blc = BusinessLocation.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        blc = BusinessLocation.de_json(de_json_dict, offline_bot)
         assert blc.address == self.address
         assert blc.location == self.location
         assert blc.api_kwargs == {}
@@ -449,7 +453,16 @@ class TestBusinessLocationWithoutRequest(BusinessTestBase):
         assert hash(blc1) != hash(blc3)
 
 
-class TestBusinessOpeningHoursIntervalWithoutRequest(BusinessTestBase):
+class TestBusinessOpeningHoursIntervalWithoutRequest(BusinessTestBase, DeserializationTestBase):
+    de_json_class = BusinessOpeningHoursInterval
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "opening_minute": self.opening_minute,
+            "closing_minute": self.closing_minute,
+        }
+
     def test_slot_behaviour(self, business_opening_hours_interval):
         inst = business_opening_hours_interval
         for attr in inst.__slots__:
@@ -462,12 +475,8 @@ class TestBusinessOpeningHoursIntervalWithoutRequest(BusinessTestBase):
         assert bohi_dict["opening_minute"] == self.opening_minute
         assert bohi_dict["closing_minute"] == self.closing_minute
 
-    def test_de_json(self):
-        json_dict = {
-            "opening_minute": self.opening_minute,
-            "closing_minute": self.closing_minute,
-        }
-        bohi = BusinessOpeningHoursInterval.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        bohi = BusinessOpeningHoursInterval.de_json(de_json_dict, offline_bot)
         assert bohi.opening_minute == self.opening_minute
         assert bohi.closing_minute == self.closing_minute
         assert bohi.api_kwargs == {}
@@ -520,7 +529,16 @@ class TestBusinessOpeningHoursIntervalWithoutRequest(BusinessTestBase):
         assert cached is closing_time
 
 
-class TestBusinessOpeningHoursWithoutRequest(BusinessTestBase):
+class TestBusinessOpeningHoursWithoutRequest(BusinessTestBase, DeserializationTestBase):
+    de_json_class = BusinessOpeningHours
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "time_zone_name": self.time_zone_name,
+            "opening_hours": [opening.to_dict() for opening in self.opening_hours],
+        }
+
     def test_slot_behaviour(self, business_opening_hours):
         inst = business_opening_hours
         for attr in inst.__slots__:
@@ -533,12 +551,8 @@ class TestBusinessOpeningHoursWithoutRequest(BusinessTestBase):
         assert boh_dict["time_zone_name"] == self.time_zone_name
         assert boh_dict["opening_hours"] == [opening.to_dict() for opening in self.opening_hours]
 
-    def test_de_json(self):
-        json_dict = {
-            "time_zone_name": self.time_zone_name,
-            "opening_hours": [opening.to_dict() for opening in self.opening_hours],
-        }
-        boh = BusinessOpeningHours.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        boh = BusinessOpeningHours.de_json(de_json_dict, offline_bot)
         assert boh.time_zone_name == self.time_zone_name
         assert boh.opening_hours == tuple(self.opening_hours)
         assert boh.api_kwargs == {}

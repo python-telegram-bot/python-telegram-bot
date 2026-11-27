@@ -22,6 +22,7 @@ import pytest
 
 from telegram import BotAccessSettings, Dice
 from telegram._user import User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -38,19 +39,24 @@ class BotAccessSettingsTestBase:
     added_users = [User(id=123, first_name="John", is_bot=False)]
 
 
-class TestBotAccessSettingsWithoutRequest(BotAccessSettingsTestBase):
+class TestBotAccessSettingsWithoutRequest(BotAccessSettingsTestBase, DeserializationTestBase):
+    de_json_class = BotAccessSettings
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "is_access_restricted": self.is_access_restricted,
+            "added_users": [user.to_dict() for user in self.added_users],
+        }
+
     def test_slot_behaviour(self, bot_access_settings):
         inst = bot_access_settings
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "is_access_restricted": self.is_access_restricted,
-            "added_users": [user.to_dict() for user in self.added_users],
-        }
-        bot_access_settings = BotAccessSettings.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        bot_access_settings = BotAccessSettings.de_json(de_json_dict, offline_bot)
         assert bot_access_settings.api_kwargs == {}
 
         assert bot_access_settings.is_access_restricted == self.is_access_restricted

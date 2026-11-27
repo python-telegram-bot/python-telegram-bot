@@ -33,6 +33,7 @@ from telegram import (
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ZERO_DATE
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -60,7 +61,20 @@ def checklist_task():
     )
 
 
-class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
+class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase, DeserializationTestBase):
+    de_json_class = ChecklistTask
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "id": self.id,
+            "text": self.text,
+            "text_entities": [entity.to_dict() for entity in self.text_entities],
+            "completed_by_user": self.completed_by_user.to_dict(),
+            "completed_by_chat": self.completed_by_chat.to_dict(),
+            "completion_date": to_timestamp(self.completion_date),
+        }
+
     def test_slot_behaviour(self, checklist_task):
         for attr in checklist_task.__slots__:
             assert getattr(checklist_task, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -78,16 +92,8 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
         assert clt_dict["completed_by_chat"] == self.completed_by_chat.to_dict()
         assert clt_dict["completion_date"] == to_timestamp(self.completion_date)
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "id": self.id,
-            "text": self.text,
-            "text_entities": [entity.to_dict() for entity in self.text_entities],
-            "completed_by_user": self.completed_by_user.to_dict(),
-            "completed_by_chat": self.completed_by_chat.to_dict(),
-            "completion_date": to_timestamp(self.completion_date),
-        }
-        clt = ChecklistTask.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        clt = ChecklistTask.de_json(de_json_dict, offline_bot)
         assert isinstance(clt, ChecklistTask)
         assert clt.id == self.id
         assert clt.text == self.text
@@ -96,40 +102,6 @@ class TestChecklistTaskWithoutRequest(ChecklistTaskTestBase):
         assert clt.completed_by_chat == self.completed_by_chat
         assert clt.completion_date == self.completion_date
         assert clt.api_kwargs == {}
-
-    def test_de_json_required_fields(self, offline_bot):
-        json_dict = {
-            "id": self.id,
-            "text": self.text,
-        }
-        clt = ChecklistTask.de_json(json_dict, offline_bot)
-        assert isinstance(clt, ChecklistTask)
-        assert clt.id == self.id
-        assert clt.text == self.text
-        assert clt.text_entities == ()
-        assert clt.completed_by_user is None
-        assert clt.completion_date is None
-        assert clt.api_kwargs == {}
-
-    def test_de_json_localization(self, offline_bot, raw_bot, tz_bot):
-        json_dict = {
-            "id": self.id,
-            "text": self.text,
-            "completion_date": to_timestamp(self.completion_date),
-        }
-        clt_bot = ChecklistTask.de_json(json_dict, offline_bot)
-        clt_bot_raw = ChecklistTask.de_json(json_dict, raw_bot)
-        clt_bot_tz = ChecklistTask.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing tzinfo objects is not reliable
-        completion_date_offset = clt_bot_tz.completion_date.utcoffset()
-        completion_date_offset_tz = tz_bot.defaults.tzinfo.utcoffset(
-            clt_bot_tz.completion_date.replace(tzinfo=None)
-        )
-
-        assert clt_bot.completion_date.tzinfo == UTC
-        assert clt_bot_raw.completion_date.tzinfo == UTC
-        assert completion_date_offset_tz == completion_date_offset
 
     @pytest.mark.parametrize(
         ("completion_date", "expected"),
@@ -200,7 +172,7 @@ class ChecklistTestBase:
         ),
     ]
     others_can_add_tasks = True
-    others_can_mark_tasks_as_done = False
+    others_can_mark_tasks_as_done = True
 
 
 @pytest.fixture(scope="module")
@@ -214,7 +186,19 @@ def checklist():
     )
 
 
-class TestChecklistWithoutRequest(ChecklistTestBase):
+class TestChecklistWithoutRequest(ChecklistTestBase, DeserializationTestBase):
+    de_json_class = Checklist
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "title": self.title,
+            "title_entities": [entity.to_dict() for entity in self.title_entities],
+            "tasks": [task.to_dict() for task in self.tasks],
+            "others_can_add_tasks": self.others_can_add_tasks,
+            "others_can_mark_tasks_as_done": self.others_can_mark_tasks_as_done,
+        }
+
     def test_slot_behaviour(self, checklist):
         for attr in checklist.__slots__:
             assert getattr(checklist, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -229,15 +213,8 @@ class TestChecklistWithoutRequest(ChecklistTestBase):
         assert cl_dict["others_can_add_tasks"] is self.others_can_add_tasks
         assert cl_dict["others_can_mark_tasks_as_done"] is self.others_can_mark_tasks_as_done
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "title": self.title,
-            "title_entities": [entity.to_dict() for entity in self.title_entities],
-            "tasks": [task.to_dict() for task in self.tasks],
-            "others_can_add_tasks": self.others_can_add_tasks,
-            "others_can_mark_tasks_as_done": self.others_can_mark_tasks_as_done,
-        }
-        cl = Checklist.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        cl = Checklist.de_json(de_json_dict, offline_bot)
         assert isinstance(cl, Checklist)
         assert cl.title == self.title
         assert cl.title_entities == tuple(self.title_entities)
@@ -245,19 +222,6 @@ class TestChecklistWithoutRequest(ChecklistTestBase):
         assert cl.others_can_add_tasks is self.others_can_add_tasks
         assert cl.others_can_mark_tasks_as_done is self.others_can_mark_tasks_as_done
         assert cl.api_kwargs == {}
-
-    def test_de_json_required_fields(self, offline_bot):
-        json_dict = {
-            "title": self.title,
-            "tasks": [task.to_dict() for task in self.tasks],
-        }
-        cl = Checklist.de_json(json_dict, offline_bot)
-        assert isinstance(cl, Checklist)
-        assert cl.title == self.title
-        assert cl.title_entities == ()
-        assert cl.tasks == tuple(self.tasks)
-        assert not cl.others_can_add_tasks
-        assert not cl.others_can_mark_tasks_as_done
 
     def test_parse_entity(self, checklist):
         assert checklist.parse_entity(checklist.title_entities[0]) == "Checklist"
@@ -309,7 +273,17 @@ def checklist_tasks_done():
     )
 
 
-class TestChecklistTasksDoneWithoutRequest(ChecklistTasksDoneTestBase):
+class TestChecklistTasksDoneWithoutRequest(ChecklistTasksDoneTestBase, DeserializationTestBase):
+    de_json_class = ChecklistTasksDone
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "checklist_message": self.checklist_message.to_dict(),
+            "marked_as_done_task_ids": self.marked_as_done_task_ids,
+            "marked_as_not_done_task_ids": self.marked_as_not_done_task_ids,
+        }
+
     def test_slot_behaviour(self, checklist_tasks_done):
         for attr in checklist_tasks_done.__slots__:
             assert getattr(checklist_tasks_done, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -324,25 +298,12 @@ class TestChecklistTasksDoneWithoutRequest(ChecklistTasksDoneTestBase):
         assert cltd_dict["marked_as_done_task_ids"] == self.marked_as_done_task_ids
         assert cltd_dict["marked_as_not_done_task_ids"] == self.marked_as_not_done_task_ids
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "checklist_message": self.checklist_message.to_dict(),
-            "marked_as_done_task_ids": self.marked_as_done_task_ids,
-            "marked_as_not_done_task_ids": self.marked_as_not_done_task_ids,
-        }
-        cltd = ChecklistTasksDone.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        cltd = ChecklistTasksDone.de_json(de_json_dict, offline_bot)
         assert isinstance(cltd, ChecklistTasksDone)
         assert cltd.checklist_message == self.checklist_message
         assert cltd.marked_as_done_task_ids == tuple(self.marked_as_done_task_ids)
         assert cltd.marked_as_not_done_task_ids == tuple(self.marked_as_not_done_task_ids)
-        assert cltd.api_kwargs == {}
-
-    def test_de_json_required_fields(self, offline_bot):
-        cltd = ChecklistTasksDone.de_json({}, offline_bot)
-        assert isinstance(cltd, ChecklistTasksDone)
-        assert cltd.checklist_message is None
-        assert cltd.marked_as_done_task_ids == ()
-        assert cltd.marked_as_not_done_task_ids == ()
         assert cltd.api_kwargs == {}
 
     def test_equality(self, checklist_tasks_done):
@@ -385,7 +346,16 @@ def checklist_tasks_added():
     )
 
 
-class TestChecklistTasksAddedWithoutRequest(ChecklistTasksAddedTestBase):
+class TestChecklistTasksAddedWithoutRequest(ChecklistTasksAddedTestBase, DeserializationTestBase):
+    de_json_class = ChecklistTasksAdded
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "checklist_message": self.checklist_message.to_dict(),
+            "tasks": [task.to_dict() for task in self.tasks],
+        }
+
     def test_slot_behaviour(self, checklist_tasks_added):
         for attr in checklist_tasks_added.__slots__:
             assert getattr(checklist_tasks_added, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -399,23 +369,10 @@ class TestChecklistTasksAddedWithoutRequest(ChecklistTasksAddedTestBase):
         assert clta_dict["checklist_message"] == self.checklist_message.to_dict()
         assert clta_dict["tasks"] == [task.to_dict() for task in self.tasks]
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "checklist_message": self.checklist_message.to_dict(),
-            "tasks": [task.to_dict() for task in self.tasks],
-        }
-        clta = ChecklistTasksAdded.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        clta = ChecklistTasksAdded.de_json(de_json_dict, offline_bot)
         assert isinstance(clta, ChecklistTasksAdded)
         assert clta.checklist_message == self.checklist_message
-        assert clta.tasks == tuple(self.tasks)
-        assert clta.api_kwargs == {}
-
-    def test_de_json_required_fields(self, offline_bot):
-        clta = ChecklistTasksAdded.de_json(
-            {"tasks": [task.to_dict() for task in self.tasks]}, offline_bot
-        )
-        assert isinstance(clta, ChecklistTasksAdded)
-        assert clta.checklist_message is None
         assert clta.tasks == tuple(self.tasks)
         assert clta.api_kwargs == {}
 

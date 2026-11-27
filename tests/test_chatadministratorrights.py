@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import ChatAdministratorRights
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -26,53 +27,58 @@ from tests.auxil.slots import mro_slots
 def chat_admin_rights():
     return ChatAdministratorRights(
         can_change_info=True,
-        can_delete_messages=True,
+        can_delete_messages=False,
         can_invite_users=True,
-        can_pin_messages=True,
+        can_pin_messages=False,
         can_promote_members=True,
-        can_restrict_members=True,
+        can_restrict_members=False,
         can_post_messages=True,
-        can_edit_messages=True,
+        can_edit_messages=False,
         can_manage_chat=True,
-        can_manage_video_chats=True,
+        can_manage_video_chats=False,
         can_manage_topics=True,
-        is_anonymous=True,
+        is_anonymous=False,
         can_post_stories=True,
-        can_edit_stories=True,
+        can_edit_stories=False,
         can_delete_stories=True,
-        can_manage_direct_messages=True,
+        can_manage_direct_messages=False,
         can_manage_tags=True,
     )
 
 
-class TestChatAdministratorRightsWithoutRequest:
+class TestChatAdministratorRightsWithoutRequest(DeserializationTestBase):
+    de_json_class = ChatAdministratorRights
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "can_change_info": True,
+            "can_delete_messages": False,
+            "can_invite_users": True,
+            "can_pin_messages": False,
+            "can_promote_members": True,
+            "can_restrict_members": False,
+            "can_post_messages": True,
+            "can_edit_messages": False,
+            "can_manage_chat": True,
+            "can_manage_video_chats": False,
+            "can_manage_topics": True,
+            "is_anonymous": False,
+            "can_post_stories": True,
+            "can_edit_stories": False,
+            "can_delete_stories": True,
+            "can_manage_direct_messages": False,
+            "can_manage_tags": True,
+        }
+
     def test_slot_behaviour(self, chat_admin_rights):
         inst = chat_admin_rights
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, chat_admin_rights):
-        json_dict = {
-            "can_change_info": True,
-            "can_delete_messages": True,
-            "can_invite_users": True,
-            "can_pin_messages": True,
-            "can_promote_members": True,
-            "can_restrict_members": True,
-            "can_post_messages": True,
-            "can_edit_messages": True,
-            "can_manage_chat": True,
-            "can_manage_video_chats": True,
-            "can_manage_topics": True,
-            "is_anonymous": True,
-            "can_post_stories": True,
-            "can_edit_stories": True,
-            "can_delete_stories": True,
-            "can_manage_direct_messages": True,
-            "can_manage_tags": True,
-        }
-        chat_administrator_rights_de = ChatAdministratorRights.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, chat_admin_rights, de_json_dict):
+        chat_administrator_rights_de = ChatAdministratorRights.de_json(de_json_dict, offline_bot)
         assert chat_administrator_rights_de.api_kwargs == {}
 
         assert chat_admin_rights == chat_administrator_rights_de

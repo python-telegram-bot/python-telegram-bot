@@ -27,6 +27,7 @@ from telegram import (
     SwitchInlineQueryChosenChat,
     WebAppInfo,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -69,7 +70,29 @@ class InlineKeyboardButtonTestBase:
     icon_custom_emoji_id = "5237829955978547322"
 
 
-class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
+class TestInlineKeyboardButtonWithoutRequest(
+    InlineKeyboardButtonTestBase, DeserializationTestBase
+):
+    de_json_class = InlineKeyboardButton
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "text": self.text,
+            "url": self.url,
+            "callback_data": self.callback_data,
+            "switch_inline_query": self.switch_inline_query,
+            "switch_inline_query_current_chat": self.switch_inline_query_current_chat,
+            "callback_game": self.callback_game.to_dict(),
+            "web_app": self.web_app.to_dict(),
+            "login_url": self.login_url.to_dict(),
+            "pay": self.pay,
+            "switch_inline_query_chosen_chat": self.switch_inline_query_chosen_chat.to_dict(),
+            "copy_text": self.copy_text.to_dict(),
+            "style": self.style,
+            "icon_custom_emoji_id": self.icon_custom_emoji_id,
+        }
+
     def test_slot_behaviour(self, inline_keyboard_button):
         inst = inline_keyboard_button
         for attr in inst.__slots__:
@@ -134,24 +157,8 @@ class TestInlineKeyboardButtonWithoutRequest(InlineKeyboardButtonTestBase):
             == inline_keyboard_button.icon_custom_emoji_id
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "text": self.text,
-            "url": self.url,
-            "callback_data": self.callback_data,
-            "switch_inline_query": self.switch_inline_query,
-            "switch_inline_query_current_chat": self.switch_inline_query_current_chat,
-            "callback_game": self.callback_game.to_dict(),
-            "web_app": self.web_app.to_dict(),
-            "login_url": self.login_url.to_dict(),
-            "pay": self.pay,
-            "switch_inline_query_chosen_chat": self.switch_inline_query_chosen_chat.to_dict(),
-            "copy_text": self.copy_text.to_dict(),
-            "style": self.style,
-            "icon_custom_emoji_id": self.icon_custom_emoji_id,
-        }
-
-        inline_keyboard_button = InlineKeyboardButton.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        inline_keyboard_button = InlineKeyboardButton.de_json(de_json_dict, offline_bot)
         assert inline_keyboard_button.api_kwargs == {}
         assert inline_keyboard_button.text == self.text
         assert inline_keyboard_button.url == self.url

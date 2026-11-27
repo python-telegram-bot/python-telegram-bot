@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import PreparedKeyboardButton
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -31,18 +32,23 @@ class PreparedKeyboardButtonTestBase:
     id = "4"
 
 
-class TestPreparedKeyboardButtonWithoutRequest(PreparedKeyboardButtonTestBase):
+class TestPreparedKeyboardButtonWithoutRequest(
+    PreparedKeyboardButtonTestBase, DeserializationTestBase
+):
+    de_json_class = PreparedKeyboardButton
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"id": self.id}
+
     def test_slot_behaviour(self, prepared_keyboard_button):
         inst = prepared_keyboard_button
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "id": self.id,
-        }
-        prepared_keyboard_button = PreparedKeyboardButton.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        prepared_keyboard_button = PreparedKeyboardButton.de_json(de_json_dict, offline_bot)
         assert prepared_keyboard_button.api_kwargs == {}
         assert prepared_keyboard_button.id == self.id
 

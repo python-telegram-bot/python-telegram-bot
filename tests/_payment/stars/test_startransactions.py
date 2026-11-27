@@ -28,6 +28,7 @@ from telegram import (
     User,
 )
 from telegram._utils.datetime import UTC, from_timestamp, to_timestamp
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -73,15 +74,12 @@ class StarTransactionTestBase:
     receiver = TransactionPartnerOther()
 
 
-class TestStarTransactionWithoutRequest(StarTransactionTestBase):
-    def test_slot_behaviour(self, star_transaction):
-        inst = star_transaction
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+class TestStarTransactionWithoutRequest(StarTransactionTestBase, DeserializationTestBase):
+    de_json_class = StarTransaction
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "id": self.id,
             "amount": self.amount,
             "nanostar_amount": self.nanostar_amount,
@@ -89,7 +87,15 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
             "source": self.source.to_dict(),
             "receiver": self.receiver.to_dict(),
         }
-        st = StarTransaction.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, star_transaction):
+        inst = star_transaction
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        st = StarTransaction.de_json(de_json_dict, offline_bot)
         assert st.api_kwargs == {}
         assert st.id == self.id
         assert st.amount == self.amount
@@ -97,22 +103,6 @@ class TestStarTransactionWithoutRequest(StarTransactionTestBase):
         assert st.date == from_timestamp(self.date)
         assert st.source == self.source
         assert st.receiver == self.receiver
-
-    def test_de_json_star_transaction_localization(
-        self, tz_bot, offline_bot, raw_bot, star_transaction
-    ):
-        json_dict = star_transaction.to_dict()
-        st_raw = StarTransaction.de_json(json_dict, raw_bot)
-        st_bot = StarTransaction.de_json(json_dict, offline_bot)
-        st_tz = StarTransaction.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        st_offset = st_tz.date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(st_tz.date.replace(tzinfo=None))
-
-        assert st_raw.date.tzinfo == UTC
-        assert st_bot.date.tzinfo == UTC
-        assert st_offset == tz_bot_offset
 
     def test_to_dict(self, star_transaction):
         expected_dict = {
@@ -166,18 +156,23 @@ class StarTransactionsTestBase:
     transactions = [star_transaction_factory(), star_transaction_factory()]
 
 
-class TestStarTransactionsWithoutRequest(StarTransactionsTestBase):
+class TestStarTransactionsWithoutRequest(StarTransactionsTestBase, DeserializationTestBase):
+    de_json_class = StarTransactions
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "transactions": [t.to_dict() for t in self.transactions],
+        }
+
     def test_slot_behaviour(self, star_transactions):
         inst = star_transactions
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "transactions": [t.to_dict() for t in self.transactions],
-        }
-        st = StarTransactions.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        st = StarTransactions.de_json(de_json_dict, offline_bot)
         assert st.api_kwargs == {}
         assert st.transactions == tuple(self.transactions)
 

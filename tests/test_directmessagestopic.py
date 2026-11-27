@@ -21,6 +21,7 @@
 import pytest
 
 from telegram import DirectMessagesTopic, User
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -40,7 +41,16 @@ class DirectMessagesTopicTestBase:
     user = User(id=67890, is_bot=False, first_name="Test")
 
 
-class TestDirectMessagesTopicWithoutRequest(DirectMessagesTopicTestBase):
+class TestDirectMessagesTopicWithoutRequest(DirectMessagesTopicTestBase, DeserializationTestBase):
+    de_json_class = DirectMessagesTopic
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "topic_id": self.topic_id,
+            "user": self.user.to_dict(),
+        }
+
     def test_slot_behaviour(self, direct_messages_topic):
         cfi = direct_messages_topic
         for attr in cfi.__slots__:
@@ -48,13 +58,8 @@ class TestDirectMessagesTopicWithoutRequest(DirectMessagesTopicTestBase):
 
         assert len(mro_slots(cfi)) == len(set(mro_slots(cfi))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "topic_id": self.topic_id,
-            "user": self.user.to_dict(),
-        }
-
-        dmt = DirectMessagesTopic.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        dmt = DirectMessagesTopic.de_json(de_json_dict, offline_bot)
         assert dmt.topic_id == self.topic_id
         assert dmt.user == self.user
         assert dmt.api_kwargs == {}

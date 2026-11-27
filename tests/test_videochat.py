@@ -27,8 +27,9 @@ from telegram import (
     VideoChatScheduled,
     VideoChatStarted,
 )
-from telegram._utils.datetime import UTC, to_timestamp
+from telegram._utils.datetime import to_timestamp
 from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -42,15 +43,21 @@ def user2():
     return User(first_name="Mister Test", id=124, is_bot=False)
 
 
-class TestVideoChatStartedWithoutRequest:
+class TestVideoChatStartedWithoutRequest(DeserializationTestBase):
+    de_json_class = VideoChatStarted
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {}
+
     def test_slot_behaviour(self):
         action = VideoChatStarted()
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        video_chat_started = VideoChatStarted.de_json({}, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        video_chat_started = VideoChatStarted.de_json(de_json_dict, offline_bot)
         assert video_chat_started.api_kwargs == {}
         assert isinstance(video_chat_started, VideoChatStarted)
 
@@ -60,8 +67,13 @@ class TestVideoChatStartedWithoutRequest:
         assert video_chat_dict == {}
 
 
-class TestVideoChatEndedWithoutRequest:
+class TestVideoChatEndedWithoutRequest(DeserializationTestBase):
+    de_json_class = VideoChatEnded
     duration = dtm.timedelta(seconds=100)
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"duration": int(self.duration.total_seconds())}
 
     def test_slot_behaviour(self):
         action = VideoChatEnded(8)
@@ -69,9 +81,8 @@ class TestVideoChatEndedWithoutRequest:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        json_dict = {"duration": int(self.duration.total_seconds())}
-        video_chat_ended = VideoChatEnded.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        video_chat_ended = VideoChatEnded.de_json(de_json_dict, offline_bot)
         assert video_chat_ended.api_kwargs == {}
 
         assert video_chat_ended._duration == self.duration
@@ -122,16 +133,21 @@ class TestVideoChatEndedWithoutRequest:
         assert hash(a) != hash(d)
 
 
-class TestVideoChatParticipantsInvitedWithoutRequest:
+class TestVideoChatParticipantsInvitedWithoutRequest(DeserializationTestBase):
+    de_json_class = VideoChatParticipantsInvited
+
+    @pytest.fixture
+    def de_json_dict(self, user1, user2):
+        return {"users": [user1.to_dict(), user2.to_dict()]}
+
     def test_slot_behaviour(self, user1):
         action = VideoChatParticipantsInvited([user1])
         for attr in action.__slots__:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self, user1, user2, offline_bot):
-        json_data = {"users": [user1.to_dict(), user2.to_dict()]}
-        video_chat_participants = VideoChatParticipantsInvited.de_json(json_data, offline_bot)
+    def test_de_json(self, user1, user2, offline_bot, de_json_dict):
+        video_chat_participants = VideoChatParticipantsInvited.de_json(de_json_dict, offline_bot)
         assert video_chat_participants.api_kwargs == {}
 
         assert isinstance(video_chat_participants.users, tuple)
@@ -173,8 +189,13 @@ class TestVideoChatParticipantsInvitedWithoutRequest:
         assert hash(a) != hash(e)
 
 
-class TestVideoChatScheduledWithoutRequest:
+class TestVideoChatScheduledWithoutRequest(DeserializationTestBase):
+    de_json_class = VideoChatScheduled
     start_date = dtm.datetime.now(dtm.UTC)
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"start_date": to_timestamp(self.start_date)}
 
     def test_slot_behaviour(self):
         inst = VideoChatScheduled(self.start_date)
@@ -185,29 +206,11 @@ class TestVideoChatScheduledWithoutRequest:
     def test_expected_values(self):
         assert VideoChatScheduled(self.start_date).start_date == self.start_date
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"start_date": to_timestamp(self.start_date)}
-        video_chat_scheduled = VideoChatScheduled.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        video_chat_scheduled = VideoChatScheduled.de_json(de_json_dict, offline_bot)
         assert video_chat_scheduled.api_kwargs == {}
 
         assert abs(video_chat_scheduled.start_date - self.start_date) < dtm.timedelta(seconds=1)
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {"start_date": to_timestamp(self.start_date)}
-
-        videochat_raw = VideoChatScheduled.de_json(json_dict, raw_bot)
-        videochat_bot = VideoChatScheduled.de_json(json_dict, offline_bot)
-        videochat_tz = VideoChatScheduled.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        videochat_offset = videochat_tz.start_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            videochat_tz.start_date.replace(tzinfo=None)
-        )
-
-        assert videochat_raw.start_date.tzinfo == UTC
-        assert videochat_bot.start_date.tzinfo == UTC
-        assert videochat_offset == tz_bot_offset
 
     def test_to_dict(self):
         video_chat_scheduled = VideoChatScheduled(self.start_date)

@@ -34,6 +34,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -84,7 +85,20 @@ class VideoNoteTestBase:
     videonote_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVideoNoteWithoutRequest(VideoNoteTestBase):
+class TestVideoNoteWithoutRequest(VideoNoteTestBase, DeserializationTestBase):
+    de_json_class = VideoNote
+
+    @pytest.fixture
+    def de_json_dict(self, offline_video_note):
+        return {
+            "file_id": self.videonote_file_id,
+            "file_unique_id": self.videonote_file_unique_id,
+            "length": self.length,
+            "duration": int(self.duration.total_seconds()),
+            "file_size": self.file_size,
+            "thumbnail": offline_video_note.thumbnail.to_dict(),
+        }
+
     def test_slot_behaviour(self, offline_video_note):
         for attr in offline_video_note.__slots__:
             assert getattr(offline_video_note, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -106,15 +120,8 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         assert offline_video_note.thumbnail.file_id
         assert offline_video_note.thumbnail.file_unique_id
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "file_id": self.videonote_file_id,
-            "file_unique_id": self.videonote_file_unique_id,
-            "length": self.length,
-            "duration": int(self.duration.total_seconds()),
-            "file_size": self.file_size,
-        }
-        json_video_note = VideoNote.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_video_note, de_json_dict):
+        json_video_note = VideoNote.de_json(de_json_dict, offline_bot)
         assert json_video_note.api_kwargs == {}
 
         assert json_video_note.file_id == self.videonote_file_id
@@ -122,6 +129,7 @@ class TestVideoNoteWithoutRequest(VideoNoteTestBase):
         assert json_video_note.length == self.length
         assert json_video_note._duration == self.duration
         assert json_video_note.file_size == self.file_size
+        assert json_video_note.thumbnail == offline_video_note.thumbnail
 
     def test_to_dict(self, offline_video_note):
         video_note_dict = offline_video_note.to_dict()

@@ -42,9 +42,10 @@ from telegram import (
     Venue,
     Video,
 )
-from telegram._utils.datetime import UTC, to_timestamp
+from telegram._utils.datetime import to_timestamp
 from telegram.constants import PollType
 from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -143,7 +144,7 @@ def poll_media():
 class PollMediaTestBase:
     animation = Animation("blah", "unique_id", 320, 180, 1)
     audio = Audio(file_id="file_id", file_unique_id="file_unique_id", duration=30)
-    document = Document("file_id", "file_unique_id", "file_name", 42)
+    document = Document("file_id", "file_unique_id", file_name="file_name", file_size=42)
     location = Location(123, 456)
     photo = (PhotoSize("file_id", "file_unique_id", 1, 1),)
     sticker = Sticker("file_id", "file_unique_id", 512, 512, False, False, "regular")
@@ -166,14 +167,12 @@ class PollMediaTestBase:
     )
 
 
-class TestPollMediaWithoutRequest(PollMediaTestBase):
-    def test_slot_behaviour(self, poll_media):
-        for attr in poll_media.__slots__:
-            assert getattr(poll_media, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_media)) == len(set(mro_slots(poll_media))), "duplicate slot"
+class TestPollMediaWithoutRequest(PollMediaTestBase, DeserializationTestBase):
+    de_json_class = PollMedia
 
-    def test_de_json(self):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "animation": self.animation.to_dict(),
             "audio": self.audio.to_dict(),
             "document": self.document.to_dict(),
@@ -184,7 +183,14 @@ class TestPollMediaWithoutRequest(PollMediaTestBase):
             "venue": self.venue.to_dict(),
             "video": self.video.to_dict(),
         }
-        poll_media = PollMedia.de_json(json_dict, None)
+
+    def test_slot_behaviour(self, poll_media):
+        for attr in poll_media.__slots__:
+            assert getattr(poll_media, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(poll_media)) == len(set(mro_slots(poll_media))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        poll_media = PollMedia.de_json(de_json_dict, offline_bot)
 
         assert poll_media.api_kwargs == {}
         assert poll_media.animation == self.animation
@@ -261,14 +267,12 @@ class PollOptionTestBase:
     media = PollMedia(location=Location(123, 456))
 
 
-class TestPollOptionWithoutRequest(PollOptionTestBase):
-    def test_slot_behaviour(self, poll_option):
-        for attr in poll_option.__slots__:
-            assert getattr(poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(poll_option)) == len(set(mro_slots(poll_option))), "duplicate slot"
+class TestPollOptionWithoutRequest(PollOptionTestBase, DeserializationTestBase):
+    de_json_class = PollOption
 
-    def test_de_json(self):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "text": self.text,
             "voter_count": self.voter_count,
             "text_entities": [e.to_dict() for e in self.text_entities],
@@ -278,7 +282,14 @@ class TestPollOptionWithoutRequest(PollOptionTestBase):
             "persistent_id": self.persistent_id,
             "media": self.media.to_dict(),
         }
-        poll_option = PollOption.de_json(json_dict, None)
+
+    def test_slot_behaviour(self, poll_option):
+        for attr in poll_option.__slots__:
+            assert getattr(poll_option, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(poll_option)) == len(set(mro_slots(poll_option))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        poll_option = PollOption.de_json(de_json_dict, offline_bot)
         assert poll_option.api_kwargs == {}
 
         assert poll_option.text == self.text
@@ -373,16 +384,21 @@ class PollAnswerTestBase:
     option_persistent_ids = ["123"]
 
 
-class TestPollAnswerWithoutRequest(PollAnswerTestBase):
-    def test_de_json(self):
-        json_dict = {
+class TestPollAnswerWithoutRequest(PollAnswerTestBase, DeserializationTestBase):
+    de_json_class = PollAnswer
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "poll_id": self.poll_id,
             "option_ids": self.option_ids,
             "user": self.user.to_dict(),
             "voter_chat": self.voter_chat.to_dict(),
             "option_persistent_ids": self.option_persistent_ids,
         }
-        poll_answer = PollAnswer.de_json(json_dict, None)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        poll_answer = PollAnswer.de_json(de_json_dict, offline_bot)
         assert poll_answer.api_kwargs == {}
 
         assert poll_answer.poll_id == self.poll_id
@@ -471,7 +487,7 @@ class PollTestBase:
         b"\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467"
         b"\\u200d\\U0001f467\\U0001f431http://google.com"
     ).decode("unicode-escape")
-    explanation_entities = [MessageEntity(13, 17, MessageEntity.URL)]
+    explanation_entities = [MessageEntity(MessageEntity.URL, 13, 17)]
     open_period = dtm.timedelta(seconds=42)
     close_date = dtm.datetime.now(dtm.UTC)
     question_entities = [
@@ -483,13 +499,18 @@ class PollTestBase:
     description = "description"
     description_entities = [MessageEntity(MessageEntity.ITALIC, 0, 11)]
     country_codes = ["AB", "CD"]
-    media = PollMedia(document=Document("file_id", "file_unique_id", "file_name", 42))
+    media = PollMedia(
+        document=Document("file_id", "file_unique_id", file_name="file_name", file_size=42)
+    )
     explanation_media = PollMedia(animation=Animation("blah", "unique_id", 320, 180, 1))
 
 
-class TestPollWithoutRequest(PollTestBase):
-    def test_de_json(self, offline_bot):
-        json_dict = {
+class TestPollWithoutRequest(PollTestBase, DeserializationTestBase):
+    de_json_class = Poll
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "id": self.id_,
             "question": self.question,
             "options": [o.to_dict() for o in self.options],
@@ -499,7 +520,7 @@ class TestPollWithoutRequest(PollTestBase):
             "type": self.type,
             "allows_multiple_answers": self.allows_multiple_answers,
             "explanation": self.explanation,
-            "explanation_entities": [self.explanation_entities[0].to_dict()],
+            "explanation_entities": [e.to_dict() for e in self.explanation_entities],
             "open_period": int(self.open_period.total_seconds()),
             "close_date": to_timestamp(self.close_date),
             "question_entities": [e.to_dict() for e in self.question_entities],
@@ -512,7 +533,9 @@ class TestPollWithoutRequest(PollTestBase):
             "media": self.media.to_dict(),
             "explanation_media": self.explanation_media.to_dict(),
         }
-        poll = Poll.de_json(json_dict, offline_bot)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        poll = Poll.de_json(de_json_dict, offline_bot)
         assert poll.api_kwargs == {}
 
         assert poll.id == self.id_
@@ -541,45 +564,6 @@ class TestPollWithoutRequest(PollTestBase):
         assert poll.country_codes == tuple(self.country_codes)
         assert poll.media == self.media
         assert poll.explanation_media == self.explanation_media
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "id": self.id_,
-            "question": self.question,
-            "options": [o.to_dict() for o in self.options],
-            "total_voter_count": self.total_voter_count,
-            "is_closed": self.is_closed,
-            "is_anonymous": self.is_anonymous,
-            "type": self.type,
-            "allows_multiple_answers": self.allows_multiple_answers,
-            "explanation": self.explanation,
-            "explanation_entities": [self.explanation_entities[0].to_dict()],
-            "open_period": int(self.open_period.total_seconds()),
-            "close_date": to_timestamp(self.close_date),
-            "question_entities": [e.to_dict() for e in self.question_entities],
-            "allows_revoting": self.allows_revoting,
-            "members_only": self.members_only,
-            "correct_option_ids": self.correct_option_ids,
-            "description": self.description,
-            "description_entities": [e.to_dict() for e in self.description_entities],
-            "country_codes": self.country_codes,
-            "media": self.media.to_dict(),
-            "explanation_media": self.explanation_media.to_dict(),
-        }
-
-        poll_raw = Poll.de_json(json_dict, raw_bot)
-        poll_bot = Poll.de_json(json_dict, offline_bot)
-        poll_bot_tz = Poll.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        poll_bot_tz_offset = poll_bot_tz.close_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            poll_bot_tz.close_date.replace(tzinfo=None)
-        )
-
-        assert poll_raw.close_date.tzinfo == UTC
-        assert poll_bot.close_date.tzinfo == UTC
-        assert poll_bot_tz_offset == tz_bot_offset
 
     def test_to_dict(self, poll):
         poll_dict = poll.to_dict()
@@ -826,7 +810,18 @@ class PollOptionAddedTestBase:
     ]
 
 
-class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
+class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase, DeserializationTestBase):
+    de_json_class = PollOptionAdded
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "poll_message": self.poll_message.to_dict(),
+            "option_persistent_id": self.option_persistent_id,
+            "option_text": self.option_text,
+            "option_text_entities": [e.to_dict() for e in self.option_text_entities],
+        }
+
     def test_slot_behaviour(self, poll_option_added):
         for attr in poll_option_added.__slots__:
             assert getattr(poll_option_added, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -834,14 +829,8 @@ class TestPollOptionAddedWithoutRequest(PollOptionAddedTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "poll_message": self.poll_message.to_dict(),
-            "option_persistent_id": self.option_persistent_id,
-            "option_text": self.option_text,
-            "option_text_entities": [e.to_dict() for e in self.option_text_entities],
-        }
-        poll_option_added = PollOptionAdded.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        poll_option_added = PollOptionAdded.de_json(de_json_dict, offline_bot)
         assert poll_option_added.api_kwargs == {}
 
         assert poll_option_added.poll_message == self.poll_message
@@ -945,7 +934,18 @@ class PollOptionDeletedTestBase:
     ]
 
 
-class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
+class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase, DeserializationTestBase):
+    de_json_class = PollOptionDeleted
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "poll_message": self.poll_message.to_dict(),
+            "option_persistent_id": self.option_persistent_id,
+            "option_text": self.option_text,
+            "option_text_entities": [e.to_dict() for e in self.option_text_entities],
+        }
+
     def test_slot_behaviour(self, poll_option_deleted):
         for attr in poll_option_deleted.__slots__:
             assert getattr(poll_option_deleted, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -953,14 +953,8 @@ class TestPollOptionDeletedWithoutRequest(PollOptionDeletedTestBase):
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "poll_message": self.poll_message.to_dict(),
-            "option_persistent_id": self.option_persistent_id,
-            "option_text": self.option_text,
-            "option_text_entities": [e.to_dict() for e in self.option_text_entities],
-        }
-        poll_option_deleted = PollOptionDeleted.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        poll_option_deleted = PollOptionDeleted.de_json(de_json_dict, offline_bot)
         assert poll_option_deleted.api_kwargs == {}
 
         assert poll_option_deleted.poll_message == self.poll_message

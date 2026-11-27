@@ -32,7 +32,8 @@ from telegram import (
     MessageOriginUser,
     User,
 )
-from telegram._utils.datetime import UTC, to_timestamp
+from telegram._utils.datetime import to_timestamp
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 ignored = ["self", "api_kwargs"]
@@ -92,28 +93,6 @@ def make_json_dict(instance: MessageOrigin, include_optional_args: bool = False)
     return json_dict
 
 
-def iter_args(
-    instance: MessageOrigin, de_json_inst: MessageOrigin, include_optional: bool = False
-):
-    """
-    We accept both the regular instance and de_json created instance and iterate over them for
-    easy one line testing later one.
-    """
-    yield instance.type, de_json_inst.type  # yield this here cause it's not available in sig.
-
-    sig = inspect.signature(instance.__class__.__init__)
-    for param in sig.parameters.values():
-        if param.name in ignored:
-            continue
-        inst_at, json_at = getattr(instance, param.name), getattr(de_json_inst, param.name)
-        if isinstance(json_at, dtm.datetime):  # Convert datetime to int
-            json_at = to_timestamp(json_at)
-        if (
-            param.default is not inspect.Parameter.empty and include_optional
-        ) or param.default is inspect.Parameter.empty:
-            yield inst_at, json_at
-
-
 @pytest.fixture
 def message_origin_type(request):
     return request.param()
@@ -135,49 +114,6 @@ class TestMessageOriginTypesWithoutRequest:
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    def test_de_json_required_args(self, offline_bot, message_origin_type):
-        cls = message_origin_type.__class__
-
-        json_dict = make_json_dict(message_origin_type)
-        const_message_origin = MessageOrigin.de_json(json_dict, offline_bot)
-        assert const_message_origin.api_kwargs == {}
-
-        assert isinstance(const_message_origin, MessageOrigin)
-        assert isinstance(const_message_origin, cls)
-        for msg_origin_type_at, const_msg_origin_at in iter_args(
-            message_origin_type, const_message_origin
-        ):
-            assert msg_origin_type_at == const_msg_origin_at
-
-    def test_de_json_all_args(self, offline_bot, message_origin_type):
-        json_dict = make_json_dict(message_origin_type, include_optional_args=True)
-        const_message_origin = MessageOrigin.de_json(json_dict, offline_bot)
-
-        assert const_message_origin.api_kwargs == {}
-
-        assert isinstance(const_message_origin, MessageOrigin)
-        assert isinstance(const_message_origin, message_origin_type.__class__)
-        for msg_origin_type_at, const_msg_origin_at in iter_args(
-            message_origin_type, const_message_origin, True
-        ):
-            assert msg_origin_type_at == const_msg_origin_at
-
-    def test_de_json_messageorigin_localization(
-        self, message_origin_type, tz_bot, offline_bot, raw_bot
-    ):
-        json_dict = make_json_dict(message_origin_type, include_optional_args=True)
-        msgorigin_raw = MessageOrigin.de_json(json_dict, raw_bot)
-        msgorigin_bot = MessageOrigin.de_json(json_dict, offline_bot)
-        msgorigin_tz = MessageOrigin.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        msgorigin_offset = msgorigin_tz.date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(msgorigin_tz.date.replace(tzinfo=None))
-
-        assert msgorigin_raw.date.tzinfo == UTC
-        assert msgorigin_bot.date.tzinfo == UTC
-        assert msgorigin_offset == tz_bot_offset
 
     def test_de_json_invalid_type(self, message_origin_type, offline_bot):
         json_dict = {"type": "invalid", "date": MODefaults.date}
@@ -230,3 +166,100 @@ class TestMessageOriginTypesWithoutRequest:
 
         assert c != e
         assert hash(c) != hash(e)
+
+
+class TestMessageOriginWithoutRequest(DeserializationTestBase):
+    de_json_class = MessageOrigin
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that MessageOrigin.de_json does not dispatch to a subclass
+        return {"type": "unknown", "date": MODefaults.date}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        message_origin = MessageOrigin.de_json(de_json_dict, offline_bot)
+        assert type(message_origin) is MessageOrigin
+        assert message_origin.api_kwargs == {}
+
+        assert message_origin.type == "unknown"
+        assert to_timestamp(message_origin.date) == MODefaults.date
+
+
+class TestMessageOriginUserWithoutRequest(DeserializationTestBase):
+    de_json_class = MessageOriginUser
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"date": MODefaults.date, "sender_user": MODefaults.sender_user.to_dict()}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        message_origin = MessageOriginUser.de_json(de_json_dict, offline_bot)
+        assert type(message_origin) is MessageOriginUser
+        assert message_origin.api_kwargs == {}
+
+        assert message_origin.type == MessageOrigin.USER
+        assert to_timestamp(message_origin.date) == MODefaults.date
+        assert message_origin.sender_user == MODefaults.sender_user
+
+
+class TestMessageOriginHiddenUserWithoutRequest(DeserializationTestBase):
+    de_json_class = MessageOriginHiddenUser
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"date": MODefaults.date, "sender_user_name": MODefaults.sender_user_name}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        message_origin = MessageOriginHiddenUser.de_json(de_json_dict, offline_bot)
+        assert type(message_origin) is MessageOriginHiddenUser
+        assert message_origin.api_kwargs == {}
+
+        assert message_origin.type == MessageOrigin.HIDDEN_USER
+        assert to_timestamp(message_origin.date) == MODefaults.date
+        assert message_origin.sender_user_name == MODefaults.sender_user_name
+
+
+class TestMessageOriginChatWithoutRequest(DeserializationTestBase):
+    de_json_class = MessageOriginChat
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "date": MODefaults.date,
+            "sender_chat": MODefaults.sender_chat.to_dict(),
+            "author_signature": MODefaults.author_signautre,
+        }
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        message_origin = MessageOriginChat.de_json(de_json_dict, offline_bot)
+        assert type(message_origin) is MessageOriginChat
+        assert message_origin.api_kwargs == {}
+
+        assert message_origin.type == MessageOrigin.CHAT
+        assert to_timestamp(message_origin.date) == MODefaults.date
+        assert message_origin.sender_chat == MODefaults.sender_chat
+        assert message_origin.author_signature == MODefaults.author_signautre
+
+
+class TestMessageOriginChannelWithoutRequest(DeserializationTestBase):
+    de_json_class = MessageOriginChannel
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "date": MODefaults.date,
+            "chat": MODefaults.chat.to_dict(),
+            "message_id": MODefaults.message_id,
+            "author_signature": MODefaults.author_signautre,
+        }
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        message_origin = MessageOriginChannel.de_json(de_json_dict, offline_bot)
+        assert type(message_origin) is MessageOriginChannel
+        assert message_origin.api_kwargs == {}
+
+        assert message_origin.type == MessageOrigin.CHANNEL
+        assert to_timestamp(message_origin.date) == MODefaults.date
+        assert message_origin.chat == MODefaults.chat
+        assert message_origin.message_id == MODefaults.message_id
+        assert message_origin.author_signature == MODefaults.author_signautre

@@ -35,6 +35,7 @@ from telegram import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import ChatMemberStatus
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -82,7 +83,14 @@ class ChatMemberTestBase:
     tag = "test_tag"
 
 
-class TestChatMemberWithoutRequest(ChatMemberTestBase):
+class TestChatMemberWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMember
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown status, so that ChatMember.de_json does not dispatch to a subclass
+        return {"status": "unknown", "user": self.user.to_dict()}
+
     def test_slot_behaviour(self, chat_member):
         inst = chat_member
         for attr in inst.__slots__:
@@ -93,9 +101,9 @@ class TestChatMemberWithoutRequest(ChatMemberTestBase):
         assert type(ChatMember(ChatMemberTestBase.user, "member").status) is ChatMemberStatus
         assert ChatMember(ChatMemberTestBase.user, "unknown").status == "unknown"
 
-    def test_de_json(self, offline_bot):
-        data = {"status": "unknown", "user": self.user.to_dict()}
-        chat_member = ChatMember.de_json(data, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMember.de_json(de_json_dict, offline_bot)
+        assert type(chat_member) is ChatMember
         assert chat_member.api_kwargs == {}
         assert chat_member.status == "unknown"
         assert chat_member.user == self.user
@@ -156,32 +164,52 @@ class TestChatMemberWithoutRequest(ChatMemberTestBase):
 
 @pytest.fixture
 def chat_member_administrator():
+    test_class = TestChatMemberAdministratorWithoutRequest
     return ChatMemberAdministrator(
-        TestChatMemberAdministratorWithoutRequest.user,
-        TestChatMemberAdministratorWithoutRequest.can_be_edited,
-        TestChatMemberAdministratorWithoutRequest.can_change_info,
-        TestChatMemberAdministratorWithoutRequest.can_delete_messages,
-        TestChatMemberAdministratorWithoutRequest.can_delete_stories,
-        TestChatMemberAdministratorWithoutRequest.can_edit_messages,
-        TestChatMemberAdministratorWithoutRequest.can_edit_stories,
-        TestChatMemberAdministratorWithoutRequest.can_invite_users,
-        TestChatMemberAdministratorWithoutRequest.can_manage_chat,
-        TestChatMemberAdministratorWithoutRequest.can_manage_topics,
-        TestChatMemberAdministratorWithoutRequest.can_manage_video_chats,
-        TestChatMemberAdministratorWithoutRequest.can_pin_messages,
-        TestChatMemberAdministratorWithoutRequest.can_post_messages,
-        TestChatMemberAdministratorWithoutRequest.can_post_stories,
-        TestChatMemberAdministratorWithoutRequest.can_promote_members,
-        TestChatMemberAdministratorWithoutRequest.can_restrict_members,
-        TestChatMemberAdministratorWithoutRequest.custom_title,
-        TestChatMemberAdministratorWithoutRequest.is_anonymous,
-        TestChatMemberAdministratorWithoutRequest.can_manage_direct_messages,
-        TestChatMemberAdministratorWithoutRequest.can_manage_tags,
+        user=test_class.user,
+        can_be_edited=test_class.can_be_edited,
+        can_change_info=test_class.can_change_info,
+        can_delete_messages=test_class.can_delete_messages,
+        can_delete_stories=test_class.can_delete_stories,
+        can_edit_messages=test_class.can_edit_messages,
+        can_edit_stories=test_class.can_edit_stories,
+        can_invite_users=test_class.can_invite_users,
+        can_manage_chat=test_class.can_manage_chat,
+        can_manage_topics=test_class.can_manage_topics,
+        can_manage_video_chats=test_class.can_manage_video_chats,
+        can_pin_messages=test_class.can_pin_messages,
+        can_post_messages=test_class.can_post_messages,
+        can_post_stories=test_class.can_post_stories,
+        can_promote_members=test_class.can_promote_members,
+        can_restrict_members=test_class.can_restrict_members,
+        custom_title=test_class.custom_title,
+        is_anonymous=test_class.is_anonymous,
+        can_manage_direct_messages=test_class.can_manage_direct_messages,
+        can_manage_tags=test_class.can_manage_tags,
     )
 
 
-class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
+class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberAdministrator
     status = ChatMemberStatus.ADMINISTRATOR
+    can_be_edited = True
+    is_anonymous = False
+    can_manage_chat = True
+    can_delete_messages = False
+    can_manage_video_chats = True
+    can_restrict_members = False
+    can_promote_members = True
+    can_change_info = False
+    can_invite_users = True
+    can_post_stories = False
+    can_edit_stories = True
+    can_delete_stories = False
+    can_post_messages = True
+    can_edit_messages = False
+    can_pin_messages = True
+    can_manage_topics = False
+    can_manage_direct_messages = True
+    can_manage_tags = False
 
     def test_slot_behaviour(self, chat_member_administrator):
         inst = chat_member_administrator
@@ -189,8 +217,9 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "user": self.user.to_dict(),
             "can_be_edited": self.can_be_edited,
             "can_change_info": self.can_change_info,
@@ -212,7 +241,9 @@ class TestChatMemberAdministratorWithoutRequest(ChatMemberTestBase):
             "can_manage_direct_messages": self.can_manage_direct_messages,
             "can_manage_tags": self.can_manage_tags,
         }
-        chat_member = ChatMemberAdministrator.de_json(data, offline_bot)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMemberAdministrator.de_json(de_json_dict, offline_bot)
 
         assert type(chat_member) is ChatMemberAdministrator
         assert chat_member.api_kwargs == {}
@@ -319,7 +350,8 @@ def chat_member_banned():
     )
 
 
-class TestChatMemberBannedWithoutRequest(ChatMemberTestBase):
+class TestChatMemberBannedWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberBanned
     status = ChatMemberStatus.BANNED
 
     def test_slot_behaviour(self, chat_member_banned):
@@ -328,38 +360,21 @@ class TestChatMemberBannedWithoutRequest(ChatMemberTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "user": self.user.to_dict(),
             "until_date": to_timestamp(self.until_date),
         }
-        chat_member = ChatMemberBanned.de_json(data, offline_bot)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMemberBanned.de_json(de_json_dict, offline_bot)
 
         assert type(chat_member) is ChatMemberBanned
         assert chat_member.api_kwargs == {}
 
         assert chat_member.user == self.user
         assert chat_member.until_date == self.until_date
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "user": self.user.to_dict(),
-            "until_date": to_timestamp(self.until_date),
-        }
-
-        cmb_raw = ChatMemberBanned.de_json(json_dict, raw_bot)
-        cmb_bot = ChatMemberBanned.de_json(json_dict, offline_bot)
-        cmb_bot_tz = ChatMemberBanned.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        cmb_bot_tz_offset = cmb_bot_tz.until_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            cmb_bot_tz.until_date.replace(tzinfo=None)
-        )
-
-        assert cmb_raw.until_date.tzinfo == UTC
-        assert cmb_bot.until_date.tzinfo == UTC
-        assert cmb_bot_tz_offset == tz_bot_offset
 
     def test_to_dict(self, chat_member_banned):
         assert chat_member_banned.to_dict() == {
@@ -393,7 +408,8 @@ def chat_member_left():
     return ChatMemberLeft(TestChatMemberLeftWithoutRequest.user)
 
 
-class TestChatMemberLeftWithoutRequest(ChatMemberTestBase):
+class TestChatMemberLeftWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberLeft
     status = ChatMemberStatus.LEFT
 
     def test_slot_behaviour(self, chat_member_left):
@@ -402,9 +418,12 @@ class TestChatMemberLeftWithoutRequest(ChatMemberTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {"user": self.user.to_dict()}
-        chat_member = ChatMemberLeft.de_json(data, offline_bot)
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"user": self.user.to_dict()}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMemberLeft.de_json(de_json_dict, offline_bot)
 
         assert type(chat_member) is ChatMemberLeft
         assert chat_member.api_kwargs == {}
@@ -438,7 +457,8 @@ def chat_member_member():
     return ChatMemberMember(TestChatMemberMemberWithoutRequest.user)
 
 
-class TestChatMemberMemberWithoutRequest(ChatMemberTestBase):
+class TestChatMemberMemberWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberMember
     status = ChatMemberStatus.MEMBER
 
     def test_slot_behaviour(self, chat_member_member):
@@ -447,35 +467,23 @@ class TestChatMemberMemberWithoutRequest(ChatMemberTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {"user": self.user.to_dict(), "until_date": to_timestamp(self.until_date)}
-        chat_member = ChatMemberMember.de_json(data, offline_bot)
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "user": self.user.to_dict(),
+            "until_date": to_timestamp(self.until_date),
+            "tag": self.tag,
+        }
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMemberMember.de_json(de_json_dict, offline_bot)
 
         assert type(chat_member) is ChatMemberMember
         assert chat_member.api_kwargs == {}
 
         assert chat_member.user == self.user
         assert chat_member.until_date == self.until_date
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "user": self.user.to_dict(),
-            "until_date": to_timestamp(self.until_date),
-        }
-
-        cmm_raw = ChatMemberMember.de_json(json_dict, raw_bot)
-        cmm_bot = ChatMemberMember.de_json(json_dict, offline_bot)
-        cmm_bot_tz = ChatMemberMember.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        cmm_bot_tz_offset = cmm_bot_tz.until_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            cmm_bot_tz.until_date.replace(tzinfo=None)
-        )
-
-        assert cmm_raw.until_date.tzinfo == UTC
-        assert cmm_bot.until_date.tzinfo == UTC
-        assert cmm_bot_tz_offset == tz_bot_offset
+        assert chat_member.tag == self.tag
 
     def test_to_dict(self, chat_member_member):
         assert chat_member_member.to_dict() == {
@@ -508,7 +516,8 @@ def chat_member_owner():
     )
 
 
-class TestChatMemberOwnerWithoutRequest(ChatMemberTestBase):
+class TestChatMemberOwnerWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberOwner
     status = ChatMemberStatus.OWNER
 
     def test_slot_behaviour(self, chat_member_owner):
@@ -517,13 +526,16 @@ class TestChatMemberOwnerWithoutRequest(ChatMemberTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "user": self.user.to_dict(),
             "is_anonymous": self.is_anonymous,
             "custom_title": self.custom_title,
         }
-        chat_member = ChatMemberOwner.de_json(data, offline_bot)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMemberOwner.de_json(de_json_dict, offline_bot)
 
         assert type(chat_member) is ChatMemberOwner
         assert chat_member.api_kwargs == {}
@@ -582,8 +594,26 @@ def chat_member_restricted():
     )
 
 
-class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
+class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase, DeserializationTestBase):
+    de_json_class = ChatMemberRestricted
     status = ChatMemberStatus.RESTRICTED
+    is_member = True
+    can_change_info = False
+    can_invite_users = True
+    can_pin_messages = False
+    can_send_messages = True
+    can_send_polls = False
+    can_send_other_messages = True
+    can_add_web_page_previews = False
+    can_manage_topics = True
+    can_send_audios = False
+    can_send_documents = True
+    can_send_photos = False
+    can_send_videos = True
+    can_send_video_notes = False
+    can_send_voice_notes = True
+    can_edit_tag = False
+    can_react_to_messages = True
 
     def test_slot_behaviour(self, chat_member_restricted):
         inst = chat_member_restricted
@@ -591,8 +621,9 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "user": self.user.to_dict(),
             "can_add_web_page_previews": self.can_add_web_page_previews,
             "can_change_info": self.can_change_info,
@@ -613,13 +644,13 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
             "can_edit_tag": self.can_edit_tag,
             "can_react_to_messages": self.can_react_to_messages,
             "tag": self.tag,
-            # legacy argument
-            "can_send_media_messages": False,
         }
-        chat_member = ChatMemberRestricted.de_json(data, offline_bot)
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_member = ChatMemberRestricted.de_json(de_json_dict, offline_bot)
 
         assert type(chat_member) is ChatMemberRestricted
-        assert chat_member.api_kwargs == {"can_send_media_messages": False}
+        assert chat_member.api_kwargs == {}
 
         assert chat_member.user == self.user
         assert chat_member.can_add_web_page_previews == self.can_add_web_page_previews
@@ -642,22 +673,11 @@ class TestChatMemberRestrictedWithoutRequest(ChatMemberTestBase):
         assert chat_member.can_react_to_messages == self.can_react_to_messages
         assert chat_member.tag == self.tag
 
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot, chat_member_restricted):
-        json_dict = chat_member_restricted.to_dict()
-
-        cmr_raw = ChatMemberRestricted.de_json(json_dict, raw_bot)
-        cmr_bot = ChatMemberRestricted.de_json(json_dict, offline_bot)
-        cmr_bot_tz = ChatMemberRestricted.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        cmr_bot_tz_offset = cmr_bot_tz.until_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            cmr_bot_tz.until_date.replace(tzinfo=None)
-        )
-
-        assert cmr_raw.until_date.tzinfo == UTC
-        assert cmr_bot.until_date.tzinfo == UTC
-        assert cmr_bot_tz_offset == tz_bot_offset
+    def test_de_json_can_send_media_messages(self, offline_bot, de_json_dict):
+        # can_send_media_messages was removed from the Bot API, but Telegram may still send it
+        json_dict = de_json_dict | {"can_send_media_messages": False}
+        chat_member = ChatMemberRestricted.de_json(json_dict, offline_bot)
+        assert chat_member.api_kwargs == {"can_send_media_messages": False}
 
     def test_to_dict(self, chat_member_restricted):
         assert chat_member_restricted.to_dict() == {

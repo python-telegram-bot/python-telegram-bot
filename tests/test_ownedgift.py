@@ -36,6 +36,7 @@ from telegram._uniquegift import (
 )
 from telegram._utils.datetime import UTC, to_timestamp
 from telegram.constants import OwnedGiftType
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -91,17 +92,24 @@ class OwnedGiftTestBase:
     is_private = True
     is_saved = True
     can_be_upgraded = True
-    was_refunded = False
+    was_refunded = True
     convert_star_count = 100
     prepaid_upgrade_star_count = 200
     can_be_transferred = True
     transfer_star_count = 300
     next_transfer_date = dtm.datetime.now(tz=UTC).replace(microsecond=0)
-    is_upgrade_separate = False
+    is_upgrade_separate = True
     unique_gift_number = 37
 
 
-class TestOwnedGiftWithoutRequest(OwnedGiftTestBase):
+class TestOwnedGiftWithoutRequest(OwnedGiftTestBase, DeserializationTestBase):
+    de_json_class = OwnedGift
+
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that OwnedGift.de_json does not dispatch to a subclass
+        return {"type": "unknown"}
+
     def test_slot_behaviour(self, owned_gift):
         inst = owned_gift
         for attr in inst.__slots__:
@@ -112,11 +120,10 @@ class TestOwnedGiftWithoutRequest(OwnedGiftTestBase):
         assert type(OwnedGift("regular").type) is OwnedGiftType
         assert OwnedGift("unknown").type == "unknown"
 
-    def test_de_json(self, offline_bot):
-        data = {"type": "unknown"}
-        paid_media = OwnedGift.de_json(data, offline_bot)
-        assert paid_media.api_kwargs == {}
-        assert paid_media.type == "unknown"
+    def test_de_json(self, offline_bot, de_json_dict):
+        owned_gift = OwnedGift.de_json(de_json_dict, offline_bot)
+        assert owned_gift.api_kwargs == {}
+        assert owned_gift.type == "unknown"
 
     @pytest.mark.parametrize(
         ("og_type", "subclass", "gift"),
@@ -191,17 +198,13 @@ def owned_gift_regular():
     )
 
 
-class TestOwnedGiftRegularWithoutRequest(OwnedGiftTestBase):
+class TestOwnedGiftRegularWithoutRequest(OwnedGiftTestBase, DeserializationTestBase):
+    de_json_class = OwnedGiftRegular
     type = OwnedGiftType.REGULAR
 
-    def test_slot_behaviour(self, owned_gift_regular):
-        inst = owned_gift_regular
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "gift": self.gift.to_dict(),
             "send_date": to_timestamp(self.send_date),
             "owned_gift_id": self.owned_gift_id,
@@ -217,7 +220,15 @@ class TestOwnedGiftRegularWithoutRequest(OwnedGiftTestBase):
             "is_upgrade_separate": self.is_upgrade_separate,
             "unique_gift_number": self.unique_gift_number,
         }
-        ogr = OwnedGiftRegular.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, owned_gift_regular):
+        inst = owned_gift_regular
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        ogr = OwnedGiftRegular.de_json(de_json_dict, offline_bot)
         assert ogr.gift == self.gift
         assert ogr.send_date == self.send_date
         assert ogr.owned_gift_id == self.owned_gift_id
@@ -308,17 +319,13 @@ def owned_gift_unique():
     )
 
 
-class TestOwnedGiftUniqueWithoutRequest(OwnedGiftTestBase):
+class TestOwnedGiftUniqueWithoutRequest(OwnedGiftTestBase, DeserializationTestBase):
+    de_json_class = OwnedGiftUnique
     type = OwnedGiftType.UNIQUE
 
-    def test_slot_behaviour(self, owned_gift_unique):
-        inst = owned_gift_unique
-        for attr in inst.__slots__:
-            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
-
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "gift": self.unique_gift.to_dict(),
             "send_date": to_timestamp(self.send_date),
             "owned_gift_id": self.owned_gift_id,
@@ -328,7 +335,15 @@ class TestOwnedGiftUniqueWithoutRequest(OwnedGiftTestBase):
             "transfer_star_count": self.transfer_star_count,
             "next_transfer_date": to_timestamp(self.next_transfer_date),
         }
-        ogu = OwnedGiftUnique.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, owned_gift_unique):
+        inst = owned_gift_unique
+        for attr in inst.__slots__:
+            assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        ogu = OwnedGiftUnique.de_json(de_json_dict, offline_bot)
         assert ogu.gift == self.unique_gift
         assert ogu.send_date == self.send_date
         assert ogu.owned_gift_id == self.owned_gift_id
@@ -432,19 +447,24 @@ class OwnedGiftsTestBase:
     ]
 
 
-class TestOwnedGiftsWithoutRequest(OwnedGiftsTestBase):
+class TestOwnedGiftsWithoutRequest(OwnedGiftsTestBase, DeserializationTestBase):
+    de_json_class = OwnedGifts
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "total_count": self.total_count,
+            "gifts": [gift.to_dict() for gift in self.gifts],
+            "next_offset": self.next_offset,
+        }
+
     def test_slot_behaviour(self, owned_gifts):
         for attr in owned_gifts.__slots__:
             assert getattr(owned_gifts, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(owned_gifts)) == len(set(mro_slots(owned_gifts))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "total_count": self.total_count,
-            "gifts": [gift.to_dict() for gift in self.gifts],
-            "next_offset": self.next_offset,
-        }
-        owned_gifts = OwnedGifts.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        owned_gifts = OwnedGifts.de_json(de_json_dict, offline_bot)
         assert owned_gifts.api_kwargs == {}
 
         assert owned_gifts.total_count == self.total_count

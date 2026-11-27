@@ -18,13 +18,21 @@
 
 import datetime as dtm
 
+import pytest
+
 from telegram import MessageAutoDeleteTimerChanged, VideoChatEnded
 from telegram.warnings import PTBDeprecationWarning
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
-class TestMessageAutoDeleteTimerChangedWithoutRequest:
+class TestMessageAutoDeleteTimerChangedWithoutRequest(DeserializationTestBase):
+    de_json_class = MessageAutoDeleteTimerChanged
     message_auto_delete_time = dtm.timedelta(seconds=100)
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"message_auto_delete_time": int(self.message_auto_delete_time.total_seconds())}
 
     def test_slot_behaviour(self):
         action = MessageAutoDeleteTimerChanged(self.message_auto_delete_time)
@@ -32,11 +40,8 @@ class TestMessageAutoDeleteTimerChangedWithoutRequest:
             assert getattr(action, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(action)) == len(set(mro_slots(action))), "duplicate slot"
 
-    def test_de_json(self):
-        json_dict = {
-            "message_auto_delete_time": int(self.message_auto_delete_time.total_seconds())
-        }
-        madtc = MessageAutoDeleteTimerChanged.de_json(json_dict, None)
+    def test_de_json(self, offline_bot, de_json_dict):
+        madtc = MessageAutoDeleteTimerChanged.de_json(de_json_dict, offline_bot)
         assert madtc.api_kwargs == {}
 
         assert madtc._message_auto_delete_time == self.message_auto_delete_time

@@ -25,6 +25,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_call,
     check_shortcut_signature,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -47,21 +48,26 @@ class ShippingQueryTestBase:
     shipping_address = ShippingAddress("GB", "", "London", "12 Grimmauld Place", "", "WC1")
 
 
-class TestShippingQueryWithoutRequest(ShippingQueryTestBase):
+class TestShippingQueryWithoutRequest(ShippingQueryTestBase, DeserializationTestBase):
+    de_json_class = ShippingQuery
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "id": self.id_,
+            "invoice_payload": self.invoice_payload,
+            "from": self.from_user.to_dict(),
+            "shipping_address": self.shipping_address.to_dict(),
+        }
+
     def test_slot_behaviour(self, shipping_query):
         inst = shipping_query
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "id": self.id_,
-            "invoice_payload": self.invoice_payload,
-            "from": self.from_user.to_dict(),
-            "shipping_address": self.shipping_address.to_dict(),
-        }
-        shipping_query = ShippingQuery.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        shipping_query = ShippingQuery.de_json(de_json_dict, offline_bot)
         assert shipping_query.api_kwargs == {}
 
         assert shipping_query.id == self.id_

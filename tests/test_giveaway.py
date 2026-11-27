@@ -31,7 +31,8 @@ from telegram import (
     Message,
     User,
 )
-from telegram._utils.datetime import UTC, to_timestamp
+from telegram._utils.datetime import to_timestamp
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -52,7 +53,8 @@ def giveaway():
     )
 
 
-class TestGiveawayWithoutRequest:
+class TestGiveawayWithoutRequest(DeserializationTestBase):
+    de_json_class = Giveaway
     chats = [Chat(1, Chat.CHANNEL), Chat(2, Chat.SUPERGROUP)]
     winners_selection_date = dtm.datetime.now(dtm.UTC).replace(microsecond=0)
     winner_count = 42
@@ -63,13 +65,9 @@ class TestGiveawayWithoutRequest:
     premium_subscription_month_count = 3
     prize_star_count = 99
 
-    def test_slot_behaviour(self, giveaway):
-        for attr in giveaway.__slots__:
-            assert getattr(giveaway, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(giveaway)) == len(set(mro_slots(giveaway))), "duplicate slot"
-
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "chats": [chat.to_dict() for chat in self.chats],
             "winners_selection_date": to_timestamp(self.winners_selection_date),
             "winner_count": self.winner_count,
@@ -81,7 +79,13 @@ class TestGiveawayWithoutRequest:
             "prize_star_count": self.prize_star_count,
         }
 
-        giveaway = Giveaway.de_json(json_dict, offline_bot)
+    def test_slot_behaviour(self, giveaway):
+        for attr in giveaway.__slots__:
+            assert getattr(giveaway, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(giveaway)) == len(set(mro_slots(giveaway))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        giveaway = Giveaway.de_json(de_json_dict, offline_bot)
         assert giveaway.api_kwargs == {}
 
         assert giveaway.chats == tuple(self.chats)
@@ -93,33 +97,6 @@ class TestGiveawayWithoutRequest:
         assert giveaway.country_codes == tuple(self.country_codes)
         assert giveaway.premium_subscription_month_count == self.premium_subscription_month_count
         assert giveaway.prize_star_count == self.prize_star_count
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "chats": [chat.to_dict() for chat in self.chats],
-            "winners_selection_date": to_timestamp(self.winners_selection_date),
-            "winner_count": self.winner_count,
-            "only_new_members": self.only_new_members,
-            "has_public_winners": self.has_public_winners,
-            "prize_description": self.prize_description,
-            "country_codes": self.country_codes,
-            "premium_subscription_month_count": self.premium_subscription_month_count,
-            "prize_star_count": self.prize_star_count,
-        }
-
-        giveaway_raw = Giveaway.de_json(json_dict, raw_bot)
-        giveaway_bot = Giveaway.de_json(json_dict, offline_bot)
-        giveaway_bot_tz = Giveaway.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        giveaway_bot_tz_offset = giveaway_bot_tz.winners_selection_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            giveaway_bot_tz.winners_selection_date.replace(tzinfo=None)
-        )
-
-        assert giveaway_raw.winners_selection_date.tzinfo == UTC
-        assert giveaway_bot.winners_selection_date.tzinfo == UTC
-        assert giveaway_bot_tz_offset == tz_bot_offset
 
     def test_to_dict(self, giveaway):
         giveaway_dict = giveaway.to_dict()
@@ -175,8 +152,15 @@ def giveaway_created():
     )
 
 
-class TestGiveawayCreatedWithoutRequest:
+class TestGiveawayCreatedWithoutRequest(DeserializationTestBase):
+    de_json_class = GiveawayCreated
     prize_star_count = 99
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "prize_star_count": self.prize_star_count,
+        }
 
     def test_slot_behaviour(self, giveaway_created):
         for attr in giveaway_created.__slots__:
@@ -185,12 +169,8 @@ class TestGiveawayCreatedWithoutRequest:
             "duplicate slot"
         )
 
-    def test_de_json(self, bot):
-        json_dict = {
-            "prize_star_count": self.prize_star_count,
-        }
-
-        gac = GiveawayCreated.de_json(json_dict, bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        gac = GiveawayCreated.de_json(de_json_dict, offline_bot)
         assert gac.api_kwargs == {}
         assert gac.prize_star_count == self.prize_star_count
 
@@ -221,7 +201,8 @@ def giveaway_winners():
     )
 
 
-class TestGiveawayWinnersWithoutRequest:
+class TestGiveawayWinnersWithoutRequest(DeserializationTestBase):
+    de_json_class = GiveawayWinners
     chat = Chat(1, Chat.CHANNEL)
     giveaway_message_id = 123456789
     winners_selection_date = dtm.datetime.now(dtm.UTC).replace(microsecond=0)
@@ -235,15 +216,9 @@ class TestGiveawayWinnersWithoutRequest:
     prize_description = "prize_description"
     prize_star_count = 99
 
-    def test_slot_behaviour(self, giveaway_winners):
-        for attr in giveaway_winners.__slots__:
-            assert getattr(giveaway_winners, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(giveaway_winners)) == len(set(mro_slots(giveaway_winners))), (
-            "duplicate slot"
-        )
-
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "chat": self.chat.to_dict(),
             "giveaway_message_id": self.giveaway_message_id,
             "winners_selection_date": to_timestamp(self.winners_selection_date),
@@ -258,7 +233,15 @@ class TestGiveawayWinnersWithoutRequest:
             "prize_star_count": self.prize_star_count,
         }
 
-        giveaway_winners = GiveawayWinners.de_json(json_dict, offline_bot)
+    def test_slot_behaviour(self, giveaway_winners):
+        for attr in giveaway_winners.__slots__:
+            assert getattr(giveaway_winners, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(giveaway_winners)) == len(set(mro_slots(giveaway_winners))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        giveaway_winners = GiveawayWinners.de_json(de_json_dict, offline_bot)
         assert giveaway_winners.api_kwargs == {}
 
         assert giveaway_winners.chat == self.chat
@@ -276,29 +259,6 @@ class TestGiveawayWinnersWithoutRequest:
         assert giveaway_winners.was_refunded == self.was_refunded
         assert giveaway_winners.prize_description == self.prize_description
         assert giveaway_winners.prize_star_count == self.prize_star_count
-
-    def test_de_json_localization(self, tz_bot, offline_bot, raw_bot):
-        json_dict = {
-            "chat": self.chat.to_dict(),
-            "giveaway_message_id": self.giveaway_message_id,
-            "winners_selection_date": to_timestamp(self.winners_selection_date),
-            "winner_count": self.winner_count,
-            "winners": [winner.to_dict() for winner in self.winners],
-        }
-
-        giveaway_winners_raw = GiveawayWinners.de_json(json_dict, raw_bot)
-        giveaway_winners_bot = GiveawayWinners.de_json(json_dict, offline_bot)
-        giveaway_winners_bot_tz = GiveawayWinners.de_json(json_dict, tz_bot)
-
-        # comparing utcoffsets because comparing timezones is unpredicatable
-        giveaway_winners_bot_tz_offset = giveaway_winners_bot_tz.winners_selection_date.utcoffset()
-        tz_bot_offset = tz_bot.defaults.tzinfo.utcoffset(
-            giveaway_winners_bot_tz.winners_selection_date.replace(tzinfo=None)
-        )
-
-        assert giveaway_winners_raw.winners_selection_date.tzinfo == UTC
-        assert giveaway_winners_bot.winners_selection_date.tzinfo == UTC
-        assert giveaway_winners_bot_tz_offset == tz_bot_offset
 
     def test_to_dict(self, giveaway_winners):
         giveaway_winners_dict = giveaway_winners.to_dict()
@@ -370,7 +330,8 @@ def giveaway_completed():
     )
 
 
-class TestGiveawayCompletedWithoutRequest:
+class TestGiveawayCompletedWithoutRequest(DeserializationTestBase):
+    de_json_class = GiveawayCompleted
     winner_count = 42
     unclaimed_prize_count = 4
     is_star_giveaway = True
@@ -382,6 +343,15 @@ class TestGiveawayCompletedWithoutRequest:
         from_user=User(1, "user1", False),
     )
 
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "winner_count": self.winner_count,
+            "unclaimed_prize_count": self.unclaimed_prize_count,
+            "giveaway_message": self.giveaway_message.to_dict(),
+            "is_star_giveaway": self.is_star_giveaway,
+        }
+
     def test_slot_behaviour(self, giveaway_completed):
         for attr in giveaway_completed.__slots__:
             assert getattr(giveaway_completed, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -389,15 +359,8 @@ class TestGiveawayCompletedWithoutRequest:
             "duplicate slot"
         )
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "winner_count": self.winner_count,
-            "unclaimed_prize_count": self.unclaimed_prize_count,
-            "giveaway_message": self.giveaway_message.to_dict(),
-            "is_star_giveaway": self.is_star_giveaway,
-        }
-
-        giveaway_completed = GiveawayCompleted.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        giveaway_completed = GiveawayCompleted.de_json(de_json_dict, offline_bot)
         assert giveaway_completed.api_kwargs == {}
 
         assert giveaway_completed.winner_count == self.winner_count

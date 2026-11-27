@@ -33,6 +33,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -50,7 +51,20 @@ class DocumentTestBase:
     document_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestDocumentWithoutRequest(DocumentTestBase):
+class TestDocumentWithoutRequest(DocumentTestBase, DeserializationTestBase):
+    de_json_class = Document
+
+    @pytest.fixture
+    def de_json_dict(self, offline_document):
+        return {
+            "file_id": self.document_file_id,
+            "file_unique_id": self.document_file_unique_id,
+            "thumbnail": offline_document.thumbnail.to_dict(),
+            "file_name": self.file_name,
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
+        }
+
     def test_slot_behaviour(self, offline_document):
         for attr in offline_document.__slots__:
             assert getattr(offline_document, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -73,16 +87,8 @@ class TestDocumentWithoutRequest(DocumentTestBase):
         assert offline_document.thumbnail.width == self.thumb_width
         assert offline_document.thumbnail.height == self.thumb_height
 
-    def test_de_json(self, offline_bot, offline_document):
-        json_dict = {
-            "file_id": self.document_file_id,
-            "file_unique_id": self.document_file_unique_id,
-            "thumbnail": offline_document.thumbnail.to_dict(),
-            "file_name": self.file_name,
-            "mime_type": self.mime_type,
-            "file_size": self.file_size,
-        }
-        test_document = Document.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_document, de_json_dict):
+        test_document = Document.de_json(de_json_dict, offline_bot)
         assert test_document.api_kwargs == {}
 
         assert test_document.file_id == self.document_file_id

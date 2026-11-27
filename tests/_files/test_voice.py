@@ -35,6 +35,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -74,7 +75,19 @@ class VoiceTestBase:
     voice_file_unique_id = "adc3145fd2e84d95b64d68eaa22aa33e"
 
 
-class TestVoiceWithoutRequest(VoiceTestBase):
+class TestVoiceWithoutRequest(VoiceTestBase, DeserializationTestBase):
+    de_json_class = Voice
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "file_id": self.voice_file_id,
+            "file_unique_id": self.voice_file_unique_id,
+            "duration": int(self.duration.total_seconds()),
+            "mime_type": self.mime_type,
+            "file_size": self.file_size,
+        }
+
     def test_slot_behaviour(self, offline_voice):
         for attr in offline_voice.__slots__:
             assert getattr(offline_voice, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -95,15 +108,8 @@ class TestVoiceWithoutRequest(VoiceTestBase):
         assert offline_voice.mime_type == self.mime_type
         assert offline_voice.file_size == self.file_size
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
-            "file_id": self.voice_file_id,
-            "file_unique_id": self.voice_file_unique_id,
-            "duration": int(self.duration.total_seconds()),
-            "mime_type": self.mime_type,
-            "file_size": self.file_size,
-        }
-        json_voice = Voice.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        json_voice = Voice.de_json(de_json_dict, offline_bot)
         assert json_voice.api_kwargs == {}
 
         assert json_voice.file_id == self.voice_file_id

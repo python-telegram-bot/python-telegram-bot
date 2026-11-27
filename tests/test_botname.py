@@ -19,6 +19,7 @@
 import pytest
 
 from telegram import BotName
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -31,7 +32,13 @@ class BotNameTestBase:
     name = "This is a test name"
 
 
-class TestBotNameWithoutRequest(BotNameTestBase):
+class TestBotNameWithoutRequest(BotNameTestBase, DeserializationTestBase):
+    de_json_class = BotName
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"name": self.name}
+
     def test_slot_behaviour(self, bot_name):
         for attr in bot_name.__slots__:
             assert getattr(bot_name, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -42,6 +49,12 @@ class TestBotNameWithoutRequest(BotNameTestBase):
 
         assert isinstance(bot_name_dict, dict)
         assert bot_name_dict["name"] == self.name
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        bot_name = BotName.de_json(de_json_dict, offline_bot)
+        assert bot_name.api_kwargs == {}
+
+        assert bot_name.name == self.name
 
     def test_equality(self):
         a = BotName(self.name)

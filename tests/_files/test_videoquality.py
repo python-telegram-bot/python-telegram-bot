@@ -18,6 +18,7 @@
 import pytest
 
 from telegram import PhotoSize, VideoQuality
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -68,7 +69,20 @@ class VideoQualityTestBase:
     file_size = 405540
 
 
-class TestVideoQualityWithoutRequest(VideoQualityTestBase):
+class TestVideoQualityWithoutRequest(VideoQualityTestBase, DeserializationTestBase):
+    de_json_class = VideoQuality
+
+    @pytest.fixture
+    def de_json_dict(self, offline_video_quality):
+        return {
+            "file_id": offline_video_quality.file_id,
+            "file_unique_id": offline_video_quality.file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "codec": self.codec,
+            "file_size": self.file_size,
+        }
+
     def test_qualities_available(self, offline_video_quality_list):
         assert isinstance(offline_video_quality_list, tuple)
         # Subsequent tests relie on the forwarded video
@@ -95,16 +109,8 @@ class TestVideoQualityWithoutRequest(VideoQualityTestBase):
         assert offline_video_quality.codec == self.codec
         assert offline_video_quality.file_size == self.file_size
 
-    def test_de_json(self, offline_bot, offline_video_quality):
-        json_dict = {
-            "file_id": offline_video_quality.file_id,
-            "file_unique_id": offline_video_quality.file_unique_id,
-            "width": self.width,
-            "height": self.height,
-            "codec": self.codec,
-            "file_size": self.file_size,
-        }
-        json_videoquality = VideoQuality.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_video_quality, de_json_dict):
+        json_videoquality = VideoQuality.de_json(de_json_dict, offline_bot)
         assert json_videoquality.api_kwargs == {}
 
         assert json_videoquality.file_id == offline_video_quality.file_id

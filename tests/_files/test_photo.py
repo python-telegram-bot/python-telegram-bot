@@ -33,6 +33,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -47,7 +48,19 @@ class PhotoTestBase:
     file_size = [29176, 27662, 27330]
 
 
-class TestPhotoWithoutRequest(PhotoTestBase):
+class TestPhotoWithoutRequest(PhotoTestBase, DeserializationTestBase):
+    de_json_class = PhotoSize
+
+    @pytest.fixture
+    def de_json_dict(self, offline_photo):
+        return {
+            "file_id": offline_photo.file_id,
+            "file_unique_id": offline_photo.file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "file_size": offline_photo.file_size,
+        }
+
     def test_slot_behaviour(self, offline_photo):
         for attr in offline_photo.__slots__:
             assert getattr(offline_photo, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -79,22 +92,15 @@ class TestPhotoWithoutRequest(PhotoTestBase):
         # so far
         assert offline_thumb.file_size in [1474, 1475, 1477]
 
-    def test_de_json(self, offline_bot, offline_photo):
-        json_dict = {
-            "file_id": offline_photo.file_id,
-            "file_unique_id": offline_photo.file_unique_id,
-            "width": self.width,
-            "height": self.height,
-            "file_size": self.file_size,
-        }
-        json_photo = PhotoSize.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_photo, de_json_dict):
+        json_photo = PhotoSize.de_json(de_json_dict, offline_bot)
         assert json_photo.api_kwargs == {}
 
         assert json_photo.file_id == offline_photo.file_id
         assert json_photo.file_unique_id == offline_photo.file_unique_id
         assert json_photo.width == self.width
         assert json_photo.height == self.height
-        assert json_photo.file_size == self.file_size
+        assert json_photo.file_size == offline_photo.file_size
 
     def test_to_dict(self, offline_photo):
         photo_dict = offline_photo.to_dict()

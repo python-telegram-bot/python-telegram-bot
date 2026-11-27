@@ -21,6 +21,7 @@ import datetime as dtm
 import pytest
 
 from telegram import Birthdate
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -35,7 +36,13 @@ def birthdate():
     return Birthdate(BirthdateTestBase.day, BirthdateTestBase.month, BirthdateTestBase.year)
 
 
-class TestBirthdateWithoutRequest(BirthdateTestBase):
+class TestBirthdateWithoutRequest(BirthdateTestBase, DeserializationTestBase):
+    de_json_class = Birthdate
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"day": self.day, "month": self.month, "year": self.year}
+
     def test_slot_behaviour(self, birthdate):
         for attr in birthdate.__slots__:
             assert getattr(birthdate, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -48,10 +55,11 @@ class TestBirthdateWithoutRequest(BirthdateTestBase):
         assert bd_dict["month"] == self.month
         assert bd_dict["year"] == self.year
 
-    def test_de_json(self, offline_bot):
-        json_dict = {"day": self.day, "month": self.month, "year": self.year}
-        bd = Birthdate.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        bd = Birthdate.de_json(de_json_dict, offline_bot)
         assert isinstance(bd, Birthdate)
+        assert bd.api_kwargs == {}
+
         assert bd.day == self.day
         assert bd.month == self.month
         assert bd.year == self.year

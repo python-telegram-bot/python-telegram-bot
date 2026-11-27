@@ -34,6 +34,7 @@ from telegram import (
     Document,
 )
 from telegram.constants import BackgroundFillType, BackgroundTypeType
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -51,7 +52,9 @@ class BackgroundFillTestBase:
     colors = [46, 47, 48, 49]
 
 
-class TestBackgroundFillWithoutRequest(BackgroundFillTestBase):
+class TestBackgroundFillWithoutRequest(BackgroundFillTestBase, DeserializationTestBase):
+    de_json_class = BackgroundFill
+
     def test_slots(self, background_fill):
         inst = background_fill
         for attr in inst.__slots__:
@@ -62,11 +65,16 @@ class TestBackgroundFillWithoutRequest(BackgroundFillTestBase):
         assert type(BackgroundFill("solid").type) is BackgroundFillType
         assert BackgroundFill("unknown").type == "unknown"
 
-    def test_de_json(self, offline_bot):
-        data = {"type": "unknown"}
-        transaction_partner = BackgroundFill.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "unknown"
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that BackgroundFill.de_json does not dispatch to a subclass
+        return {"type": "unknown"}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_fill = BackgroundFill.de_json(de_json_dict, offline_bot)
+        assert type(background_fill) is BackgroundFill
+        assert background_fill.api_kwargs == {}
+        assert background_fill.type == "unknown"
 
     @pytest.mark.parametrize(
         ("bf_type", "subclass"),
@@ -121,7 +129,8 @@ def background_fill_gradient():
     )
 
 
-class TestBackgroundFillGradientWithoutRequest(BackgroundFillTestBase):
+class TestBackgroundFillGradientWithoutRequest(BackgroundFillTestBase, DeserializationTestBase):
+    de_json_class = BackgroundFillGradient
     type = BackgroundFill.GRADIENT
 
     def test_slots(self, background_fill_gradient):
@@ -130,15 +139,22 @@ class TestBackgroundFillGradientWithoutRequest(BackgroundFillTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "top_color": self.top_color,
             "bottom_color": self.bottom_color,
             "rotation_angle": self.rotation_angle,
         }
-        transaction_partner = BackgroundFillGradient.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "gradient"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_fill = BackgroundFillGradient.de_json(de_json_dict, offline_bot)
+        assert type(background_fill) is BackgroundFillGradient
+        assert background_fill.api_kwargs == {}
+        assert background_fill.type == "gradient"
+        assert background_fill.top_color == self.top_color
+        assert background_fill.bottom_color == self.bottom_color
+        assert background_fill.rotation_angle == self.rotation_angle
 
     def test_to_dict(self, background_fill_gradient):
         assert background_fill_gradient.to_dict() == {
@@ -179,7 +195,10 @@ def background_fill_freeform_gradient():
     )
 
 
-class TestBackgroundFillFreeformGradientWithoutRequest(BackgroundFillTestBase):
+class TestBackgroundFillFreeformGradientWithoutRequest(
+    BackgroundFillTestBase, DeserializationTestBase
+):
+    de_json_class = BackgroundFillFreeformGradient
     type = BackgroundFill.FREEFORM_GRADIENT
 
     def test_slots(self, background_fill_freeform_gradient):
@@ -188,11 +207,16 @@ class TestBackgroundFillFreeformGradientWithoutRequest(BackgroundFillTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {"colors": self.colors}
-        transaction_partner = BackgroundFillFreeformGradient.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "freeform_gradient"
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"colors": self.colors}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_fill = BackgroundFillFreeformGradient.de_json(de_json_dict, offline_bot)
+        assert type(background_fill) is BackgroundFillFreeformGradient
+        assert background_fill.api_kwargs == {}
+        assert background_fill.type == "freeform_gradient"
+        assert background_fill.colors == tuple(self.colors)
 
     def test_to_dict(self, background_fill_freeform_gradient):
         assert background_fill_freeform_gradient.to_dict() == {
@@ -221,7 +245,8 @@ def background_fill_solid():
     return BackgroundFillSolid(TestBackgroundFillSolidWithoutRequest.color)
 
 
-class TestBackgroundFillSolidWithoutRequest(BackgroundFillTestBase):
+class TestBackgroundFillSolidWithoutRequest(BackgroundFillTestBase, DeserializationTestBase):
+    de_json_class = BackgroundFillSolid
     type = BackgroundFill.SOLID
 
     def test_slots(self, background_fill_solid):
@@ -230,11 +255,16 @@ class TestBackgroundFillSolidWithoutRequest(BackgroundFillTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {"color": self.color}
-        transaction_partner = BackgroundFillSolid.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "solid"
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"color": self.color}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_fill = BackgroundFillSolid.de_json(de_json_dict, offline_bot)
+        assert type(background_fill) is BackgroundFillSolid
+        assert background_fill.api_kwargs == {}
+        assert background_fill.type == "solid"
+        assert background_fill.color == self.color
 
     def test_to_dict(self, background_fill_solid):
         assert background_fill_solid.to_dict() == {
@@ -267,7 +297,7 @@ class BackgroundTypeTestBase:
     type = BackgroundType.WALLPAPER
     fill = BackgroundFillSolid(42)
     dark_theme_dimming = 43
-    document = Document("file_id", "file_unique_id", "file_name", 42)
+    document = Document("file_id", "file_unique_id", file_name="file_name", file_size=42)
     is_blurred = True
     is_moving = True
     intensity = 45
@@ -275,7 +305,9 @@ class BackgroundTypeTestBase:
     theme_name = "test theme name"
 
 
-class TestBackgroundTypeWithoutRequest(BackgroundTypeTestBase):
+class TestBackgroundTypeWithoutRequest(BackgroundTypeTestBase, DeserializationTestBase):
+    de_json_class = BackgroundType
+
     def test_slots(self, background_type):
         inst = background_type
         for attr in inst.__slots__:
@@ -286,11 +318,16 @@ class TestBackgroundTypeWithoutRequest(BackgroundTypeTestBase):
         assert type(BackgroundType("wallpaper").type) is BackgroundTypeType
         assert BackgroundType("unknown").type == "unknown"
 
-    def test_de_json(self, offline_bot):
-        data = {"type": "unknown"}
-        transaction_partner = BackgroundType.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "unknown"
+    @pytest.fixture
+    def de_json_dict(self):
+        # An unknown type, so that BackgroundType.de_json does not dispatch to a subclass
+        return {"type": "unknown"}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_type = BackgroundType.de_json(de_json_dict, offline_bot)
+        assert type(background_type) is BackgroundType
+        assert background_type.api_kwargs == {}
+        assert background_type.type == "unknown"
 
     @pytest.mark.parametrize(
         ("bt_type", "subclass"),
@@ -348,7 +385,8 @@ def background_type_fill():
     )
 
 
-class TestBackgroundTypeFillWithoutRequest(BackgroundTypeTestBase):
+class TestBackgroundTypeFillWithoutRequest(BackgroundTypeTestBase, DeserializationTestBase):
+    de_json_class = BackgroundTypeFill
     type = BackgroundType.FILL
 
     def test_slots(self, background_type_fill):
@@ -357,11 +395,17 @@ class TestBackgroundTypeFillWithoutRequest(BackgroundTypeTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {"fill": self.fill.to_dict(), "dark_theme_dimming": self.dark_theme_dimming}
-        transaction_partner = BackgroundTypeFill.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "fill"
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"fill": self.fill.to_dict(), "dark_theme_dimming": self.dark_theme_dimming}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_type = BackgroundTypeFill.de_json(de_json_dict, offline_bot)
+        assert type(background_type) is BackgroundTypeFill
+        assert background_type.api_kwargs == {}
+        assert background_type.type == "fill"
+        assert background_type.fill == self.fill
+        assert background_type.dark_theme_dimming == self.dark_theme_dimming
 
     def test_to_dict(self, background_type_fill):
         assert background_type_fill.to_dict() == {
@@ -397,7 +441,8 @@ def background_type_pattern():
     )
 
 
-class TestBackgroundTypePatternWithoutRequest(BackgroundTypeTestBase):
+class TestBackgroundTypePatternWithoutRequest(BackgroundTypeTestBase, DeserializationTestBase):
+    de_json_class = BackgroundTypePattern
     type = BackgroundType.PATTERN
 
     def test_slots(self, background_type_pattern):
@@ -406,17 +451,26 @@ class TestBackgroundTypePatternWithoutRequest(BackgroundTypeTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "document": self.document.to_dict(),
             "fill": self.fill.to_dict(),
             "intensity": self.intensity,
             "is_inverted": self.is_inverted,
             "is_moving": self.is_moving,
         }
-        transaction_partner = BackgroundTypePattern.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "pattern"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_type = BackgroundTypePattern.de_json(de_json_dict, offline_bot)
+        assert type(background_type) is BackgroundTypePattern
+        assert background_type.api_kwargs == {}
+        assert background_type.type == "pattern"
+        assert background_type.document == self.document
+        assert background_type.fill == self.fill
+        assert background_type.intensity == self.intensity
+        assert background_type.is_inverted == self.is_inverted
+        assert background_type.is_moving == self.is_moving
 
     def test_to_dict(self, background_type_pattern):
         assert background_type_pattern.to_dict() == {
@@ -460,7 +514,8 @@ def background_type_chat_theme():
     )
 
 
-class TestBackgroundTypeChatThemeWithoutRequest(BackgroundTypeTestBase):
+class TestBackgroundTypeChatThemeWithoutRequest(BackgroundTypeTestBase, DeserializationTestBase):
+    de_json_class = BackgroundTypeChatTheme
     type = BackgroundType.CHAT_THEME
 
     def test_slots(self, background_type_chat_theme):
@@ -469,11 +524,16 @@ class TestBackgroundTypeChatThemeWithoutRequest(BackgroundTypeTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {"theme_name": self.theme_name}
-        transaction_partner = BackgroundTypeChatTheme.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "chat_theme"
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"theme_name": self.theme_name}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_type = BackgroundTypeChatTheme.de_json(de_json_dict, offline_bot)
+        assert type(background_type) is BackgroundTypeChatTheme
+        assert background_type.api_kwargs == {}
+        assert background_type.type == "chat_theme"
+        assert background_type.theme_name == self.theme_name
 
     def test_to_dict(self, background_type_chat_theme):
         assert background_type_chat_theme.to_dict() == {
@@ -507,7 +567,8 @@ def background_type_wallpaper():
     )
 
 
-class TestBackgroundTypeWallpaperWithoutRequest(BackgroundTypeTestBase):
+class TestBackgroundTypeWallpaperWithoutRequest(BackgroundTypeTestBase, DeserializationTestBase):
+    de_json_class = BackgroundTypeWallpaper
     type = BackgroundType.WALLPAPER
 
     def test_slots(self, background_type_wallpaper):
@@ -516,16 +577,24 @@ class TestBackgroundTypeWallpaperWithoutRequest(BackgroundTypeTestBase):
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "document": self.document.to_dict(),
             "dark_theme_dimming": self.dark_theme_dimming,
             "is_blurred": self.is_blurred,
             "is_moving": self.is_moving,
         }
-        transaction_partner = BackgroundTypeWallpaper.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == "wallpaper"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        background_type = BackgroundTypeWallpaper.de_json(de_json_dict, offline_bot)
+        assert type(background_type) is BackgroundTypeWallpaper
+        assert background_type.api_kwargs == {}
+        assert background_type.type == "wallpaper"
+        assert background_type.document == self.document
+        assert background_type.dark_theme_dimming == self.dark_theme_dimming
+        assert background_type.is_blurred == self.is_blurred
+        assert background_type.is_moving == self.is_moving
 
     def test_to_dict(self, background_type_wallpaper):
         assert background_type_wallpaper.to_dict() == {
@@ -571,18 +640,25 @@ class ChatBackgroundTestBase:
     type = BackgroundTypeFill(BackgroundFillSolid(42), 43)
 
 
-class TestChatBackgroundWithoutRequest(ChatBackgroundTestBase):
+class TestChatBackgroundWithoutRequest(ChatBackgroundTestBase, DeserializationTestBase):
+    de_json_class = ChatBackground
+
     def test_slots(self, chat_background):
         inst = chat_background
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot):
-        data = {"type": self.type.to_dict()}
-        transaction_partner = ChatBackground.de_json(data, offline_bot)
-        assert transaction_partner.api_kwargs == {}
-        assert transaction_partner.type == self.type
+    @pytest.fixture
+    def de_json_dict(self):
+        return {"type": self.type.to_dict()}
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        chat_background = ChatBackground.de_json(de_json_dict, offline_bot)
+        assert type(chat_background) is ChatBackground
+        assert chat_background.api_kwargs == {}
+        assert chat_background.type == self.type
+        assert type(chat_background.type) is BackgroundTypeFill
 
     def test_to_dict(self, chat_background):
         assert chat_background.to_dict() == {"type": chat_background.type.to_dict()}

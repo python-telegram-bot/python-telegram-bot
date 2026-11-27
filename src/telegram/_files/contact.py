@@ -58,7 +58,7 @@ class Contact(TelegramObject):
     ):
         super().__init__(api_kwargs=api_kwargs)
         # Required
-        self.phone_number: str = str(phone_number)
+        self.phone_number: str = phone_number
         self.first_name: str = first_name
         # Optionals
         self.last_name: str | None = last_name

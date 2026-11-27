@@ -20,6 +20,7 @@
 import pytest
 
 from telegram import Animation, Game, MessageEntity, PhotoSize
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -45,31 +46,16 @@ class GameTestBase:
         b"\\U0001f469\\u200d\\U0001f469\\u200d\\U0001f467"
         b"\\u200d\\U0001f467\\U0001f431http://google.com"
     ).decode("unicode-escape")
-    text_entities = [MessageEntity(13, 17, MessageEntity.URL)]
+    text_entities = [MessageEntity(MessageEntity.URL, 13, 17)]
     animation = Animation("blah", "unique_id", 320, 180, 1)
 
 
-class TestGameWithoutRequest(GameTestBase):
-    def test_slot_behaviour(self, game):
-        for attr in game.__slots__:
-            assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(game)) == len(set(mro_slots(game))), "duplicate slot"
+class TestGameWithoutRequest(GameTestBase, DeserializationTestBase):
+    de_json_class = Game
 
-    def test_de_json_required(self, offline_bot):
-        json_dict = {
-            "title": self.title,
-            "description": self.description,
-            "photo": [self.photo[0].to_dict()],
-        }
-        game = Game.de_json(json_dict, offline_bot)
-        assert game.api_kwargs == {}
-
-        assert game.title == self.title
-        assert game.description == self.description
-        assert game.photo == tuple(self.photo)
-
-    def test_de_json_all(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "title": self.title,
             "description": self.description,
             "photo": [self.photo[0].to_dict()],
@@ -77,7 +63,14 @@ class TestGameWithoutRequest(GameTestBase):
             "text_entities": [self.text_entities[0].to_dict()],
             "animation": self.animation.to_dict(),
         }
-        game = Game.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, game):
+        for attr in game.__slots__:
+            assert getattr(game, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(game)) == len(set(mro_slots(game))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        game = Game.de_json(de_json_dict, offline_bot)
         assert game.api_kwargs == {}
 
         assert game.title == self.title

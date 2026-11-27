@@ -45,6 +45,7 @@ from tests.auxil.bot_method_checks import (
     check_shortcut_signature,
 )
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.files import data_file
 from tests.auxil.slots import mro_slots
 
@@ -68,6 +69,7 @@ class StickerTestBase:
     thumb_file_size = 21448
     type = Sticker.REGULAR
     custom_emoji_id = "ThisIsSuchACustomEmojiID"
+    set_name = "test_by_bot"
     needs_repainting = True
     mask_position = MaskPosition(point="forehead", x_shift=0.1, y_shift=-0.1, scale=1.0)
     thumbnail = PhotoSize(
@@ -100,7 +102,29 @@ class StickerTestBase:
     )
 
 
-class TestStickerWithoutRequest(StickerTestBase):
+class TestStickerWithoutRequest(StickerTestBase, DeserializationTestBase):
+    de_json_class = Sticker
+
+    @pytest.fixture
+    def de_json_dict(self, offline_sticker):
+        return {
+            "file_id": self.sticker_file_id,
+            "file_unique_id": self.sticker_file_unique_id,
+            "width": self.width,
+            "height": self.height,
+            "is_animated": self.is_animated,
+            "is_video": self.is_video,
+            "type": self.type,
+            "emoji": self.emoji,
+            "file_size": self.file_size,
+            "set_name": self.set_name,
+            "mask_position": self.mask_position.to_dict(),
+            "premium_animation": self.premium_animation.to_dict(),
+            "custom_emoji_id": self.custom_emoji_id,
+            "thumbnail": offline_sticker.thumbnail.to_dict(),
+            "needs_repainting": self.needs_repainting,
+        }
+
     def test_slot_behaviour(self, offline_sticker):
         for attr in offline_sticker.__slots__:
             assert getattr(offline_sticker, attr, "err") != "err", f"got extra slot '{attr}'"
@@ -151,23 +175,8 @@ class TestStickerWithoutRequest(StickerTestBase):
         assert sticker_dict["type"] == offline_sticker.type
         assert sticker_dict["needs_repainting"] == offline_sticker.needs_repainting
 
-    def test_de_json(self, offline_bot, offline_sticker):
-        json_dict = {
-            "file_id": self.sticker_file_id,
-            "file_unique_id": self.sticker_file_unique_id,
-            "width": self.width,
-            "height": self.height,
-            "is_animated": self.is_animated,
-            "is_video": self.is_video,
-            "thumbnail": offline_sticker.thumbnail.to_dict(),
-            "emoji": self.emoji,
-            "file_size": self.file_size,
-            "premium_animation": self.premium_animation.to_dict(),
-            "type": self.type,
-            "custom_emoji_id": self.custom_emoji_id,
-            "needs_repainting": self.needs_repainting,
-        }
-        json_sticker = Sticker.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_sticker, de_json_dict):
+        json_sticker = Sticker.de_json(de_json_dict, offline_bot)
         assert json_sticker.api_kwargs == {}
 
         assert json_sticker.file_id == self.sticker_file_id
@@ -176,12 +185,14 @@ class TestStickerWithoutRequest(StickerTestBase):
         assert json_sticker.height == self.height
         assert json_sticker.is_animated == self.is_animated
         assert json_sticker.is_video == self.is_video
+        assert json_sticker.type == self.type
         assert json_sticker.emoji == self.emoji
         assert json_sticker.file_size == self.file_size
-        assert json_sticker.thumbnail == offline_sticker.thumbnail
+        assert json_sticker.set_name == self.set_name
+        assert json_sticker.mask_position == self.mask_position
         assert json_sticker.premium_animation == self.premium_animation
-        assert json_sticker.type == self.type
         assert json_sticker.custom_emoji_id == self.custom_emoji_id
+        assert json_sticker.thumbnail == offline_sticker.thumbnail
         assert json_sticker.needs_repainting == self.needs_repainting
 
     def test_type_enum_conversion(self):
@@ -529,29 +540,39 @@ class StickerSetTestBase:
     )
 
 
-class TestStickerSetWithoutRequest(StickerSetTestBase):
+class TestStickerSetWithoutRequest(StickerSetTestBase, DeserializationTestBase):
+    de_json_class = StickerSet
+
+    @pytest.fixture
+    def de_json_dict(self, offline_sticker):
+        return {
+            "name": self.name,
+            "title": self.title,
+            "stickers": [x.to_dict() for x in self.stickers],
+            "sticker_type": self.sticker_type,
+            "thumbnail": offline_sticker.thumbnail.to_dict(),
+        }
+
     def test_slot_behaviour(self):
         inst = StickerSet("this", "is", self.stickers, "not")
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_de_json(self, offline_bot, offline_sticker):
-        json_dict = {
-            "name": self.name,
-            "title": self.title,
-            "stickers": [x.to_dict() for x in self.stickers],
-            "thumbnail": offline_sticker.thumbnail.to_dict(),
-            "sticker_type": self.sticker_type,
-            "contains_masks": self.contains_masks,
-        }
-        sticker_set = StickerSet.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, offline_sticker, de_json_dict):
+        sticker_set = StickerSet.de_json(de_json_dict, offline_bot)
+        assert sticker_set.api_kwargs == {}
 
         assert sticker_set.name == self.name
         assert sticker_set.title == self.title
         assert sticker_set.stickers == tuple(self.stickers)
-        assert sticker_set.thumbnail == offline_sticker.thumbnail
         assert sticker_set.sticker_type == self.sticker_type
+        assert sticker_set.thumbnail == offline_sticker.thumbnail
+
+    def test_de_json_contains_masks(self, offline_bot, de_json_dict):
+        # contains_masks was removed from the Bot API, but Telegram may still send it
+        json_dict = de_json_dict | {"contains_masks": self.contains_masks}
+        sticker_set = StickerSet.de_json(json_dict, offline_bot)
         assert sticker_set.api_kwargs == {"contains_masks": self.contains_masks}
 
     def test_sticker_set_to_dict(self):
@@ -1065,21 +1086,26 @@ def mask_position():
     )
 
 
-class TestMaskPositionWithoutRequest(MaskPositionTestBase):
+class TestMaskPositionWithoutRequest(MaskPositionTestBase, DeserializationTestBase):
+    de_json_class = MaskPosition
+
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
+            "point": self.point,
+            "x_shift": self.x_shift,
+            "y_shift": self.y_shift,
+            "scale": self.scale,
+        }
+
     def test_slot_behaviour(self, mask_position):
         inst = mask_position
         for attr in inst.__slots__:
             assert getattr(inst, attr, "err") != "err", f"got extra slot '{attr}'"
         assert len(mro_slots(inst)) == len(set(mro_slots(inst))), "duplicate slot"
 
-    def test_mask_position_de_json(self, offline_bot):
-        json_dict = {
-            "point": self.point,
-            "x_shift": self.x_shift,
-            "y_shift": self.y_shift,
-            "scale": self.scale,
-        }
-        mask_position = MaskPosition.de_json(json_dict, offline_bot)
+    def test_de_json(self, offline_bot, de_json_dict):
+        mask_position = MaskPosition.de_json(de_json_dict, offline_bot)
         assert mask_position.api_kwargs == {}
 
         assert mask_position.point == self.point

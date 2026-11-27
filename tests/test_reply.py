@@ -22,22 +22,41 @@ import datetime as dtm
 import pytest
 
 from telegram import (
+    Animation,
+    Audio,
     BotCommand,
     Chat,
     Checklist,
     ChecklistTask,
+    Contact,
+    Dice,
+    Document,
     ExternalReplyInfo,
+    Game,
     Giveaway,
+    GiveawayWinners,
+    Invoice,
     LinkPreviewOptions,
     LivePhoto,
+    Location,
     MessageEntity,
     MessageOriginUser,
     PaidMediaInfo,
     PaidMediaPreview,
+    PhotoSize,
+    Poll,
+    PollOption,
     ReplyParameters,
+    Sticker,
+    Story,
     TextQuote,
     User,
+    Venue,
+    Video,
+    VideoNote,
+    Voice,
 )
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -52,6 +71,24 @@ def external_reply_info():
         paid_media=ExternalReplyInfoTestBase.paid_media,
         checklist=ExternalReplyInfoTestBase.checklist,
         live_photo=ExternalReplyInfoTestBase.live_photo,
+        animation=ExternalReplyInfoTestBase.animation,
+        audio=ExternalReplyInfoTestBase.audio,
+        document=ExternalReplyInfoTestBase.document,
+        photo=ExternalReplyInfoTestBase.photo,
+        sticker=ExternalReplyInfoTestBase.sticker,
+        story=ExternalReplyInfoTestBase.story,
+        video=ExternalReplyInfoTestBase.video,
+        video_note=ExternalReplyInfoTestBase.video_note,
+        voice=ExternalReplyInfoTestBase.voice,
+        has_media_spoiler=ExternalReplyInfoTestBase.has_media_spoiler,
+        contact=ExternalReplyInfoTestBase.contact,
+        dice=ExternalReplyInfoTestBase.dice,
+        game=ExternalReplyInfoTestBase.game,
+        giveaway_winners=ExternalReplyInfoTestBase.giveaway_winners,
+        invoice=ExternalReplyInfoTestBase.invoice,
+        location=ExternalReplyInfoTestBase.location,
+        poll=ExternalReplyInfoTestBase.poll,
+        venue=ExternalReplyInfoTestBase.venue,
     )
 
 
@@ -85,18 +122,52 @@ class ExternalReplyInfoTestBase:
         mime_type="image/jpeg",
         file_size=1024,
     )
+    animation = Animation("animation_id", "animation_unique_id", 320, 180, 1)
+    audio = Audio("audio_id", "audio_unique_id", 42)
+    document = Document("document_id", "document_unique_id")
+    photo = [PhotoSize("photo_id", "photo_unique_id", 640, 360)]
+    sticker = Sticker("sticker_id", "sticker_unique_id", 512, 512, False, False, Sticker.REGULAR)
+    story = Story(Chat(3, Chat.CHANNEL), 4)
+    video = Video("video_id", "video_unique_id", 640, 360, 5)
+    video_note = VideoNote("video_note_id", "video_note_unique_id", 240, 3)
+    voice = Voice("voice_id", "voice_unique_id", 2)
+    has_media_spoiler = True
+    contact = Contact("+11234567890", "first name")
+    dice = Dice(5, Dice.DICE)
+    game = Game("game title", "game description", [PhotoSize("game_id", "game_unique_id", 1, 1)])
+    giveaway_winners = GiveawayWinners(
+        Chat(5, Chat.CHANNEL),
+        6,
+        dtm.datetime.now(dtm.UTC).replace(microsecond=0),
+        1,
+        [User(7, "winner", False)],
+    )
+    invoice = Invoice("invoice title", "invoice description", "start_parameter", "EUR", 100)
+    location = Location(13.4, 52.5)
+    poll = Poll(
+        id="poll_id",
+        question="poll question",
+        options=[
+            PollOption(text="option 1", voter_count=1, persistent_id="0"),
+            PollOption(text="option 2", voter_count=0, persistent_id="1"),
+        ],
+        total_voter_count=1,
+        is_closed=False,
+        is_anonymous=True,
+        type=Poll.REGULAR,
+        allows_multiple_answers=False,
+        allows_revoting=True,
+        members_only=False,
+    )
+    venue = Venue(Location(13.4, 52.5), "venue title", "venue address")
 
 
-class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
-    def test_slot_behaviour(self, external_reply_info):
-        for attr in external_reply_info.__slots__:
-            assert getattr(external_reply_info, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(external_reply_info)) == len(set(mro_slots(external_reply_info))), (
-            "duplicate slot"
-        )
+class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase, DeserializationTestBase):
+    de_json_class = ExternalReplyInfo
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "origin": self.origin.to_dict(),
             "chat": self.chat.to_dict(),
             "message_id": self.message_id,
@@ -105,9 +176,35 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
             "paid_media": self.paid_media.to_dict(),
             "checklist": self.checklist.to_dict(),
             "live_photo": self.live_photo.to_dict(),
+            "animation": self.animation.to_dict(),
+            "audio": self.audio.to_dict(),
+            "document": self.document.to_dict(),
+            "photo": [photo.to_dict() for photo in self.photo],
+            "sticker": self.sticker.to_dict(),
+            "story": self.story.to_dict(),
+            "video": self.video.to_dict(),
+            "video_note": self.video_note.to_dict(),
+            "voice": self.voice.to_dict(),
+            "has_media_spoiler": self.has_media_spoiler,
+            "contact": self.contact.to_dict(),
+            "dice": self.dice.to_dict(),
+            "game": self.game.to_dict(),
+            "giveaway_winners": self.giveaway_winners.to_dict(),
+            "invoice": self.invoice.to_dict(),
+            "location": self.location.to_dict(),
+            "poll": self.poll.to_dict(),
+            "venue": self.venue.to_dict(),
         }
 
-        external_reply_info = ExternalReplyInfo.de_json(json_dict, offline_bot)
+    def test_slot_behaviour(self, external_reply_info):
+        for attr in external_reply_info.__slots__:
+            assert getattr(external_reply_info, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(external_reply_info)) == len(set(mro_slots(external_reply_info))), (
+            "duplicate slot"
+        )
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        external_reply_info = ExternalReplyInfo.de_json(de_json_dict, offline_bot)
         assert external_reply_info.api_kwargs == {}
 
         assert external_reply_info.origin == self.origin
@@ -118,6 +215,24 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert external_reply_info.paid_media == self.paid_media
         assert external_reply_info.checklist == self.checklist
         assert external_reply_info.live_photo == self.live_photo
+        assert external_reply_info.animation == self.animation
+        assert external_reply_info.audio == self.audio
+        assert external_reply_info.document == self.document
+        assert external_reply_info.photo == tuple(self.photo)
+        assert external_reply_info.sticker == self.sticker
+        assert external_reply_info.story == self.story
+        assert external_reply_info.video == self.video
+        assert external_reply_info.video_note == self.video_note
+        assert external_reply_info.voice == self.voice
+        assert external_reply_info.has_media_spoiler == self.has_media_spoiler
+        assert external_reply_info.contact == self.contact
+        assert external_reply_info.dice == self.dice
+        assert external_reply_info.game == self.game
+        assert external_reply_info.giveaway_winners == self.giveaway_winners
+        assert external_reply_info.invoice == self.invoice
+        assert external_reply_info.location == self.location
+        assert external_reply_info.poll == self.poll
+        assert external_reply_info.venue == self.venue
 
     def test_to_dict(self, external_reply_info):
         ext_reply_info_dict = external_reply_info.to_dict()
@@ -131,6 +246,24 @@ class TestExternalReplyInfoWithoutRequest(ExternalReplyInfoTestBase):
         assert ext_reply_info_dict["paid_media"] == self.paid_media.to_dict()
         assert ext_reply_info_dict["checklist"] == self.checklist.to_dict()
         assert ext_reply_info_dict["live_photo"] == self.live_photo.to_dict()
+        assert ext_reply_info_dict["animation"] == self.animation.to_dict()
+        assert ext_reply_info_dict["audio"] == self.audio.to_dict()
+        assert ext_reply_info_dict["document"] == self.document.to_dict()
+        assert ext_reply_info_dict["photo"] == [photo.to_dict() for photo in self.photo]
+        assert ext_reply_info_dict["sticker"] == self.sticker.to_dict()
+        assert ext_reply_info_dict["story"] == self.story.to_dict()
+        assert ext_reply_info_dict["video"] == self.video.to_dict()
+        assert ext_reply_info_dict["video_note"] == self.video_note.to_dict()
+        assert ext_reply_info_dict["voice"] == self.voice.to_dict()
+        assert ext_reply_info_dict["has_media_spoiler"] == self.has_media_spoiler
+        assert ext_reply_info_dict["contact"] == self.contact.to_dict()
+        assert ext_reply_info_dict["dice"] == self.dice.to_dict()
+        assert ext_reply_info_dict["game"] == self.game.to_dict()
+        assert ext_reply_info_dict["giveaway_winners"] == self.giveaway_winners.to_dict()
+        assert ext_reply_info_dict["invoice"] == self.invoice.to_dict()
+        assert ext_reply_info_dict["location"] == self.location.to_dict()
+        assert ext_reply_info_dict["poll"] == self.poll.to_dict()
+        assert ext_reply_info_dict["venue"] == self.venue.to_dict()
 
     def test_equality(self, external_reply_info):
         a = external_reply_info
@@ -173,21 +306,25 @@ class TextQuoteTestBase:
     is_manual = True
 
 
-class TestTextQuoteWithoutRequest(TextQuoteTestBase):
-    def test_slot_behaviour(self, text_quote):
-        for attr in text_quote.__slots__:
-            assert getattr(text_quote, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(text_quote)) == len(set(mro_slots(text_quote))), "duplicate slot"
+class TestTextQuoteWithoutRequest(TextQuoteTestBase, DeserializationTestBase):
+    de_json_class = TextQuote
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "text": self.text,
             "position": self.position,
             "entities": [entity.to_dict() for entity in self.entities],
             "is_manual": self.is_manual,
         }
 
-        text_quote = TextQuote.de_json(json_dict, offline_bot)
+    def test_slot_behaviour(self, text_quote):
+        for attr in text_quote.__slots__:
+            assert getattr(text_quote, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(text_quote)) == len(set(mro_slots(text_quote))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        text_quote = TextQuote.de_json(de_json_dict, offline_bot)
         assert text_quote.api_kwargs == {}
 
         assert text_quote.text == self.text

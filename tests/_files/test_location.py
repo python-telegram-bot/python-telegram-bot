@@ -27,6 +27,7 @@ from telegram.error import BadRequest
 from telegram.request import RequestData
 from telegram.warnings import PTBDeprecationWarning
 from tests.auxil.build_messages import make_message
+from tests.auxil.deserialization import DeserializationTestBase
 from tests.auxil.slots import mro_slots
 
 
@@ -51,14 +52,12 @@ class LocationTestBase:
     proximity_alert_radius = 50
 
 
-class TestLocationWithoutRequest(LocationTestBase):
-    def test_slot_behaviour(self, location):
-        for attr in location.__slots__:
-            assert getattr(location, attr, "err") != "err", f"got extra slot '{attr}'"
-        assert len(mro_slots(location)) == len(set(mro_slots(location))), "duplicate slot"
+class TestLocationWithoutRequest(LocationTestBase, DeserializationTestBase):
+    de_json_class = Location
 
-    def test_de_json(self, offline_bot):
-        json_dict = {
+    @pytest.fixture
+    def de_json_dict(self):
+        return {
             "latitude": self.latitude,
             "longitude": self.longitude,
             "horizontal_accuracy": self.horizontal_accuracy,
@@ -66,7 +65,14 @@ class TestLocationWithoutRequest(LocationTestBase):
             "heading": self.heading,
             "proximity_alert_radius": self.proximity_alert_radius,
         }
-        location = Location.de_json(json_dict, offline_bot)
+
+    def test_slot_behaviour(self, location):
+        for attr in location.__slots__:
+            assert getattr(location, attr, "err") != "err", f"got extra slot '{attr}'"
+        assert len(mro_slots(location)) == len(set(mro_slots(location))), "duplicate slot"
+
+    def test_de_json(self, offline_bot, de_json_dict):
+        location = Location.de_json(de_json_dict, offline_bot)
         assert location.api_kwargs == {}
 
         assert location.latitude == self.latitude
