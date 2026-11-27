@@ -1,0 +1,5 @@
+internal = "Use `annotationlib` to resolve forward refs in `test_official`"
+[[pull_requests]]
+uid = "5402"
+author_uids = ["visveshkhanna"]
+closes_threads = ["5260"]
