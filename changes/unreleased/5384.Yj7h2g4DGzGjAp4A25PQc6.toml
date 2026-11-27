@@ -1,0 +1,5 @@
+features = "Add ``filters.IS_BOT``"
+[[pull_requests]]
+uid = "5384"
+author_uids = ["ShahadatTest", "harshil21"]
+closes_threads = ["5315"]
