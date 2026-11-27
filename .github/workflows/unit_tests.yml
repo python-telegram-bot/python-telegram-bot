@@ -52,7 +52,7 @@ jobs:
           repository: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name || github.repository }}
           ref: ${{ github.event_name == 'pull_request_target' && github.event.pull_request.head.sha || '' }}
           # The job condition limits this checkout to the commit in the maintainer's label event.
-          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }}
+          allow-unsafe-pr-checkout: ${{ github.event_name == 'pull_request_target' }} # zizmor: ignore[unsafe-checkout]
           persist-credentials: false
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6.3.0
